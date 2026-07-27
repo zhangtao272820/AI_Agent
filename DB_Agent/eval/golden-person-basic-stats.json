@@ -1,0 +1,33 @@
+{
+  "description": "人员域聚合 paraphrase golden — slot LLM + Judge 锁 person_info",
+  "cases": [
+    {
+      "id": "region_count_paraphrase_a",
+      "user": "河西区有多少老人",
+      "expect": {
+        "intent": "aggregation",
+        "locations": ["河西区"],
+        "primaryTable": "person_info"
+      }
+    },
+    {
+      "id": "region_count_paraphrase_b",
+      "user": "统计一下河西区老年人口数量",
+      "expect": {
+        "intent": "aggregation",
+        "locations": ["河西区"],
+        "primaryTable": "person_info"
+      }
+    },
+    {
+      "id": "age_gender_distribution",
+      "user": "河西区70到79岁老人按性别分布",
+      "expect": {
+        "intent": "aggregation",
+        "locations": ["河西区"],
+        "dimensions": ["性别"],
+        "primaryTable": "person_info"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+apiVersion: clawhive/v1
+kind: Skill
+metadata:
+  id: text.word_count
+  name: 文本词数统计
+  version: 1.0.0
+  description: 统计文本的词数、字符数、行数等基础指标
+  owner: platform
+  tags: [text, utility]
+spec:
+  runtime: python3.11
+  entry: entrypoint/main.py:run
+  io:
+    inputSchema: schemas/input.schema.json
+    outputSchema: schemas/output.schema.json

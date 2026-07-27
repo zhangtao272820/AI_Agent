@@ -1,0 +1,23 @@
+id: story_youwei_act1_model
+label: 临时模特
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [youwei]
+  stage_min: friend
+  affinity_min: 52
+  flags_absent: [studio_sketch_done]
+prompt_snippet: |
+  【专属故事 · 画室里的第三支笔 · 第1幕 · 临时模特】
+  她拉你当速写模特，笑学姐又熬夜
+  立绘气质参考：casual, home, work。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [studio_sketch_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

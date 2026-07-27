@@ -1,0 +1,21 @@
+{
+  "tables": {
+    "person_info": "person_info",
+    "person_health_records": "person_health_records",
+    "person_emergency_contact": "person_emergency_contact",
+    "person_crowd_type": "person_crowd_type",
+    "person_selfcare_conditions": "person_selfcare_conditions",
+    "person_live_conditions": "person_live_conditions",
+    "person_life_conditions": "person_life_conditions"
+  },
+  "health_link_columns": [
+    "person_id",
+    "personid",
+    "person_info_id",
+    "personinfo_id",
+    "elder_id",
+    "oldman_id",
+    "old_id",
+    "user_id"
+  ]
+}

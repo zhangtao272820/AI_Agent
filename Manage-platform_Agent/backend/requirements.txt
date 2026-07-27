@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+langgraph
+openai
+sqlalchemy
+psycopg2-binary
+redis
+python-jose[cryptography]
+prometheus-client
+python-multipart
+websockets>=12.0
+jsonschema
+kubernetes>=31.0.0

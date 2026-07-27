@@ -1,0 +1,38 @@
+{
+  "id": "httpbin-form-fill",
+  "name": "httpbin 表单填写（黄金宏）",
+  "description": "打开 httpbin forms/post，填写 Customer name，可选确认后截图式收尾（不提交支付类动作）",
+  "args": ["customer_name", "startUrl"],
+  "steps": [
+    {
+      "action": "goto",
+      "url": "{{startUrl}}",
+      "waitUntil": "domcontentloaded"
+    },
+    {
+      "action": "snapshot",
+      "assignTo": "landing"
+    },
+    {
+      "action": "type",
+      "selector": "input[name=\"custname\"]",
+      "text": "{{customer_name}}",
+      "clear": true
+    },
+    {
+      "action": "approve",
+      "title": "确认表单已填写",
+      "message": "已在 Customer name 填入 {{customer_name}}。确认后结束（默认不点提交）。"
+    },
+    {
+      "action": "extract",
+      "selector": "input[name=\"custname\"]",
+      "attr": "value",
+      "assignTo": "filled_name"
+    },
+    {
+      "action": "finish",
+      "answer": "工作流 httpbin-form-fill 完成。Customer name={{filled_name}}；落地={{landing}}"
+    }
+  ]
+}

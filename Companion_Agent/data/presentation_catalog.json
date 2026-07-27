@@ -1,0 +1,368 @@
+{
+  "version": 1,
+  "notes": "开局序章 / 结局 CG 场 / 标题轮播。sprite 拼 /api/sprites/{id}/{outfit?_}{emotion}.png",
+  "title_carousel": {
+    "interval_ms": 8000,
+    "slides": [
+      {
+        "character_id": "xiaoyou",
+        "outfit": "casual",
+        "emotion": "happy"
+      },
+      {
+        "character_id": "wanyu",
+        "outfit": "work",
+        "emotion": "neutral"
+      },
+      {
+        "character_id": "linxi",
+        "outfit": "work",
+        "emotion": "shy"
+      },
+      {
+        "character_id": "ruolin",
+        "outfit": "work",
+        "emotion": "neutral"
+      },
+      {
+        "character_id": "jingliu",
+        "outfit": "work",
+        "emotion": "neutral"
+      },
+      {
+        "character_id": "aili",
+        "outfit": "casual",
+        "emotion": "happy"
+      }
+    ]
+  },
+  "opening": {
+    "bgm": "opening_prologue",
+    "skip_label": "跳过序章",
+    "world_brief": [
+      "你是落脚小镇的普通公司职员，与亲妹妹沈书璃、义妹沈枫音同住。",
+      "工作日去公司，周末在咖啡店、书店与校园之间晃——偶遇会变成故事。",
+      "心力有限，一天只能认真见几个人；专属路线靠好感一点点推开。"
+    ],
+    "slides": [
+      {
+        "id": "home",
+        "bg": "home.png",
+        "period": "afternoon",
+        "title": "落脚",
+        "sprites": [
+          {
+            "character_id": "shuli",
+            "outfit": "casual",
+            "emotion": "happy"
+          },
+          {
+            "character_id": "fengyin",
+            "outfit": "casual",
+            "emotion": "shy"
+          }
+        ],
+        "lines": [
+          "你是普通公司职员。带着不多的行李，落脚这座还算安静的小镇。",
+          "亲妹妹沈书璃同城念书，常回这间屋——晚饭与借书，她比谁都懂你。",
+          "义妹沈枫音同住。屋檐下先学会敲门——亲近，不等于没有边界。"
+        ],
+        "caption": "你是普通公司职员。带着不多的行李，落脚这座还算安静的小镇。"
+      },
+      {
+        "id": "rhythm",
+        "bg": "cafe.png",
+        "period": "afternoon",
+        "title": "日常",
+        "sprites": [
+          {
+            "character_id": "linxi",
+            "outfit": "work",
+            "emotion": "neutral"
+          },
+          {
+            "character_id": "wanyu",
+            "outfit": "work",
+            "emotion": "happy"
+          },
+          {
+            "character_id": "yeyu",
+            "outfit": "work",
+            "emotion": "neutral"
+          }
+        ],
+        "lines": [
+          "工作日去公司。工位之间往往只差一步——实习同事，或是上司的目光。",
+          "周末在咖啡店晃。有人会把热拿铁推到你面前——像记得你的糖度。",
+          "便利店的荧光灯整夜不熄。夜班柜台后，也有人在等一句闲聊。",
+          "隔壁住着插画师苏晚悠。门铃有时会响两下——也许只是借个盐。",
+          "校园、图书馆、坡上书店……这座镇还有很多人。恋爱只发生在愿意靠近之后。"
+        ],
+        "caption": "工作日去公司，周末在咖啡店与便利店之间晃——偶遇会变成故事。"
+      },
+      {
+        "id": "limits",
+        "bg": "home.png",
+        "period": "morning",
+        "title": "一天",
+        "sprite": {
+          "character_id": "xiaoyou",
+          "outfit": "casual",
+          "emotion": "shy"
+        },
+        "lines": [
+          "心力有限，钱要算——一天只能认真见几个人。",
+          "选地点、见面、聊聊，就是你的日常。",
+          "今天先从最近的人开始：邻居、咖啡店熟人，或是回家看见妹妹。"
+        ],
+        "caption": "心力有限——一天只能认真见几个人。选地点、见面、聊聊。"
+      },
+      {
+        "id": "begin",
+        "bg": "starry.png",
+        "period": "night",
+        "title": "启程",
+        "sprites": [
+          {
+            "character_id": "xiaoyou",
+            "outfit": "casual",
+            "emotion": "happy"
+          },
+          {
+            "character_id": "wanyu",
+            "outfit": "casual",
+            "emotion": "neutral"
+          },
+          {
+            "character_id": "linxi",
+            "outfit": "casual",
+            "emotion": "shy"
+          },
+          {
+            "character_id": "ruolin",
+            "outfit": "casual",
+            "emotion": "neutral"
+          }
+        ],
+        "lines": [
+          "故事从今天开始。",
+          "出门吧——去见她。"
+        ],
+        "caption": "故事从今天开始。出门吧——去见她。"
+      }
+    ]
+  },
+  "ending_type_defaults": {
+    "secret": {
+      "bg": "starry.png",
+      "bgm": "ending_true",
+      "emotion": "love"
+    },
+    "good": {
+      "bg": "cafe.png",
+      "bgm": "ending_good",
+      "emotion": "happy"
+    },
+    "normal": {
+      "bg": "campus.png",
+      "bgm": "ending_soft",
+      "emotion": "shy"
+    },
+    "bad": {
+      "bg": "rain.png",
+      "bgm": "ending_bad",
+      "emotion": "sad"
+    }
+  },
+  "endings": {
+    "ending_xiaoyou_frame_true": {
+      "bg": "room.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "xiaoyou",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      },
+      "pages": [
+        "通宵的颜料味还停在窗沿。你以为她会把你画进某一页——她却把未完成的速写本塞进你怀里。",
+        "「里面没有你。」她嗓子有点哑，像刚吵完架又像刚哭完，「因为你要活在画外面。活着的那种。」",
+        "晨光从阳台缝里挤进来。你们谁也没再提「告白」两个字，却把对方的名字，轻轻放进了此后每一个交稿日。"
+      ]
+    },
+    "ending_xiaoyou_atelier_partner": {
+      "bg": "room.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "xiaoyou",
+        "outfit": "end_robe_open",
+        "emotion": "love"
+      },
+      "pages": [
+        "通贩打包台上并排两双手：一双裁刀，一双贴胶带。恋爱之外，你们更像能互相改稿的搭档。",
+        "她偶尔会用马克笔在你手背点一下：「这里漏了。」然后假装很忙地低头。那比钻戒更早宣告了关系。"
+      ]
+    },
+    "ending_wanyu_last_cup_true": {
+      "bg": "cafe.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "wanyu",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      },
+      "pages": [
+        "打烊铃响过之后，店里只剩咖啡机冷却的细响。她把没有写单的杯子推到你面前：「这杯不卖。」",
+        "蒸汽散尽时，她第一次叫你的名字，而不是「熟客先生」。窗外雨停了，霓虹把你们的影子叠在一起。",
+        "你学会在关店之后留下——不是为了多喝一杯，是为了让把热饮递给所有人的她，也有人替她关灯。"
+      ]
+    },
+    "ending_wanyu_shop_anchor": {
+      "bg": "cafe.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "wanyu",
+        "outfit": "end_robe_open",
+        "emotion": "love"
+      },
+      "pages": [
+        "雨窗上的水珠慢下来。她记住你的糖度，也记住你哪天会晚到。",
+        "店还是那家店，座位还是那个座位——只是她看你的眼神，终于不再像在服务，而像在等一个人回家。"
+      ]
+    },
+    "ending_ruolin_peer_true": {
+      "bg": "campus.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "ruolin",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_jingliu_rooftop_true": {
+      "bg": "starry.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "jingliu",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_aili_second_bloom_true": {
+      "bg": "forest.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "aili",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_linxi_onestep_true": {
+      "bg": "office.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "linxi",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_yeyu_hem_true": {
+      "bg": "store.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "yeyu",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_taotao_plain_true": {
+      "bg": "festival.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "taotao",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_shizuku_aloud_true": {
+      "bg": "library.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "shizuku",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_qiansha_merge_true": {
+      "bg": "office.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "qiansha",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_shiori_blank_true": {
+      "bg": "library.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "shiori",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_miara_oath_true": {
+      "bg": "forest.png",
+      "bgm": "ending_true",
+      "sprite": {
+        "character_id": "miara",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_xingnai_album_good": {
+      "bg": "campus.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "xingnai",
+        "outfit": "end_lingerie_set",
+        "emotion": "love"
+      }
+    },
+    "ending_fengyin_knock_good": {
+      "bg": "home.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "fengyin",
+        "outfit": "max_slit_gown",
+        "emotion": "love"
+      }
+    },
+    "ending_qingcai_summer_good": {
+      "bg": "festival.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "qingcai",
+        "outfit": "max_slit_gown",
+        "emotion": "love"
+      }
+    },
+    "ending_xiaoyang_stall_good": {
+      "bg": "campus.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "xiaoyang",
+        "outfit": "max_slit_gown",
+        "emotion": "love"
+      }
+    },
+    "ending_luna_moon_good": {
+      "bg": "cafe.png",
+      "bgm": "ending_good",
+      "sprite": {
+        "character_id": "luna",
+        "outfit": "max_slit_gown",
+        "emotion": "love"
+      }
+    }
+  }
+}

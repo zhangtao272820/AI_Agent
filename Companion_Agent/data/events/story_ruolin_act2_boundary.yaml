@@ -1,0 +1,24 @@
+id: story_ruolin_act2_boundary
+label: 边界课
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [ruolin]
+  stage_min: close_friend
+  affinity_min: 62
+  flags_absent: [rl_boundary_kept]
+  flags_present: [rl_office_hours]
+prompt_snippet: |
+  【专属故事 · 讲台下的一年 · 第2幕 · 边界课】
+  她主动谈伦理与流言；你是否尊重「课结束前不越线」
+  立绘气质参考：grading, evening_tea, corridor_qa。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [rl_boundary_kept]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

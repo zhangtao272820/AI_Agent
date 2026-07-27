@@ -1,0 +1,137 @@
+# ClawHive standard chain — override per environment
+fullname: clawhive
+
+image:
+  # first-party images: clawhive/<name>:<tag>
+  tag: prod
+  pullPolicy: IfNotPresent
+
+# Shared secrets (prefer --set or SealedSecrets in prod)
+secrets:
+  clawhiveInternalToken: "change-internal-token"
+  adminUsername: admin
+  adminPassword: admin123
+  jwtSecret: change-this-secret
+  pgUser: postgres
+  pgPassword: postgres
+  pgDatabase: clawhive
+  openaiApiKey: ""
+  qwenApiKey: ""
+
+backend:
+  replicas: 1
+  servicePort: 8000
+  nodePort: 18000
+  controlMode: kubernetes
+  image: clawhive/clawhive_backend
+
+frontend:
+  replicas: 1
+  servicePort: 80
+  nodePort: 18073
+  image: clawhive/clawhive_frontend
+
+postgres:
+  enabled: true
+  image: pgvector/pgvector:pg16
+  storage: 10Gi
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+
+# Default HPA for stateless agents (requires metrics-server). Override per agent.
+agentAutoscalingDefaults: &agentAutoscalingDefaults
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+
+# Standard collaboration agents (Deployment name == docker_service / k8s_deployment)
+agents:
+  db_agent:
+    enabled: true
+    image: clawhive/db_agent
+    port: 13101
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+  rag_agent:
+    enabled: true
+    image: clawhive/rag_agent
+    port: 13102
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+  code_assistent_agent:
+    enabled: true
+    image: clawhive/code_assistent_agent
+    port: 13103
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+  extractor_agent:
+    enabled: true
+    image: clawhive/extractor_agent
+    port: 13104
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+  ai_admin_agent:
+    enabled: true
+    image: clawhive/ai_admin_agent
+    port: 13105
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+  manager_agent:
+    enabled: true
+    image: clawhive/manager_agent
+    port: 13106
+    replicas: 1
+    autoscaling: *agentAutoscalingDefaults
+
+# Optional LiteLLM model egress gateway (P2b). When enabled, agents use litellm as OPENAI_BASE_URL.
+litellm:
+  enabled: false
+  image: ghcr.io/berriai/litellm:main-latest
+  port: 4000
+  nodePort: 14000
+  masterKey: "sk-clawhive-litellm"
+
+monitoring:
+  enabled: true
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    port: 9090
+    nodePort: 19090
+  grafana:
+    image: grafana/grafana:11.2.2
+    port: 3000
+    nodePort: 13000
+    adminUser: admin
+    adminPassword: admin123
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    port: 9093
+    nodePort: 19093
+  tempo:
+    image: grafana/tempo:2.6.1
+    port: 3200
+    nodePort: 3200
+  loki:
+    image: grafana/loki:3.1.1
+    port: 3100
+    nodePort: 3100
+  langfuse:
+    enabled: true
+    image: docker.1ms.run/langfuse/langfuse:2
+    port: 3000
+    nodePort: 13001
+    publicUrl: ""
+    nextauthSecret: "change-langfuse-nextauth-secret"
+    salt: "change-langfuse-salt"
+
+serviceAccount:
+  create: true
+  name: clawhive-backend
+
+rbac:
+  create: true
+
+resources: {}

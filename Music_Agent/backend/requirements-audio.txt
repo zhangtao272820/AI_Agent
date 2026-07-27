@@ -1,0 +1,2 @@
+# Demucs 分轨（Phase 3；仅导出 stems，不做重编配）
+demucs>=4.0.1

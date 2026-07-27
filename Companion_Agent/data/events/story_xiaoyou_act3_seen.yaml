@@ -1,0 +1,24 @@
+id: story_xiaoyou_act3_seen
+label: 被看见的作品
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [xiaoyou]
+  stage_min: crush
+  affinity_min: 75
+  flags_absent: [xy_portfolio_shown]
+  flags_present: [xy_deadline_shared]
+prompt_snippet: |
+  【专属故事 · 画框里的邻人 · 第3幕 · 被看见的作品】
+  夜市/书店/作品集；她敢把未完成的自己给你看
+  立绘气质参考：night_market, portfolio, sketch_together。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [xy_portfolio_shown]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

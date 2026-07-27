@@ -1,0 +1,32 @@
+{
+  "foot_pressure": {
+    "main_table": "remote_activity_foot_log",
+    "measure_table": "remote_activity_foot_measure_log",
+    "area_detail_markers": [
+      "区域信息",
+      "区域压力",
+      "区域类型",
+      "区域总压",
+      "分区",
+      "重心",
+      "坐标",
+      "热力",
+      "左右脚",
+      "足弓",
+      "前掌",
+      "后跟"
+    ]
+  },
+  "join_hints": [
+    {
+      "when_tables": ["remote_activity_foot_log"],
+      "join_only_if_question_needs": "区域/分区/重心",
+      "sql_hint": "仅当用户明确问区域时分区才 JOIN remote_activity_foot_measure_log"
+    },
+    {
+      "when_tables": ["person_health_records"],
+      "join_only_if_question_needs": "健康指标/体征/体检",
+      "sql_hint": "先 person_info 按姓名定位，再 JOIN person_health_records ON person_id"
+    }
+  ]
+}

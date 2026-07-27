@@ -1,0 +1,368 @@
+{{- if .Values.monitoring.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clawhive-prometheus-config
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: clawhive_backend
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["clawhive-backend:8000"]
+      - job_name: manager_agent
+        metrics_path: /api/metrics/prometheus
+        static_configs:
+          - targets: ["manager_agent:13106"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: {{ .Values.monitoring.prometheus.image }}
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: clawhive-prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: prometheus
+  ports:
+    - port: {{ .Values.monitoring.prometheus.port }}
+      targetPort: 9090
+      nodePort: {{ .Values.monitoring.prometheus.nodePort }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: {{ .Values.monitoring.alertmanager.image }}
+          ports:
+            - containerPort: 9093
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: alertmanager
+  ports:
+    - port: {{ .Values.monitoring.alertmanager.port }}
+      targetPort: 9093
+      nodePort: {{ .Values.monitoring.alertmanager.nodePort }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: {{ .Values.monitoring.grafana.image }}
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: {{ .Values.monitoring.grafana.adminUser | quote }}
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: {{ .Values.monitoring.grafana.adminPassword | quote }}
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: grafana
+  ports:
+    - port: {{ .Values.monitoring.grafana.port }}
+      targetPort: 3000
+      nodePort: {{ .Values.monitoring.grafana.nodePort }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clawhive-tempo-config
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+data:
+  tempo.yaml: |
+    server:
+      http_listen_port: 3200
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            http:
+    storage:
+      trace:
+        backend: local
+        wal:
+          path: /tmp/tempo/wal
+        local:
+          path: /tmp/tempo/traces
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: tempo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+    spec:
+      containers:
+        - name: tempo
+          image: {{ .Values.monitoring.tempo.image }}
+          args: ["-config.file=/etc/tempo/tempo.yaml"]
+          ports:
+            - containerPort: 3200
+            - containerPort: 4318
+          volumeMounts:
+            - name: config
+              mountPath: /etc/tempo
+      volumes:
+        - name: config
+          configMap:
+            name: clawhive-tempo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: tempo
+  ports:
+    - name: http
+      port: {{ .Values.monitoring.tempo.port }}
+      targetPort: 3200
+      nodePort: {{ .Values.monitoring.tempo.nodePort }}
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: loki
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki
+  template:
+    metadata:
+      labels:
+        app: loki
+    spec:
+      containers:
+        - name: loki
+          image: {{ .Values.monitoring.loki.image }}
+          args: ["-config.file=/etc/loki/local-config.yaml"]
+          ports:
+            - containerPort: 3100
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: loki
+  ports:
+    - port: {{ .Values.monitoring.loki.port }}
+      targetPort: 3100
+      nodePort: {{ .Values.monitoring.loki.nodePort }}
+{{- if dig "langfuse" "enabled" true .Values.monitoring }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langfuse
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: langfuse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langfuse
+  template:
+    metadata:
+      labels:
+        app: langfuse
+    spec:
+      initContainers:
+        - name: create-langfuse-db
+          image: {{ .Values.postgres.image }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              until pg_isready -h clawhive-postgres -U "$POSTGRES_USER"; do sleep 2; done
+              psql -h clawhive-postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tc \
+                "SELECT 1 FROM pg_database WHERE datname='langfuse'" | grep -q 1 \
+                || psql -h clawhive-postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE DATABASE langfuse;"
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_DB
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_PASSWORD
+      containers:
+        - name: langfuse
+          image: {{ .Values.monitoring.langfuse.image }}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: {{ printf "postgresql://%s:%s@clawhive-postgres:5432/langfuse" .Values.secrets.pgUser .Values.secrets.pgPassword | quote }}
+            - name: NEXTAUTH_URL
+              value: {{ .Values.monitoring.langfuse.publicUrl | default (printf "http://127.0.0.1:%v" .Values.monitoring.langfuse.nodePort) | quote }}
+            - name: NEXTAUTH_SECRET
+              value: {{ .Values.monitoring.langfuse.nextauthSecret | quote }}
+            - name: SALT
+              value: {{ .Values.monitoring.langfuse.salt | quote }}
+            - name: TELEMETRY_ENABLED
+              value: "false"
+            - name: LANGFUSE_INIT_ORG_ID
+              value: "clawhive"
+            - name: LANGFUSE_INIT_ORG_NAME
+              value: "ClawHive"
+            - name: LANGFUSE_INIT_PROJECT_ID
+              value: "clawhive"
+            - name: LANGFUSE_INIT_PROJECT_NAME
+              value: "ClawHive"
+            - name: LANGFUSE_INIT_PROJECT_PUBLIC_KEY
+              value: "pk-lf-clawhive"
+            - name: LANGFUSE_INIT_PROJECT_SECRET_KEY
+              value: "sk-lf-clawhive"
+            - name: LANGFUSE_INIT_USER_EMAIL
+              value: "admin@clawhive.local"
+            - name: LANGFUSE_INIT_USER_NAME
+              value: "admin"
+            - name: LANGFUSE_INIT_USER_PASSWORD
+              value: "admin123"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: langfuse
+  namespace: {{ include "clawhive.namespace" . }}
+spec:
+  type: NodePort
+  selector:
+    app: langfuse
+  ports:
+    - port: {{ .Values.monitoring.langfuse.port }}
+      targetPort: 3000
+      nodePort: {{ .Values.monitoring.langfuse.nodePort }}
+{{- end }}
+{{- end }}

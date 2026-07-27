@@ -1,0 +1,23 @@
+id: story_yeyu_act1_counter
+label: 夜班柜台
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [yeyu]
+  stage_min: friend
+  affinity_min: 50
+  flags_absent: [yy_night_counter]
+prompt_snippet: |
+  【专属故事 · 针线与夜班灯 · 第1幕 · 夜班柜台】
+  便利店拌嘴，第一次看见她手指上的针眼
+  立绘气质参考：casual, work, rain。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [yy_night_counter, late_night_store_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

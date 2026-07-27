@@ -1,0 +1,24 @@
+id: story_youwei_act2_pack
+label: 通贩打包
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [youwei]
+  stage_min: close_friend
+  affinity_min: 70
+  flags_absent: [bond_ally_done]
+  flags_present: [studio_sketch_done]
+prompt_snippet: |
+  【专属故事 · 画室里的第三支笔 · 第2幕 · 通贩打包】
+  一起帮苏晚悠打包；她承认你让学姐更安定
+  立绘气质参考：casual, work。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [bond_ally_done, studio_ally]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

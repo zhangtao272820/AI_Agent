@@ -1,0 +1,31 @@
+id: story_xiaoyou_act1_threshold
+label: 门槛与门铃
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [xiaoyou]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [xy_atelier_invited]
+prompt_snippet: |
+  【专属故事 · 画框里的邻人 · 第1幕 · 门槛与门铃】
+  这是恋爱故事的一幕，请写长一点、慢一点，像短篇小说的一节，而不是一句提示。
+
+  场景节拍（按顺序推进，可跨多轮对话）：
+  1) 傍晚阳台寒暄——她手上有颜料，门铃响得比往常轻。
+  2) 她借你一点稀释剂或纸，欲言又止；你是否跨过「邻居」的礼貌距离。
+  3) 第一次被邀请进画室：灯光、未干的画、她背对你说话的肩线。
+  4) 收束于「门槛」隐喻：进来容易，要懂何时退出她的创作边界。
+
+  立绘气质参考：casual, home, atelier_paint。
+  用角色口吻推进；可给 2～3 个短选项（进不进门 / 夸画 / 主动告辞）。
+  括号外 spoken 可比日常闲聊更长（约 80～180 字），可带一点场景描写，但仍是口语。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [xy_atelier_invited]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

@@ -1,0 +1,96 @@
+# ClawHive 企业告警规则（Prometheus 评估，Grafana / :9090/alerts 可查看）
+groups:
+  - name: clawhive_availability
+    interval: 30s
+    rules:
+      - alert: ClawHiveBackendDown
+        expr: up{job="clawhive_backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: platform
+        annotations:
+          summary: "ClawHive 后端不可达"
+          description: "job=clawhive_backend 连续 2 分钟 scrape 失败"
+
+      - alert: ManagerAgentDown
+        expr: up{job="manager_agent"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: manager
+        annotations:
+          summary: "Manager Agent 不可达"
+          description: "编排入口 offline，任务将无法执行"
+
+      - alert: DbAgentDown
+        expr: up{job="db_agent"} == 0
+        for: 3m
+        labels:
+          severity: warning
+          source: db_agent
+        annotations:
+          summary: "DB Agent 不可达"
+
+      - alert: RagAgentDown
+        expr: up{job="rag_agent"} == 0
+        for: 3m
+        labels:
+          severity: warning
+          source: rag_agent
+        annotations:
+          summary: "RAG Agent 不可达"
+
+  - name: clawhive_sla
+    interval: 60s
+    rules:
+      - alert: ManagerSearchHitRateLow
+        expr: manager_search_hit_rate < 0.2
+        for: 15m
+        labels:
+          severity: warning
+          source: manager
+        annotations:
+          summary: "Manager 联网搜索命中率过低 (<20%)"
+          description: "检查 Tavily/SERP 配置或 query 质量"
+
+      - alert: ManagerSynthLatencyHigh
+        expr: manager_phase_ms_avg{phase="synth"} > 90000
+        for: 10m
+        labels:
+          severity: warning
+          source: manager
+        annotations:
+          summary: "Manager 合成阶段 P95 延迟过高 (>90s)"
+
+      - alert: ManagerRunVolumeSpike
+        expr: increase(manager_runs_total[1h]) > 200
+        for: 5m
+        labels:
+          severity: info
+          source: manager
+        annotations:
+          summary: "Manager 1h 内 run 数异常偏高"
+
+  - name: clawhive_quota
+    interval: 60s
+    rules:
+      - alert: TenantQuotaNearLimit
+        expr: clawhive_tenant_quota_utilization >= 0.8 and clawhive_tenant_quota_utilization < 1
+        for: 5m
+        labels:
+          severity: warning
+          source: platform
+        annotations:
+          summary: "租户 Token 配额已达 80%"
+          description: "tenant={{ $labels.tenant_id }}"
+
+      - alert: TenantQuotaExceeded
+        expr: clawhive_tenant_quota_utilization >= 1
+        for: 1m
+        labels:
+          severity: critical
+          source: platform
+        annotations:
+          summary: "租户 Token 配额已用尽"
+          description: "tenant={{ $labels.tenant_id }}，新任务将被拒绝"

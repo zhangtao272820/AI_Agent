@@ -1,0 +1,115 @@
+{
+  "version": 3,
+  "description": "总管黄金路径 E2E（需子 Agent + LLM 在线；CI 可 E2E_SKIP_IF_NO_AGENTS=1 跳过）",
+  "cases": [
+    {
+      "id": "rag-hit",
+      "text": "根据知识库说明一下探视制度",
+      "forceIntent": "rag",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "finalNotContains": ["知识库检索未找到", "暂未找到", "未检索到"],
+        "maxDurationMs": 180000
+      }
+    },
+    {
+      "id": "db-read",
+      "text": "查询测试数据表前5条记录",
+      "forceIntent": "db",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 180000
+      }
+    },
+    {
+      "id": "db-metrics-direct",
+      "text": "老人一共有多少人",
+      "forceIntent": "db",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 120000
+      }
+    },
+    {
+      "id": "db-chart-shortcut",
+      "text": "查询各地区销售Top5并画柱状图",
+      "forceIntent": "multi",
+      "env": { "MANAGER_DB_CHART_SHORTCUT": "1" },
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 240000
+      }
+    },
+    {
+      "id": "db-markdown-chart",
+      "text": "统计各区域订单数量并生成柱状图",
+      "forceIntent": "multi",
+      "env": { "MANAGER_DB_CHART_SHORTCUT": "1" },
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 240000
+      }
+    },
+    {
+      "id": "crawler-web-summary",
+      "text": "联网搜索近期人工智能行业要闻摘要",
+      "forceIntent": "crawler",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 300000
+      }
+    },
+    {
+      "id": "rag-miss-graceful",
+      "text": "知识库中火星移民政策全文",
+      "forceIntent": "rag",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 120000
+      }
+    },
+    {
+      "id": "admin-confirm-flow",
+      "text": "帮我添加明天下午3点的会议提醒",
+      "expect": {
+        "expectHumanConfirm": true,
+        "maxDurationMs": 180000
+      }
+    },
+    {
+      "id": "admin-confirm-cancel",
+      "text": "帮我删除所有会议提醒",
+      "expect": {
+        "expectHumanConfirm": true,
+        "maxDurationMs": 180000
+      }
+    },
+    {
+      "id": "clause-decompose-structure",
+      "text": "先查知识库探视制度，再汇总成简短报告",
+      "env": { "MANAGER_CLAUSE_DECOMPOSE": "1" },
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 240000
+      }
+    },
+    {
+      "id": "multi-db-then-report",
+      "text": "查一下数据库里人员总数，并生成简短汇总",
+      "forceIntent": "multi",
+      "expect": {
+        "mustFinal": true,
+        "mustNotAgentError": true,
+        "maxDurationMs": 240000
+      }
+    }
+  ]
+}

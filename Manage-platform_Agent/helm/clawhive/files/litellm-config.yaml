@@ -1,0 +1,53 @@
+# LiteLLM proxy — maps capability-layer physical model names to DashScope compatible API.
+# Upstream keys: OPENAI_API_KEY / DASHSCOPE_API_KEY (same value for DashScope).
+# Agents keep calling OpenAI-compatible SDK against http://litellm:4000/v1 — no SDK change.
+
+model_list:
+  - model_name: qwen3.5-flash-2026-02-23
+    litellm_params:
+      model: openai/qwen3.5-flash-2026-02-23
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: qwen-plus-2025-09-11
+    litellm_params:
+      model: openai/qwen-plus-2025-09-11
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: qwen3-coder-flash
+    litellm_params:
+      model: openai/qwen3-coder-flash
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: qwen-vl-plus
+    litellm_params:
+      model: openai/qwen-vl-plus
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: text-embedding-v1
+    litellm_params:
+      model: openai/text-embedding-v1
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: text-embedding-v3
+    litellm_params:
+      model: openai/text-embedding-v3
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  # Fallbacks for generic env defaults
+  - model_name: qwen-plus
+    litellm_params:
+      model: openai/qwen-plus
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: qwen-flash
+    litellm_params:
+      model: openai/qwen-flash
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

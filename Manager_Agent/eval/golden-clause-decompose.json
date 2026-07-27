@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "description": "子句拆解黄金集（结构校验 + 离线 agentsFromClauses 断言）",
+  "cases": [
+    {
+      "id": "rag-then-report",
+      "user": "先查知识库探视制度，再汇总成简短报告",
+      "taskClauses": [
+        { "id": "c1", "text": "查知识库探视制度", "agents": ["rag"] },
+        { "id": "c2", "text": "汇总成简短报告", "agents": ["report"] }
+      ],
+      "expectAgents": ["rag", "report"],
+      "expectScopedRagIncludes": ["探视"]
+    },
+    {
+      "id": "db-then-chart",
+      "user": "查询销售Top5并画柱状图",
+      "taskClauses": [
+        { "id": "c1", "text": "查询销售Top5", "agents": ["db"] },
+        { "id": "c2", "text": "画柱状图", "agents": ["visualize"] }
+      ],
+      "expectAgents": ["db", "visualize"],
+      "expectScopedDbIncludes": ["销售"]
+    },
+    {
+      "id": "multi-rag-db",
+      "user": "对照知识库政策和数据库住院人数",
+      "taskClauses": [
+        { "id": "c1", "text": "查知识库政策", "agents": ["rag"] },
+        { "id": "c2", "text": "查数据库住院人数", "agents": ["db"] }
+      ],
+      "expectAgents": ["rag", "db"],
+      "expectRouteMerge": { "routerHint": ["db"], "mustInclude": ["rag", "db"] }
+    },
+    {
+      "id": "rag-viz-admin-combo",
+      "user": "查知识库财务制度、画收入对比图，并安排明天10点项目周会",
+      "taskClauses": [
+        { "id": "c1", "text": "查知识库财务制度", "agents": ["rag"] },
+        { "id": "c2", "text": "画收入对比图", "agents": ["visualize"] },
+        { "id": "c3", "text": "安排明天10点项目周会", "agents": ["admin"] }
+      ],
+      "expectAgents": ["rag", "visualize", "admin"],
+      "expectScopedRagIncludes": ["财务"],
+      "expectPlanAgents": ["rag", "visualize", "admin", "code", "clean"],
+      "expectParallelRoots": ["rag", "admin"]
+    }
+  ]
+}

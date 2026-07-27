@@ -1,0 +1,203 @@
+/* RAG 文档助手 · Cursor 式历史侧栏与输入区 */
+
+/* 深色主题统一滚动条（侧栏 / 聊天 / 思考过程 / 依据面板） */
+.rag-app-root {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.38) rgba(15, 23, 42, 0.45);
+}
+
+.rag-app-root * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.32) rgba(15, 23, 42, 0.35);
+}
+
+.rag-app-root *::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.rag-app-root *::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.35);
+  border-radius: 9999px;
+}
+
+.rag-app-root *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.55), rgba(14, 165, 233, 0.35));
+  border-radius: 9999px;
+  border: 1px solid rgba(15, 23, 42, 0.5);
+}
+
+.rag-app-root *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(125, 211, 252, 0.75), rgba(56, 189, 248, 0.55));
+}
+
+.rag-app-root *::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.rag-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.rag-history-row {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.35);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rag-history-row:hover {
+  border-color: rgba(56, 189, 248, 0.28);
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.rag-history-row.active {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(14, 116, 144, 0.18);
+  box-shadow: inset 3px 0 0 rgba(56, 189, 248, 0.75);
+}
+
+.rag-history-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.55rem 0.65rem 0.35rem;
+  cursor: pointer;
+  color: #e2e8f0;
+}
+
+.rag-history-item-title {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rag-history-item-meta {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(148, 163, 184, 0.9);
+  margin-top: 0.15rem;
+}
+
+.rag-history-item-actions {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 0.45rem 0.45rem;
+  min-height: 1.65rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.rag-history-row:hover .rag-history-item-actions,
+.rag-history-row.active .rag-history-item-actions,
+.rag-history-row:focus-within .rag-history-item-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rag-history-action-btn {
+  flex: 1;
+  font-size: 0.65rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.35);
+  color: #94a3b8;
+  padding: 0.2rem 0.35rem;
+  cursor: pointer;
+}
+
+.rag-history-action-btn:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #e2e8f0;
+}
+
+.rag-history-action-btn.danger:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fecaca;
+}
+
+.rag-chat-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 8rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.rag-chat-loading-dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(56, 189, 248, 0.25);
+  border-top-color: #38bdf8;
+  border-radius: 50%;
+  animation: rag-spin 0.85s linear infinite;
+}
+
+@keyframes rag-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rag-send-cancel.is-cancel {
+  background: rgba(239, 68, 68, 0.92) !important;
+}
+
+.rag-send-cancel.is-cancel:hover {
+  background: rgba(248, 113, 113, 0.95) !important;
+}
+
+.rag-feedback-ack {
+  margin: 0.35rem 0 0;
+  font-size: 0.68rem;
+  color: #86efac;
+  line-height: 1.45;
+}
+
+.rag-input-hint {
+  font-size: 0.65rem;
+  color: rgba(148, 163, 184, 0.75);
+  margin-bottom: 0.35rem;
+  text-align: right;
+}
+
+.formatted-answer.rag-answer-main {
+  line-height: 1.78;
+  letter-spacing: 0.02em;
+}
+
+.formatted-answer.rag-answer-main p {
+  margin: 0 0 0.85em;
+  color: #cbd5e1;
+}
+
+.formatted-answer.rag-answer-main p:last-child {
+  margin-bottom: 0;
+}
+
+.formatted-answer.rag-answer-main h2,
+.formatted-answer.rag-answer-main h3 {
+  margin: 1.1em 0 0.5em;
+  padding-left: 0.55rem;
+  border-left: 2px solid rgba(56, 189, 248, 0.45);
+  color: #bae6fd;
+}

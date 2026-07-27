@@ -1,0 +1,23 @@
+id: story_aili_act1_balcony
+label: 阳台重逢
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [aili]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [al_balcony_remeet]
+prompt_snippet: |
+  【专属故事 · 旧婚书与新花束 · 第1幕 · 阳台重逢】
+  偶遇、客套、第一次递花却不谈旧事
+  立绘气质参考：balcony, bouquet_wrap, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [al_balcony_remeet, balcony_chat_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

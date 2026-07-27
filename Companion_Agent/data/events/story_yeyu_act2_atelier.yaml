@@ -1,0 +1,24 @@
+id: story_yeyu_act2_atelier
+label: 人台与别针
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [yeyu]
+  stage_min: close_friend
+  affinity_min: 68
+  flags_absent: [yy_atelier_in]
+  flags_present: [yy_night_counter]
+prompt_snippet: |
+  【专属故事 · 针线与夜班灯 · 第2幕 · 人台与别针】
+  被带进工作室；mannequin_pin / fabric_drape
+  立绘气质参考：mannequin_pin, fabric_drape, look_sketch。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [yy_atelier_in]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

@@ -1,0 +1,25 @@
+{
+  "schemaSearchKeywords": [],
+  "hints": [
+    {
+      "id": "statistics",
+      "scope": "分布、占比、趋势、对比、汇总类统计问题",
+      "text": "分组列与时间列须来自 schema 注释；注意 NULL 与枚举取值。"
+    },
+    {
+      "id": "time_range",
+      "scope": "问题含明确或相对时间范围（最近、本月、某年等）",
+      "text": "先确认事实表上的时间列名，再写区间条件；相对时间可参考补丁 default_time_range。"
+    },
+    {
+      "id": "named_entity_filter",
+      "scope": "问题含具体人名、机构名等专有名词过滤",
+      "text": "WHERE 或 JOIN 必须体现该专有名词，与查询计划一致。"
+    },
+    {
+      "id": "multi_condition",
+      "scope": "问题含多个筛选条件（且/或/非、区间、为空等）",
+      "text": "每个条件须映射到 schema 中的列；多条件用 AND 组合，除非用户明确说「或者」。"
+    }
+  ]
+}

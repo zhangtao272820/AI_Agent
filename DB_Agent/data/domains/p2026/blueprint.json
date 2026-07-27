@@ -1,0 +1,45 @@
+{
+  "schemaSearchKeywords": [],
+  "hints": [
+    {
+      "id": "person_health_join",
+      "scope": "按姓名查询个人健康指标、体检记录、生命体征等，需要关联人员与健康明细",
+      "text": "先在人员主表按姓名定位，再 JOIN 健康明细表（通过 person_id 等外键）；返回指标列，勿只查基础档案字段。"
+    },
+    {
+      "id": "foot_pressure",
+      "scope": "足底压力测试、平衡测量、活动检测记录类问题",
+      "text": "主表 remote_activity_foot_log；仅当用户明确问区域/分区/重心时才 JOIN remote_activity_foot_measure_log。按姓名过滤，时间倒序 LIMIT。"
+    },
+    {
+      "id": "psychology_mood",
+      "scope": "情绪识别仪、心理检测、情绪状态、压力疲劳类实训记录",
+      "text": "主查表 remote_psychology_mood（表注释含情绪识别仪）；指标列必须以 schema 注释为准，禁止假设不存在的列名；缺列则说明无法计算对应占比/等级，勿查中医就诊/主诉诊断表。"
+    },
+    {
+      "id": "nursing_chronic",
+      "scope": "慢性病检测、老年护理、实训室护理设备记录（血压血糖等）",
+      "text": "主查表 remote_nursing_chronic（表注释含老年护理/慢性病）；按 cus_name 过滤姓名，返回 systolic_bp、diastolic_bp、fpg、hra_name_list 等；勿与 person_health_records 健康档案混用。"
+    },
+    {
+      "id": "statistics",
+      "scope": "分布、占比、趋势、对比、汇总类统计问题",
+      "text": "分组列与时间列须来自 schema 注释；注意 NULL 与枚举取值。"
+    },
+    {
+      "id": "time_range",
+      "scope": "问题含明确或相对时间范围（最近、本月、某年等）",
+      "text": "先确认事实表上的时间列名，再写区间条件。"
+    },
+    {
+      "id": "named_entity_filter",
+      "scope": "问题含具体人名、机构名等专有名词过滤",
+      "text": "WHERE 或 JOIN 必须体现该专有名词，与查询计划一致。"
+    },
+    {
+      "id": "multi_condition",
+      "scope": "问题含多个筛选条件（年龄、地区、性别、时间等组合）",
+      "text": "每个条件映射到 person_info 或事实表对应列；枚举值参考 value_maps。"
+    }
+  ]
+}

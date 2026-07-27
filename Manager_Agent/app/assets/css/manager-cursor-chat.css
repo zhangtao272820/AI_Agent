@@ -1,0 +1,899 @@
+/* 总管 Agent · Cursor 对话可读性（最后加载，压过 scoped 样式） */
+
+.spring-root.cosmic-theme.cursor-workbench {
+  --chat-col-width: min(760px, calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 48px));
+  --chat-font-body: 15px;
+  --chat-font-body-lh: 1.78;
+  --chat-font-secondary: 14px;
+  --chat-font-ui: 13px;
+  --chat-font-meta: 12px;
+  --chat-font-mono: 13px;
+  --chat-text-primary: #eceff4;
+  --chat-text-secondary: #c8d0dc;
+  --chat-text-muted: #8b97a8;
+  --mgr-glass-strong: rgba(10, 14, 32, 0.58);
+  --cursor-surface: rgba(15, 20, 32, 0.72);
+  --cursor-surface-elevated: rgba(22, 27, 40, 0.88);
+  --cursor-border: rgba(148, 163, 184, 0.16);
+}
+
+/* ── 主滚动区：flex 子项可滚动 ── */
+.spring-root.cursor-workbench .spring-log.chat-scroll,
+.spring-root.cursor-workbench .spring-log.cosmic-panel,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+/* ── 正文 / 用户气泡 ── */
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .spring-log-text,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .cosmic-bubble-user .spring-log-text {
+  font-size: var(--chat-font-body) !important;
+  line-height: var(--chat-font-body-lh) !important;
+  color: var(--chat-text-primary) !important;
+  font-weight: 450;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .cosmic-bubble-user {
+  padding: 10px 14px !important;
+  border-radius: 16px 16px 4px 16px !important;
+  background: linear-gradient(145deg, rgba(30, 58, 138, 0.62), rgba(88, 28, 135, 0.42)) !important;
+  border: 1px solid rgba(96, 165, 250, 0.45) !important;
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .cosmic-bubble-user .spring-log-text {
+  color: #eff6ff !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  background: linear-gradient(155deg, rgba(8, 14, 42, 0.58), rgba(6, 10, 28, 0.52) 45%, rgba(18, 8, 38, 0.55)) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-ul li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-ol li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-ul li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-ol li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .conv-stream-body,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .conv-stream-body .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body .md-ul li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body .md-ol li {
+  font-size: var(--chat-font-body) !important;
+  line-height: var(--chat-font-body-lh) !important;
+  color: var(--chat-text-primary) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h2,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h2,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body .md-h2 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+  margin: 1rem 0 0.5rem !important;
+  border-bottom: 1px solid var(--cursor-border) !important;
+  padding-bottom: 0.35rem !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h3,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h3,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body .md-h3 {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+}
+
+/* DB 类键值列表：Cursor 式紧凑数据卡 */
+.spring-root.cursor-workbench.cosmic-theme .reply-chat .md-ul,
+.spring-root.cursor-workbench.cosmic-theme .md-body.reply-chat .md-ul {
+  list-style: none !important;
+  margin: 0.75rem 0 1rem !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--cursor-border) !important;
+  background: rgba(2, 6, 23, 0.42) !important;
+  overflow: visible !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-chat .md-ul li,
+.spring-root.cursor-workbench.cosmic-theme .md-body.reply-chat .md-ul li {
+  padding: 10px 14px !important;
+  font-size: var(--chat-font-secondary) !important;
+  line-height: 1.62 !important;
+  color: var(--chat-text-secondary) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.07) !important;
+  font-variant-numeric: tabular-nums;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-chat .md-ul li:last-child,
+.spring-root.cursor-workbench.cosmic-theme .md-body.reply-chat .md-ul li:last-child {
+  border-bottom: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-chat .md-ul li strong,
+.spring-root.cursor-workbench.cosmic-theme .md-body.reply-chat .md-ul li strong {
+  color: var(--chat-text-primary) !important;
+  font-weight: 550 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-inner,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-body {
+  font-size: var(--chat-font-body) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  background: linear-gradient(155deg, rgba(8, 14, 42, 0.58), rgba(6, 10, 28, 0.52) 45%, rgba(18, 8, 38, 0.55)) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  border-radius: 14px 14px 14px 4px !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-header {
+  padding: 10px 14px 8px !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-body {
+  padding: 10px 14px 12px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-avatar {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 6px !important;
+  background: rgba(51, 65, 85, 0.55) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-avatar-mark {
+  font-size: 11px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .spring-log-meta,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .meta-time {
+  font-size: var(--chat-font-meta) !important;
+  color: var(--chat-text-muted) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .meta-pill {
+  font-size: var(--chat-font-meta) !important;
+  padding: 2px 8px !important;
+  opacity: 0.85;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-title {
+  font-size: var(--chat-font-ui) !important;
+  font-weight: 600 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .message-action-btn {
+  font-size: var(--chat-font-meta) !important;
+  padding: 4px 10px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-input-field.spring-input-area {
+  font-size: var(--chat-font-body) !important;
+  line-height: var(--chat-font-body-lh) !important;
+  min-height: 48px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .step-result-card,
+.spring-root.cursor-workbench.cosmic-theme .step-result-title,
+.spring-root.cursor-workbench.cosmic-theme .step-result-preview {
+  font-size: var(--chat-font-secondary) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .turn-feedback-label,
+.spring-root.cursor-workbench.cosmic-theme .turn-feedback-ack {
+  font-size: var(--chat-font-meta) !important;
+}
+
+/* ── Cursor 式思考过程（位于回答上方） ── */
+.spring-root.cursor-workbench .cursor-thought-panel.process-panel {
+  order: 3;
+  width: 100% !important;
+  margin: 4px 0 10px !important;
+  padding: 0 !important;
+  border: 1px solid var(--cursor-border) !important;
+  border-radius: 12px !important;
+  background: var(--cursor-surface) !important;
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.14) !important;
+  overflow: visible !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel > .process-panel-summary {
+  padding: 10px 14px !important;
+  min-height: 0;
+  font-size: var(--chat-font-ui) !important;
+  font-weight: 600 !important;
+  color: var(--chat-text-muted) !important;
+  gap: 8px !important;
+  border-bottom: 1px solid transparent;
+  background: transparent !important;
+  transition: background 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel > .process-panel-summary:hover {
+  background: rgba(30, 41, 59, 0.35) !important;
+  color: var(--chat-text-secondary) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel[open] > .process-panel-summary {
+  border-bottom-color: var(--cursor-border) !important;
+  background: rgba(30, 41, 59, 0.28) !important;
+  color: var(--chat-text-primary) !important;
+  margin-bottom: 0 !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-chevron {
+  width: 14px !important;
+  height: 14px !important;
+  background: rgba(51, 65, 85, 0.45) !important;
+  border-radius: 4px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-chevron::before {
+  width: 6px !important;
+  height: 6px !important;
+  border-color: var(--chat-text-muted) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-label::before {
+  content: none;
+  margin: 0;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-label {
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-badge,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-badge-muted,
+.spring-root.cursor-workbench .cursor-thought-panel .agent-chip-sm {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  color: var(--chat-text-muted) !important;
+  background: rgba(51, 65, 85, 0.45) !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+/* 思考过程滚动区 */
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll {
+  padding: 10px 12px 12px !important;
+  margin-left: 0 !important;
+  border-left: none !important;
+  max-height: min(42vh, 480px) !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  pointer-events: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.55) rgba(15, 23, 42, 0.35);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-track,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.35);
+  border-radius: 999px;
+  margin: 4px 0;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-thumb,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.5);
+  border-radius: 999px;
+  border: 2px solid rgba(15, 23, 42, 0.35);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-thumb:hover,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.65);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-timeline {
+  max-height: none !important;
+  overflow: visible !important;
+  border-left: 2px solid rgba(100, 116, 139, 0.2) !important;
+  margin-left: 4px !important;
+  padding-left: 12px !important;
+  padding-right: 4px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step {
+  padding: 8px 0 10px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step + .process-step {
+  border-top: 1px solid rgba(148, 163, 184, 0.06) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-kind,
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-from,
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-meta .meta-time {
+  font-size: 11px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-from {
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  background: rgba(51, 65, 85, 0.4) !important;
+  color: var(--chat-text-muted) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-text,
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-code {
+  font-size: var(--chat-font-mono) !important;
+  line-height: 1.55 !important;
+  color: var(--chat-text-secondary) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.kind-thinking .process-step-text {
+  color: #93c5fd !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.kind-phase .process-step-dot,
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.kind-status .process-step-dot {
+  background: rgba(167, 139, 250, 0.75) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-expand-btn {
+  font-size: var(--chat-font-meta) !important;
+  margin-top: 4px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .spring-search-sources-panel > summary {
+  font-size: var(--chat-font-meta) !important;
+  padding: 6px 0 !important;
+  color: #a5b4fc !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .spring-search-sources-list li {
+  font-size: var(--chat-font-secondary) !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  background: rgba(2, 6, 23, 0.35) !important;
+  margin-bottom: 4px !important;
+}
+
+/* 对话轮次内顺序：用户 → 思考 → 回答 */
+.spring-root.cursor-workbench .spring-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spring-root.cursor-workbench .spring-turn > .chat-user-row {
+  order: 1;
+}
+
+.spring-root.cursor-workbench .spring-turn > .turn-agent-pipeline {
+  order: 2;
+}
+
+.spring-root.cursor-workbench .spring-turn > .cursor-thought-panel {
+  order: 3;
+}
+
+.spring-root.cursor-workbench .spring-turn > .conv-streaming-reply {
+  order: 4;
+}
+
+.spring-root.cursor-workbench .spring-turn > .reply-panel {
+  order: 5;
+}
+
+.spring-root.cursor-workbench .spring-turn > .turn-feedback-bar {
+  order: 6;
+}
+
+.spring-root.cursor-workbench .spring-turn > .spring-log-item.kind-error {
+  order: 7;
+}
+
+/* 反馈栏 */
+.spring-root.cursor-workbench .turn-feedback-bar {
+  padding: 4px 2px !important;
+  opacity: 0.85;
+}
+
+/* ── 思考过程：运行中指示 ── */
+.spring-root.cursor-workbench .cursor-thought-panel.is-running > .process-panel-summary {
+  color: var(--chat-text-secondary) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-spinner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #60a5fa;
+  flex-shrink: 0;
+  animation: cursor-thought-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cursor-thought-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 8px rgba(96, 165, 250, 0.55); }
+}
+
+/* ── 步骤执行结果（Cursor tool-call 风格） ── */
+.spring-root.cursor-workbench .cursor-step-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.spring-root.cursor-workbench .cursor-step-results-head {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--chat-text-muted);
+  padding: 0 2px 4px;
+}
+
+.spring-root.cursor-workbench .cursor-tool-card.step-result-card {
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  background: rgba(2, 6, 23, 0.45) !important;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.spring-root.cursor-workbench .cursor-tool-card.step-result-card:hover {
+  border-color: rgba(148, 163, 184, 0.22) !important;
+  background: rgba(2, 6, 23, 0.58) !important;
+}
+
+.spring-root.cursor-workbench .cursor-tool-card.step-result-success {
+  border-left: 3px solid rgba(52, 211, 153, 0.55) !important;
+}
+
+.spring-root.cursor-workbench .cursor-tool-card.step-result-failed {
+  border-left: 3px solid rgba(248, 113, 113, 0.55) !important;
+}
+
+.spring-root.cursor-workbench .step-result-icon {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.spring-root.cursor-workbench .step-result-agent {
+  font-size: 11px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  background: rgba(51, 65, 85, 0.45) !important;
+  color: var(--chat-text-muted) !important;
+}
+
+.spring-root.cursor-workbench .cursor-tool-card .step-result-preview {
+  max-height: min(240px, 36vh) !important;
+  border: 1px solid rgba(148, 163, 184, 0.08) !important;
+  border-radius: 8px !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── 回答区：Cursor 简洁气泡 ── */
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  background: var(--cursor-surface-elevated) !important;
+  border: 1px solid var(--cursor-border) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .conv-stream-bubble {
+  background: var(--cursor-surface) !important;
+  border: 1px solid var(--cursor-border) !important;
+  border-radius: 12px !important;
+}
+
+/* ── 输入框：弱化宇宙特效 ── */
+.spring-root.cursor-workbench .spring-input.cosmic-input-dock,
+.spring-root.cursor-workbench .spring-input.cosmic-comms-console {
+  border-radius: 14px !important;
+  border: 1px solid var(--cursor-border) !important;
+  background: var(--cursor-surface-elevated) !important;
+  box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.22) !important;
+  animation: none !important;
+}
+
+.spring-root.cursor-workbench .cosmic-input-head {
+  display: none;
+}
+
+.spring-root.cursor-workbench .spring-input-field.spring-input-area {
+  background: rgba(2, 6, 23, 0.35) !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.spring-root.cursor-workbench .spring-input-field.spring-input-area:focus {
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.12) !important;
+}
+
+@media (min-width: 1400px) {
+  .spring-root.cosmic-theme.cursor-workbench {
+    --chat-col-width: min(800px, calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 56px));
+  }
+}
+
+/* ── 思考过程面板：Cursor 式卡片，默认可见 ── */
+.spring-root.cursor-workbench .cursor-thought-panel.process-panel {
+  margin: 4px 0 2px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(96, 165, 250, 0.22) !important;
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.52), rgba(8, 12, 28, 0.38)) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel.is-running {
+  border-color: rgba(96, 165, 250, 0.42) !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12), 0 6px 22px rgba(37, 99, 235, 0.12) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel.is-collapsed {
+  border-color: rgba(100, 116, 139, 0.28) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel > .process-panel-summary {
+  padding: 10px 4px !important;
+  color: #cbd5e1 !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-label {
+  color: #93c5fd !important;
+  font-size: 13px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  color: #64748b !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .process-panel .process-agent-trail {
+  display: inline-flex !important;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 42%;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-phase {
+  font-size: 10px !important;
+  padding: 1px 7px !important;
+  border-radius: 999px !important;
+  background: rgba(79, 70, 229, 0.28) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(129, 140, 248, 0.25) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.is-latest .process-step-dot {
+  background: #818cf8 !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.is-latest-live .process-step-dot {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25), 0 0 10px rgba(56, 189, 248, 0.55) !important;
+  background: #60a5fa !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.kind-thinking .process-step-body {
+  background: rgba(30, 58, 138, 0.12) !important;
+  border-radius: 8px !important;
+  padding: 6px 8px !important;
+  border-left: 2px solid rgba(96, 165, 250, 0.45) !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step.kind-phase .process-step-body {
+  border-left: 2px solid rgba(167, 139, 250, 0.4) !important;
+  padding-left: 8px !important;
+}
+
+/* ── 回复区 Markdown 层次（避免整段白字） ── */
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h1,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h1 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+  margin: 0.25rem 0 0.75rem !important;
+  letter-spacing: 0.01em;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h2,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h2 {
+  color: #bae6fd !important;
+  border-bottom-color: rgba(56, 189, 248, 0.28) !important;
+  padding-left: 10px !important;
+  border-left: 3px solid rgba(56, 189, 248, 0.55) !important;
+  border-bottom: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h3,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h3 {
+  color: #c4b5fd !important;
+  padding-left: 8px !important;
+  border-left: 2px solid rgba(167, 139, 250, 0.45) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h4,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h4 {
+  color: #a5b4fc !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-p {
+  color: #dbeafe !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-strong,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-strong {
+  color: #f8fafc !important;
+  font-weight: 650 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-quote,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-quote {
+  margin: 10px 0 12px !important;
+  padding: 10px 12px 10px 14px !important;
+  border-left: 3px solid rgba(45, 212, 191, 0.55) !important;
+  border-radius: 0 10px 10px 0 !important;
+  background: rgba(15, 118, 110, 0.12) !important;
+  color: #99f6e4 !important;
+  font-size: var(--chat-font-secondary) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-hr,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-hr {
+  border: none !important;
+  height: 1px !important;
+  margin: 14px 0 !important;
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.35), transparent) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-badge,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  margin: 0 2px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: baseline;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-badge-ok,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-badge-ok {
+  background: rgba(22, 163, 74, 0.2) !important;
+  color: #86efac !important;
+  border: 1px solid rgba(34, 197, 94, 0.25) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-badge-warn,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-badge-warn {
+  background: rgba(217, 119, 6, 0.18) !important;
+  color: #fcd34d !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-avatar {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(139, 92, 246, 0.35)) !important;
+  border: 1px solid rgba(147, 197, 253, 0.35) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-kind {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  background: rgba(51, 65, 85, 0.45) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-tone-chat .reply-panel-inner.cosmic-bubble-reply {
+  background: linear-gradient(
+    165deg,
+    rgba(12, 20, 48, 0.72) 0%,
+    rgba(8, 14, 36, 0.58) 55%,
+    rgba(20, 12, 44, 0.62) 100%
+  ) !important;
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(56, 189, 248, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.spring-root.cursor-workbench .conv-stream-bubble {
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+  background: rgba(15, 23, 42, 0.45) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+}
+
+.spring-root.cursor-workbench .conv-stream-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.spring-root.cursor-workbench .conv-stream-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: cursor-thought-pulse 1.2s ease-in-out infinite;
+}
+
+/* ── 回复面板：Cursor 式排版（疏朗、不截断） ── */
+.spring-root.cursor-workbench.cosmic-theme .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel-body {
+  padding: 12px 18px 16px !important;
+  overflow: visible !important;
+  overflow-x: auto !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-summary {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat {
+  letter-spacing: 0.02em !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-p,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-p {
+  margin: 0 0 1.05em !important;
+  line-height: 1.78 !important;
+  color: #cbd5e1 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-p:last-child,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h2,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h2 {
+  margin: 1.35em 0 0.65em !important;
+  padding: 6px 0 6px 12px !important;
+  line-height: 1.45 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h2:first-child,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h2:first-child {
+  margin-top: 0.15em !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-h3,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-h3 {
+  margin: 1.1em 0 0.55em !important;
+  padding: 4px 0 4px 10px !important;
+  line-height: 1.45 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-ol,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-ol {
+  margin: 0.65rem 0 1rem 1.35em !important;
+  padding: 0 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-ol li,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-ol li {
+  margin: 0.45em 0 !important;
+  line-height: 1.72 !important;
+  padding-left: 0.25em !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-badge,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-badge {
+  display: inline-block !important;
+  padding: 2px 8px !important;
+  margin: 0 4px 2px 0 !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  vertical-align: baseline !important;
+  white-space: nowrap !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-table-scroll,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-table-scroll {
+  display: block !important;
+  margin: 0.85em 0 1.1em !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px !important;
+  border: 1px solid rgba(99, 102, 241, 0.22) !important;
+  background: rgba(15, 23, 42, 0.45) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-table,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-table {
+  display: table !important;
+  width: 100% !important;
+  min-width: min(100%, 420px) !important;
+  border-collapse: collapse !important;
+  font-size: var(--chat-font-secondary) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-table th,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-chat .md-table td,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-table th,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .md-body.reply-chat .md-table td {
+  padding: 9px 12px !important;
+  line-height: 1.55 !important;
+  vertical-align: top !important;
+  white-space: normal !important;
+  word-break: normal !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-attachments {
+  margin-top: 1rem !important;
+  padding-top: 0.65rem !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-attachments-summary {
+  padding: 8px 0 !important;
+  font-size: var(--chat-font-ui) !important;
+  color: #94a3b8 !important;
+}

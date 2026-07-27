@@ -1,0 +1,22 @@
+{
+  "arxiv": {
+    "type": "streamable-http",
+    "url": "http://admin_mcp_gateway:8790/mcp/arxiv"
+  },
+  "memory": {
+    "type": "streamable-http",
+    "url": "http://admin_mcp_gateway:8790/mcp/memory"
+  },
+  "cron": {
+    "type": "streamable-http",
+    "url": "http://admin_mcp_gateway:8790/mcp/cron"
+  },
+  "fetch": {
+    "type": "streamable-http",
+    "url": "http://admin_mcp_gateway:8790/mcp/fetch"
+  },
+  "sequential_thinking": {
+    "type": "streamable-http",
+    "url": "http://admin_mcp_gateway:8790/mcp/sequential-thinking"
+  }
+}

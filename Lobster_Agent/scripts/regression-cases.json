@@ -1,0 +1,59 @@
+[
+  {
+    "name": "runoob-home-extract",
+    "task": "打开 https://www.runoob.com/ ，提取页面标题、主标题和第一个教程链接，输出结构化 JSON 并结束。",
+    "timeoutSec": 150
+  },
+  {
+    "name": "runoob-search-html",
+    "task": "打开 https://www.runoob.com/tags/index.html ，提取页面主标题和正文前 80 个字符，输出结构化 JSON 并结束。",
+    "timeoutSec": 150
+  },
+  {
+    "name": "example-basic-extract",
+    "task": "打开 https://example.com ，提取页面标题、主标题和第一个链接，输出结构化 JSON 并结束。",
+    "timeoutSec": 150
+  },
+  {
+    "name": "baidu-search-extract",
+    "task": "打开 https://www.baidu.com/ ，搜索「Python 教程」，提取第一条搜索结果的标题和链接，输出 JSON 并结束。",
+    "startUrl": "https://www.baidu.com/",
+    "timeoutSec": 180
+  },
+  {
+    "name": "gov-news-list",
+    "task": "打开 https://www.gov.cn/ ，提取首页至少 3 条资讯标题和链接，输出 JSON 并结束。",
+    "startUrl": "https://www.gov.cn/",
+    "timeoutSec": 180
+  },
+  {
+    "name": "example-form-mock",
+    "task": "打开 https://httpbin.org/forms/post ，在 custname 字段填写 test_user 并截图，输出 JSON 并结束。",
+    "startUrl": "https://httpbin.org/forms/post",
+    "timeoutSec": 200
+  },
+  {
+    "name": "antd-form-fill",
+    "task": "打开 Ant Design Form 示例页，在用户名输入框填写 test 并截图，输出 JSON 并结束。",
+    "startUrl": "https://ant.design/components/form-cn",
+    "timeoutSec": 200
+  },
+  {
+    "name": "w3schools-search",
+    "task": "打开 https://www.w3schools.com/ ，如有 cookie 提示则关闭，搜索 HTML tutorial，提取第一条结果标题和链接，输出 JSON。",
+    "startUrl": "https://www.w3schools.com/",
+    "timeoutSec": 200
+  },
+  {
+    "name": "dynamic-dropdown",
+    "task": "引擎:stagehand\n打开 https://the-internet.herokuapp.com/dropdown ，选择 Option 1，截图并输出 JSON。",
+    "startUrl": "https://the-internet.herokuapp.com/dropdown",
+    "timeoutSec": 180
+  },
+  {
+    "name": "mdn-search-scroll",
+    "task": "打开 https://developer.mozilla.org/zh-CN/ ，搜索 array，向下滚动一次后提取前 2 条结果标题，输出 JSON。",
+    "startUrl": "https://developer.mozilla.org/zh-CN/",
+    "timeoutSec": 220
+  }
+]

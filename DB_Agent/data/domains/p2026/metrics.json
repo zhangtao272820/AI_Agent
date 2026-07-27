@@ -1,0 +1,90 @@
+{
+  "metrics": [
+    {
+      "id": "person_total_count",
+      "title": "老人总数",
+      "description": "person_info 有效记录总数",
+      "match_hints": ["一共多少", "总数", "多少人", "几个老人", "记录数"],
+      "tables": ["person_info"],
+      "sql": "SELECT COUNT(*) AS count FROM person_info WHERE deleted = 0"
+    },
+    {
+      "id": "person_gender_distribution",
+      "title": "性别分布",
+      "description": "按性别统计老人人数",
+      "match_hints": ["性别分布", "男女比例", "男性女性", "男女人数"],
+      "tables": ["person_info"],
+      "sql": "SELECT CASE WHEN is_gender = 1 THEN '男' WHEN is_gender = 2 THEN '女' ELSE '未知' END AS gender, COUNT(*) AS count FROM person_info WHERE deleted = 0 GROUP BY gender ORDER BY count DESC"
+    },
+    {
+      "id": "person_age_distribution",
+      "title": "年龄分布",
+      "match_hints": ["年龄分布", "年龄段", "岁数分布"],
+      "tables": ["person_info"],
+      "sql": "SELECT CASE WHEN age IS NULL OR age < 0 THEN '未知' WHEN age < 60 THEN '<60' WHEN age BETWEEN 60 AND 69 THEN '60-69' WHEN age BETWEEN 70 AND 79 THEN '70-79' WHEN age BETWEEN 80 AND 89 THEN '80-89' ELSE '90+' END AS age_bucket, COUNT(*) AS count FROM person_info WHERE deleted = 0 GROUP BY age_bucket ORDER BY age_bucket"
+    },
+    {
+      "id": "person_region_top",
+      "title": "地区分布",
+      "match_hints": ["地区分布", "省市分布", "地区统计"],
+      "tables": ["person_info"],
+      "sql": "SELECT COALESCE(NULLIF(TRIM(provinces_and_cities), ''), '未知') AS region, COUNT(*) AS count FROM person_info WHERE deleted = 0 GROUP BY region ORDER BY count DESC LIMIT 30"
+    },
+    {
+      "id": "person_new_trend_monthly",
+      "title": "新增趋势",
+      "match_hints": ["新增趋势", "录入趋势", "按月新增", "建档趋势"],
+      "tables": ["person_info"],
+      "sql": "SELECT DATE_FORMAT(create_time, '%Y-%m') AS month, COUNT(*) AS count FROM person_info WHERE deleted = 0 AND create_time IS NOT NULL GROUP BY month ORDER BY month LIMIT 60"
+    },
+    {
+      "id": "foot_pressure_total",
+      "title": "足压检测次数",
+      "match_hints": ["足压", "足底", "压力检测", "多少条", "几次"],
+      "tables": ["remote_activity_foot_log"],
+      "sql": "SELECT COUNT(*) AS count FROM remote_activity_foot_log WHERE deleted = 0"
+    },
+    {
+      "id": "foot_pressure_person_count",
+      "title": "足压检测人数",
+      "match_hints": ["多少人做过足压", "足压检测人数", "几个人足压"],
+      "tables": ["remote_activity_foot_log"],
+      "sql": "SELECT COUNT(DISTINCT person_name) AS count FROM remote_activity_foot_log WHERE deleted = 0"
+    },
+    {
+      "id": "health_records_total",
+      "title": "健康记录总数",
+      "match_hints": ["健康记录", "健康数据", "多少条健康"],
+      "tables": ["person_health_records"],
+      "sql": "SELECT COUNT(*) AS count FROM person_health_records WHERE deleted = 0"
+    },
+    {
+      "id": "bone_log_total",
+      "title": "骨密度检测次数",
+      "match_hints": ["骨密度", "骨密度检测", "多少次骨密度"],
+      "tables": ["remote_health_bone_log"],
+      "sql": "SELECT COUNT(*) AS count FROM remote_health_bone_log WHERE deleted = 0"
+    },
+    {
+      "id": "psychology_mood_total",
+      "title": "情绪识别记录数",
+      "match_hints": ["情绪识别", "心理检测", "多少条情绪"],
+      "tables": ["remote_psychology_mood"],
+      "sql": "SELECT COUNT(*) AS count FROM remote_psychology_mood WHERE deleted = 0"
+    },
+    {
+      "id": "person_with_health_record",
+      "title": "有健康档案的老人数",
+      "match_hints": ["有健康档案", "健康档案人数", "多少人有健康记录"],
+      "tables": ["person_info", "person_health_records"],
+      "sql": "SELECT COUNT(DISTINCT phr.person_id) AS count FROM person_health_records phr INNER JOIN person_info p ON p.id = phr.person_id WHERE phr.deleted = 0 AND p.deleted = 0"
+    },
+    {
+      "id": "foot_pressure_monthly_trend",
+      "title": "足压检测月度趋势",
+      "match_hints": ["足压趋势", "按月足压", "足压月度", "足压检测按月", "按月趋势"],
+      "tables": ["remote_activity_foot_log"],
+      "sql": "SELECT DATE_FORMAT(create_time, '%Y-%m') AS month, COUNT(*) AS count FROM remote_activity_foot_log WHERE deleted = 0 AND create_time IS NOT NULL GROUP BY month ORDER BY month LIMIT 36"
+    }
+  ]
+}

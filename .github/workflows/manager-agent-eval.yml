@@ -1,0 +1,90 @@
+name: Manager Agent Eval Gate
+
+on:
+  push:
+    paths:
+      - 'Manager_Agent/**'
+      - 'Manage-platform_Agent/**'
+      - 'shared/**'
+      - 'scripts/smoke-evolution-convergence.ts'
+      - '.github/workflows/manager-agent-eval.yml'
+  pull_request:
+    paths:
+      - 'Manager_Agent/**'
+      - 'Manage-platform_Agent/**'
+      - 'shared/**'
+      - 'scripts/smoke-evolution-convergence.ts'
+      - '.github/workflows/manager-agent-eval.yml'
+
+defaults:
+  run:
+    working-directory: Manager_Agent
+
+jobs:
+  golden-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate golden eval JSON structure
+        run: node scripts/check-eval-golden-all.mjs
+      - name: Route golden structural gate (gui/crawler/media)
+        run: node scripts/check-eval-route-golden.mjs
+      - name: Structural smoke (golden/clause/skill/batch-a)
+        run: npm run smoke:golden && npm run smoke:clause && npm run smoke:skill-draft && npm run smoke:batch-a
+
+  nlu-gate:
+    runs-on: ubuntu-latest
+    needs: golden-structure
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: NLU regression gate (skip if no history)
+        run: npm run gate:nlu
+
+  route-convergence:
+    runs-on: ubuntu-latest
+    needs: golden-structure
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Route convergence offline gate (L1 + L1.5)
+        run: npm run smoke:route-convergence && npm run smoke:route-plan-card && npm run smoke:route-matrix-ws && npm run smoke:phase2
+
+  evolution-convergence:
+    runs-on: ubuntu-latest
+    needs: golden-structure
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Evolution convergence + env MODE gate
+        run: npm run smoke:env-modes && npm run smoke:evolution-convergence
+
+  route-matrix-orchestrate:
+    runs-on: ubuntu-latest
+    needs: [route-convergence, evolution-convergence]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Route matrix orchestrate (L2, real LLM)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          MANAGER_MODEL_ROUTE: ${{ secrets.MANAGER_MODEL_ROUTE }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "SKIP: OPENAI_API_KEY not configured"
+            exit 0
+          fi
+          npm run smoke:route-matrix-orchestrate

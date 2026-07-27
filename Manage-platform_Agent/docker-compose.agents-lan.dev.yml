@@ -1,0 +1,75 @@
+# 开发模式覆盖：bind mount + nuxt dev（改代码即生效，但较慢）
+# 用法：docker compose --env-file .env.agents-lan -f docker-compose.agents-lan.yml -f docker-compose.agents-lan.dev.yml up -d --force-recreate db_agent rag_agent code_assistent_agent manager_agent
+#
+# 注意：生产 build 勿加本文件，只用 docker-compose.agents-lan.yml：
+#   docker compose --env-file .env.agents-lan -f docker-compose.agents-lan.yml build db_agent manager_agent
+
+x-dev-node-image: &dev_node_image docker.m.daocloud.io/library/node:20-bullseye
+
+services:
+  db_agent:
+    build: !override
+      context: ..
+      dockerfile_inline: |
+        FROM docker.m.daocloud.io/library/node:20-bullseye
+        WORKDIR /app
+    image: clawhive/db_agent:dev
+    volumes:
+      - ../DB_Agent:/app
+      - db_agent_node_modules:/app/node_modules
+      - db_agent_nuxt:/app/.nuxt
+    command: >
+      sh -c "if [ ! -f node_modules/.docker-deps-ok ]; then
+        npm install --legacy-peer-deps && touch node_modules/.docker-deps-ok;
+      fi;
+      exec npm run dev -- --host 0.0.0.0 --port ${DB_PORT:-13101}"
+
+  rag_agent:
+    build: !override
+      context: ..
+      dockerfile_inline: |
+        FROM docker.m.daocloud.io/library/node:20-bullseye
+        WORKDIR /app
+    image: clawhive/rag_agent:dev
+    volumes:
+      - ../RAG_Agent:/app
+      - rag_agent_node_modules:/app/node_modules
+      - rag_agent_nuxt:/app/.nuxt
+    command: sh -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0 --port ${RAG_PORT:-13102}"
+
+  code_assistent_agent:
+    build: !override
+      context: ..
+      dockerfile_inline: |
+        FROM docker.m.daocloud.io/library/node:20-bullseye
+        WORKDIR /app
+    image: clawhive/code_assistent_agent:dev
+    volumes:
+      - ../code_assistent_Agent:/app
+      - ../shared:/app/agent-repo-shared
+      - ../:/workspace
+    environment:
+      PROJECT_DIR: /workspace
+      ALLOWED_ROOTS: /workspace,/app
+      WRITE_TOOL_ENABLED: "1"
+      COMMAND_TOOL_ENABLED: "1"
+    command: sh -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0 --port ${CODE_PORT:-13103}"
+
+  manager_agent:
+    build: !override
+      context: ..
+      dockerfile_inline: |
+        FROM docker.m.daocloud.io/library/node:20-bullseye
+        WORKDIR /app
+    image: clawhive/manager_agent:dev
+    volumes:
+      - ../Manager_Agent:/app
+      - manager_agent_node_modules:/app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    command: >
+      sh -c "if [ ! -f node_modules/.docker-deps-ok ]; then
+        npm install --legacy-peer-deps && touch node_modules/.docker-deps-ok;
+      fi;
+      exec npm run dev -- --host 0.0.0.0 --port ${MANAGER_PORT:-13106}"

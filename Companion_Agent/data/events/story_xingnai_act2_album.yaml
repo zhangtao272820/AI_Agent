@@ -1,0 +1,24 @@
+id: story_xingnai_act2_album
+label: 相册
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [xingnai]
+  stage_min: close_friend
+  affinity_min: 78
+  flags_absent: [xn_album]
+  flags_present: [xn_bento]
+prompt_snippet: |
+  【专属故事 · 旧相册的缺口 · 第2幕 · 相册】
+  翻旧照片；承认曾喜欢却没说
+  立绘气质参考：old_photo_album, bike_after_school, date。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [xn_album, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

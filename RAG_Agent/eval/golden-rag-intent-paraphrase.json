@@ -1,0 +1,30 @@
+{
+  "description": "RAG 意图 paraphrase golden — definition/comparison/process 换说法",
+  "cases": [
+    {
+      "id": "definition_paraphrase_a",
+      "user": "手册里失能老人护理员配比要求是什么",
+      "expect": { "intent": "definition", "includes": ["护理员", "配比"] }
+    },
+    {
+      "id": "definition_paraphrase_b",
+      "user": "制度文档如何定义护理员与失能老人的比例",
+      "expect": { "intent": "definition", "includes": ["护理员", "比例"] }
+    },
+    {
+      "id": "comparison_paraphrase_a",
+      "user": "对比两份方案在申领门槛上的差异",
+      "expect": { "intent": "comparison", "includes": ["对比", "门槛"] }
+    },
+    {
+      "id": "comparison_paraphrase_b",
+      "user": "两者在申请条件方面有什么不同",
+      "expect": { "intent": "comparison", "includes": ["申请", "不同"] }
+    },
+    {
+      "id": "process_paraphrase",
+      "user": "办理补贴需要走哪些步骤",
+      "expect": { "intent": "process", "includes": ["步骤"] }
+    }
+  ]
+}

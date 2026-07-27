@@ -1,0 +1,80 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clawhive-pg-data
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.postgres.storage }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clawhive-postgres
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: clawhive-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clawhive-postgres
+  template:
+    metadata:
+      labels:
+        app: clawhive-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: CLAWHIVE_PG_DB
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: clawhive-pg-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clawhive-postgres
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: clawhive-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+{{- end }}

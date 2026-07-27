@@ -1,0 +1,55 @@
+# Monorepo: never commit real env files (subprojects also have their own .gitignore)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node / frontend build artifacts
+node_modules/
+dist/
+.output/
+.nuxt/
+.cache/
+*.tsbuildinfo
+
+# Local runtime data (Manager metrics, sessions, evolution, etc.)
+**/.data/
+backups/
+
+# Crawler / agent runtime checkpoints & caches
+checkpoint_*.json
+**/cache_index.json
+
+# Generated docs (code_assistent_Agent writes at runtime)
+**/README.generated.md
+
+# Personal / local learning & design docs (do not push to Gitee)
+**/Agent知识-本地.md
+**/学习指南.md
+local-learning/
+
+# Upgrade / design docs — local only; README.md at project root stays tracked
+**/doc/**
+**/docs/**
+doc/**
+docs/**
+
+# Cursor IDE config (all agents, local only — never push)
+**/.cursor/
+
+# 各 Agent 本地 shared junction（Docker 构建时由 COPY shared 注入）
+**/agent-repo-shared/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local-only interview guide clone (do not push)
+ai-agent-interview-guide-main/
+
+# Manage-platform local postgres/runtime (large WAL / data dirs)
+Manage-platform_Agent/.local/

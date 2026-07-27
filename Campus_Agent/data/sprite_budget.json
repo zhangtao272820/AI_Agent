@@ -1,0 +1,175 @@
+{
+  "female_by_beauty": {
+    "school_belle": {
+      "tier": "T0",
+      "sprites_per_character": 80,
+      "ids": [
+        "f21",
+        "f22",
+        "f23",
+        "f24"
+      ]
+    },
+    "extreme": {
+      "tier": "T1",
+      "sprites_per_character": 80,
+      "ids": [
+        "f06",
+        "f07",
+        "f09",
+        "f10",
+        "f12",
+        "f14",
+        "f18",
+        "f19"
+      ]
+    },
+    "high": {
+      "tier": "T2",
+      "sprites_per_character": 50,
+      "ids": [
+        "f01",
+        "f02",
+        "f03",
+        "f04",
+        "f08",
+        "f13",
+        "f20",
+        "f25"
+      ]
+    },
+    "mid": {
+      "tier": "T3",
+      "sprites_per_character": 30,
+      "ids": [
+        "f05",
+        "f11",
+        "f15",
+        "f16",
+        "f17"
+      ]
+    },
+    "low": {
+      "tier": "T4",
+      "sprites_per_character": 20,
+      "ids": []
+    }
+  },
+  "male_by_beauty": {
+    "all": {
+      "sprites_per_character": 15,
+      "ids": [
+        "pc",
+        "m01",
+        "m02",
+        "m03",
+        "m04",
+        "m05",
+        "m06",
+        "m07",
+        "m08",
+        "m09"
+      ],
+      "note": "全员统一约15张，不分颜值加码；无私密包"
+    }
+  },
+  "private_pack": {
+    "sprites_per_female": 20,
+    "applies_to": "all_female",
+    "outfits": [
+      "casual",
+      "pajama",
+      "towel"
+    ],
+    "rating": "adult_suggestive_18plus",
+    "note": "叠在校服配额之上；全女统一+20；禁裸露私密部位；adult woman age 18+"
+  },
+  "outfits": [
+    "summer",
+    "winter",
+    "casual",
+    "pajama",
+    "towel"
+  ],
+  "actions_core": [
+    "stand",
+    "study",
+    "eat",
+    "chat",
+    "pass_note",
+    "listen",
+    "rain",
+    "dorm",
+    "wave",
+    "think"
+  ],
+  "actions_scene": [
+    "sc_classroom_lean",
+    "sc_classroom_blackboard",
+    "sc_cafeteria_counter",
+    "sc_cafeteria_seat",
+    "sc_library_shelf",
+    "sc_library_read",
+    "sc_hallway_window",
+    "sc_hallway_locker",
+    "sc_rooftop_rail",
+    "sc_playground_fence",
+    "sc_dorm_bunk",
+    "sc_dorm_desk",
+    "sc_shop_browse"
+  ],
+  "actions_private": [
+    "sit_bunk",
+    "stretch",
+    "yawn",
+    "wet_hair",
+    "door",
+    "lean_wall",
+    "look_back",
+    "hug_pillow",
+    "after_bath",
+    "window_night",
+    "bed_edge"
+  ],
+  "emotions_female": [
+    "neutral",
+    "happy",
+    "shy",
+    "sad",
+    "angry"
+  ],
+  "emotions_male": [
+    "neutral",
+    "happy",
+    "angry"
+  ],
+  "q_pack": {
+    "applies_to": "all_students",
+    "min_per_character": 1,
+    "files": ["q_stand_neutral.png"],
+    "optional_moods": ["happy", "shy", "sad"],
+    "naming": "q_{action}_{emotion}.png",
+    "form": "square face avatar (head-and-shoulders), not full-body chibi",
+    "usage": "map pins / seat grid / location face rail only — never Gal primary",
+    "note": "不挤占写实 T0–T4 与私密包配额；缺图时引擎 fallback 写实 stand；女 f01–f25 已出 q_stand_neutral 头像"
+  },
+  "bg_priority": [
+    "classroom",
+    "cafeteria",
+    "library",
+    "hallway",
+    "playground",
+    "dorm_f1",
+    "dorm_m1",
+    "default"
+  ],
+  "totals_estimate": {
+    "female_school": "4*80 + 8*80 + 8*50 + 5*30 + 0*20 = 1510",
+    "female_private": "25*20 = 500",
+    "female": "1510 + 500 = 2010",
+    "male": "10*15 = 150",
+    "q_min": "35*1 = 35",
+    "note": "2026-07-21：观感重排 T1/T2；取消 T4；去明星锚点。同日身材可见性：全女 25 人 identity 均需按 FULL-BODY body lock（height/figure/bust/weight_kg）重出；f01/f03/f19 整包重出。M11 起另计全员 Q 包。"
+  },
+  "notes": "校园两套校服 + 宿舍三套私密装；含场景互动 sc_* 与私密 actions_private。男全员15张。Q 版独立。详见 doc/archive/立绘生产计划.md"
+}

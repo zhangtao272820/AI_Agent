@@ -1,0 +1,24 @@
+id: story_shiori_act2_moon
+label: 窗边月
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shiori]
+  stage_min: close_friend
+  affinity_min: 68
+  flags_absent: [sr_window_read]
+  flags_present: [sr_first_recommend]
+prompt_snippet: |
+  【专属故事 · 坡上书店的月亮 · 第2幕 · 窗边月】
+  打烊后窗边共读；触及她的幻想/cos 爱好
+  立绘气质参考：window_read, poetry_nook, unbox_crate。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sr_window_read, spirit_oath_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

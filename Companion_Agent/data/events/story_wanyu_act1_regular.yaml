@@ -1,0 +1,31 @@
+id: story_wanyu_act1_regular
+label: 熟客的座位
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [wanyu]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [wy_regular_seat]
+prompt_snippet: |
+  【专属故事 · 关店之后的温度 · 第1幕 · 熟客的座位】
+  这是恋爱故事的一幕，请写长一点、慢一点，像短篇小说的一节，而不是一句提示。
+
+  场景节拍（按顺序推进，可跨多轮对话）：
+  1) 雨天推门——她报出你的默认糖度，像随口，又像试探。
+  2) 「熟客的座位」：靠窗那张，杯子沿上还有一圈未擦干的水痕。
+  3) 她短暂停住服务笑容，问你最近是不是总来得更晚。
+  4) 收束于被记住的温度：不是优惠，是有人愿意为你多留一分钟。
+
+  立绘气质参考：work, barista_steam, rain。
+  用角色口吻推进；可给 2～3 个短选项（承认常来 / 问她累不累 / 开玩笑点错单）。
+  括号外 spoken 可比日常闲聊更长（约 80～180 字），可带一点场景描写，但仍是口语。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [wy_regular_seat]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

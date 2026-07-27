@@ -1,0 +1,506 @@
+/* ═══════════════════════════════════════════════════════════════
+   HITL 面板 SSOT · Plan Mode / Run Todo / 风险确认模态
+   须在 nuxt.css 中最后加载，覆盖 scoped / modes / enhance 装饰冲突
+
+   层级：风险模态 z-index 10050（高于 AppModal 9999、侧栏 40–45、输入坞 25）
+   视觉：本文件是唯一「高强调」协作层；过程日志不得抢边框/光效
+   ═══════════════════════════════════════════════════════════════ */
+
+.spring-root.cursor-workbench {
+  --hitl-radius: 14px;
+  --hitl-radius-sm: 10px;
+  --hitl-pad-x: 16px;
+  --hitl-pad-y: 14px;
+  --hitl-font-title: 14px;
+  --hitl-font-body: 13px;
+  --hitl-font-meta: 11px;
+  --hitl-btn-h: 34px;
+  --hitl-border: rgba(129, 140, 248, 0.4);
+  --hitl-border-danger: rgba(251, 113, 133, 0.5);
+  --hitl-accent: #818cf8;
+  --hitl-danger: #fb7185;
+  --hitl-surface:
+    radial-gradient(120% 80% at 0% 0%, rgba(99, 102, 241, 0.2), transparent 55%),
+    linear-gradient(165deg, rgba(30, 27, 75, 0.94), rgba(15, 23, 42, 0.96));
+  --hitl-surface-danger:
+    radial-gradient(120% 80% at 0% 0%, rgba(244, 63, 94, 0.18), transparent 55%),
+    linear-gradient(165deg, rgba(76, 29, 49, 0.92), rgba(15, 23, 42, 0.96));
+  --hitl-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ── 共用：Plan Mode 卡 / 风险模态 ── */
+.spring-root.cursor-workbench .plan-mode-card {
+  border-radius: var(--hitl-radius) !important;
+  border: 1px solid var(--hitl-border) !important;
+  background: var(--hitl-surface) !important;
+  box-shadow: var(--hitl-shadow) !important;
+}
+
+.spring-root.cursor-workbench .plan-mode-card.is-tier-strict {
+  border-color: var(--hitl-border-danger) !important;
+  background: var(--hitl-surface-danger) !important;
+}
+
+.spring-root.cursor-workbench .plan-mode-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.spring-root.cursor-workbench .plan-mode-title-row strong {
+  font-size: var(--hitl-font-title);
+  font-weight: 700;
+  color: #e2e8f0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spring-root.cursor-workbench .plan-mode-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: #e0e7ff;
+  background: rgba(99, 102, 241, 0.35);
+  border: 1px solid rgba(165, 180, 252, 0.35);
+}
+
+.spring-root.cursor-workbench .plan-mode-badge.is-risk {
+  color: #fecdd3;
+  background: rgba(159, 18, 57, 0.35);
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
+.spring-root.cursor-workbench .plan-mode-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.spring-root.cursor-workbench .plan-mode-risk-chip {
+  font-size: var(--hitl-font-meta);
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #cbd5e1;
+}
+
+.spring-root.cursor-workbench .plan-mode-risk-chip.is-high {
+  color: #fecdd3;
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(159, 18, 57, 0.28);
+}
+
+.spring-root.cursor-workbench .plan-mode-risk-chip.is-normal {
+  color: #c7d2fe;
+  border-color: rgba(129, 140, 248, 0.35);
+  background: rgba(67, 56, 202, 0.25);
+}
+
+.spring-root.cursor-workbench .plan-mode-risk-score {
+  font-size: var(--hitl-font-meta);
+  color: #94a3b8;
+}
+
+.spring-root.cursor-workbench .plan-mode-primary,
+.spring-root.cursor-workbench .hitl-btn {
+  min-height: var(--hitl-btn-h) !important;
+  padding: 0 14px !important;
+  border-radius: 9px !important;
+  font-size: var(--hitl-font-body) !important;
+  font-weight: 650 !important;
+}
+
+.spring-root.cursor-workbench .plan-mode-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  border-color: transparent !important;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+
+.spring-root.cursor-workbench .hitl-btn-danger {
+  background: linear-gradient(135deg, #e11d48, #be123c) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(190, 18, 60, 0.35);
+}
+
+.spring-root.cursor-workbench .hitl-btn-danger:disabled,
+.spring-root.cursor-workbench .plan-mode-primary:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+/* Plan 预览头/操作栏节奏 */
+.spring-root.cursor-workbench .conv-plan-preview {
+  border-radius: var(--hitl-radius) !important;
+  padding: var(--hitl-pad-y) var(--hitl-pad-x) !important;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+/* Run Todo 与 Plan 同圆角/字阶 */
+.spring-root.cursor-workbench .run-todo-panel,
+.spring-root.cursor-workbench .spring-plan-todo {
+  border-radius: var(--hitl-radius) !important;
+  padding: var(--hitl-pad-y) var(--hitl-pad-x) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.08), rgba(15, 23, 42, 0.55)) !important;
+  box-shadow: var(--hitl-shadow) !important;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-title {
+  font-size: var(--hitl-font-meta);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-count {
+  font-size: var(--hitl-font-meta);
+  font-weight: 700;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-item {
+  border-radius: var(--hitl-radius-sm) !important;
+  font-size: var(--hitl-font-body);
+}
+
+/* ── 风险确认模态（Teleport，不占顶栏） ── */
+.hitl-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  animation: hitl-backdrop-in 0.18s ease-out;
+}
+
+.hitl-confirm-panel {
+  width: min(440px, 100%);
+  max-height: min(88vh, 720px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: hitl-panel-in 0.22s ease-out;
+}
+
+.hitl-confirm-panel.plan-mode-card {
+  border-radius: 16px;
+  border: 1px solid rgba(251, 113, 133, 0.42);
+  background:
+    radial-gradient(90% 70% at 8% 0%, rgba(244, 63, 94, 0.2), transparent 52%),
+    radial-gradient(70% 50% at 100% 0%, rgba(251, 146, 60, 0.08), transparent 48%),
+    linear-gradient(165deg, rgba(41, 18, 28, 0.96), rgba(12, 18, 36, 0.98));
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(251, 113, 133, 0.12),
+    0 0 48px rgba(244, 63, 94, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.hitl-confirm-head {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(251, 113, 133, 0.16);
+}
+
+.hitl-confirm-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hitl-confirm-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: #fff1f2;
+}
+
+.hitl-confirm-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.hitl-confirm-agent-chip {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #bae6fd;
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  background: rgba(14, 165, 233, 0.14);
+}
+
+.hitl-confirm-side-effect {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fda4af;
+}
+
+.hitl-confirm-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hitl-confirm-summary {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 113, 133, 0.22);
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hitl-confirm-line {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #fecdd3;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.hitl-confirm-meta {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+.hitl-confirm-meta-label {
+  flex-shrink: 0;
+  opacity: 0.72;
+  font-weight: 650;
+  color: #fda4af;
+}
+
+.hitl-confirm-page-link {
+  color: #7dd3fc;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.hitl-confirm-page-link:hover {
+  text-decoration: underline;
+}
+
+.hitl-confirm-run-id {
+  font-size: 10px;
+  opacity: 0.88;
+  word-break: break-all;
+  color: #e2e8f0;
+}
+
+.hitl-confirm-screenshot-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.hitl-confirm-screenshot {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  display: block;
+  object-fit: contain;
+  background: rgba(8, 16, 48, 0.45);
+  cursor: zoom-in;
+  transition: max-height 0.2s ease;
+}
+
+.hitl-confirm-screenshot.expanded {
+  max-height: min(56vh, 560px);
+  cursor: zoom-out;
+}
+
+.hitl-confirm-screenshot-hint {
+  font-size: 11px;
+  opacity: 0.7;
+  color: #94a3b8;
+}
+
+.hitl-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 14px 20px 18px;
+  border-top: 1px solid rgba(251, 113, 133, 0.14);
+  background: linear-gradient(180deg, transparent, rgba(15, 23, 42, 0.55));
+}
+
+.hitl-confirm-actions .hitl-btn {
+  min-width: 96px;
+  min-height: 36px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.hitl-confirm-actions .hitl-btn-cancel {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+.hitl-confirm-actions .hitl-btn-cancel:hover:not(:disabled) {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+  background: rgba(30, 41, 59, 0.9) !important;
+}
+
+.hitl-confirm-actions .hitl-btn-danger {
+  background: linear-gradient(135deg, #fb7185, #e11d48 55%, #be123c) !important;
+  border: 1px solid rgba(254, 205, 211, 0.28) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 22px rgba(225, 29, 72, 0.38) !important;
+}
+
+.hitl-confirm-actions .hitl-btn-danger:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.hitl-confirm-actions .hitl-btn-danger:disabled {
+  opacity: 0.55;
+  box-shadow: none !important;
+  filter: none;
+}
+
+@keyframes hitl-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hitl-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 专业态：只做增量，不重写整卡底色 */
+.spring-root.cursor-workbench.mode-professional .spring-plan-todo-title::before {
+  content: '▸ ';
+  color: #38bdf8;
+}
+
+.spring-root.cursor-workbench.mode-professional .conv-plan-preview.is-professional-plan .plan-mode-title-row strong::before {
+  content: '◈ ';
+  color: #38bdf8;
+}
+
+.spring-root.cursor-workbench.mode-professional .spring-plan-todo-item.is-running {
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  background: rgba(14, 165, 233, 0.1) !important;
+}
+
+/* ── 执行摘要（A4：与步状态同源着色，弱于 HITL）── */
+.reply-exec-summary {
+  margin: 10px 0 4px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.32);
+}
+
+.reply-exec-summary.is-outcome-ok {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.reply-exec-summary.is-outcome-ok > summary {
+  color: #6ee7b7;
+}
+
+.reply-exec-summary.is-outcome-fail {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.reply-exec-summary.is-outcome-fail > summary {
+  color: #fca5a5;
+}
+
+.reply-exec-summary.is-outcome-human {
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.reply-exec-summary.is-outcome-human > summary {
+  color: #fcd34d;
+}
+
+.reply-exec-summary > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  color: #93c5fd;
+  list-style: none;
+}
+
+.reply-exec-summary > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reply-exec-summary-body {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #cbd5e1;
+}

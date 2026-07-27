@@ -1,0 +1,24 @@
+id: story_ruolin_act4_peer
+label: 对等的名字
+priority: 8
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [ruolin]
+  stage_min: dating
+  affinity_min: 85
+  flags_absent: [rl_name_without_title]
+  flags_present: [rl_semester_end_walk]
+prompt_snippet: |
+  【专属故事 · 讲台下的一年 · 第4幕 · 对等的名字】
+  不再称老师；在雨窗备课夜确认关系
+  立绘气质参考：rain_prep, date, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [rl_name_without_title, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

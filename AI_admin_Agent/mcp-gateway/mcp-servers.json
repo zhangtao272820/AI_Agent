@@ -1,0 +1,37 @@
+[
+  {
+    "id": "arxiv",
+    "port": 8791,
+    "stdio": "uvx arxiv-mcp-server",
+    "phase": 3,
+    "playgroundId": "arxiv"
+  },
+  {
+    "id": "memory",
+    "port": 8792,
+    "stdio": "npx -y @modelcontextprotocol/server-memory /data/memory",
+    "phase": 3,
+    "playgroundId": "memory_graph"
+  },
+  {
+    "id": "cron",
+    "port": 8793,
+    "stdio": "npx -y mcp-cron --transport stdio --db-path /data/cron/results.db",
+    "phase": 3,
+    "playgroundId": "scheduled_briefing"
+  },
+  {
+    "id": "fetch",
+    "port": 8794,
+    "stdio": "uvx mcp-server-fetch",
+    "phase": 3,
+    "playgroundId": "fetch_url"
+  },
+  {
+    "id": "sequential-thinking",
+    "port": 8795,
+    "stdio": "npx -y @modelcontextprotocol/server-sequential-thinking",
+    "phase": 3,
+    "playgroundId": "thinking_outline"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "description": "真实域 + 协作路由 golden（doc/真实域路由测试用例.md A–H）",
+  "cases": [
+    { "id": "A1", "expectCap": ["db"], "user": "老人一共有多少人" },
+    { "id": "B1", "expectCap": ["rag"], "user": "失能老人护理员配比标准是多少" },
+    { "id": "C3", "expectCap": ["admin"], "user": "坐地铁从天津西站到天津站大概多久" },
+    { "id": "D2", "expectCap": ["rag"], "user": "失能老人补贴标准是多少" },
+    { "id": "E1", "expectCap": ["rag", "db", "clean", "code", "visualize"], "user": "知识库查失能老人护理员配比，数据库查张三血压血糖，对比分析并出图" },
+    { "id": "E4", "expectCap": ["rag", "db", "admin", "code", "visualize"], "user": "知识库查失能老人护理员配比，数据库查王建国的慢性病检测记录，对比分析并出图。并告诉我坐地铁从天津西站到天津站大概多久" },
+    { "id": "H1", "expectCap": ["rag", "crawler", "code", "report"], "user": "对照知识库护理员配比标准，网上查最新民政部相关通知，汇总对比" },
+    { "id": "H3", "expectCap": ["multimodal", "rag"], "user": "识图提取体检报告关键指标，并对照知识库里的护理规范原文" },
+    { "id": "H5", "expectCap": ["db", "code", "visualize", "admin"], "user": "查林婉清足底压力检测次数并出趋势图，同时帮我订明天下午三点的复查提醒" }
+  ]
+}

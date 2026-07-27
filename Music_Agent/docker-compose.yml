@@ -1,0 +1,55 @@
+# 单独启动 Music Agent（与 agents-lan 中 music_agent 等价，便于本机调试）
+# 用法：在 Music_Agent 目录执行  docker compose up --build
+# 浏览器：http://localhost:13110/  （API 与前端同源）
+# GPU：需 NVIDIA Container Toolkit；无 GPU 时注释 gpus 并设 NEURAL_DEVICE=cpu
+services:
+  music_agent:
+    build:
+      context: .
+      args:
+        NODE_BASE_IMAGE: ${MUSIC_AGENT_NODE_IMAGE:-node:20-bullseye}
+        PYTHON_BASE_IMAGE: ${MUSIC_AGENT_PYTHON_IMAGE:-python:3.10-slim-bookworm}
+        PIP_INDEX_URL: ${MUSIC_AGENT_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        APT_DEBIAN_MIRROR: ${MUSIC_AGENT_APT_DEBIAN_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}
+        APT_SECURITY_MIRROR: ${MUSIC_AGENT_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}
+        TORCH_INDEX_URL: ${MUSIC_AGENT_TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu118}
+        INSTALL_NEURAL: "1"
+    container_name: music_agent_standalone
+    working_dir: /music/backend
+    ports:
+      - "${MUSIC_AGENT_PORT:-13110}:13110"
+    # Key 等从本目录 .env 注入；避免仅用 ${OPENAI_API_KEY:-} 在部分 compose 调用下被展开为空
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      API_PORT: "13110"
+      MUSIC_FRONTEND_DIST: /music/frontend/dist
+      CORS_ORIGINS: ${MUSIC_AGENT_CORS_ORIGINS:-http://localhost:13110,http://127.0.0.1:13110}
+      STREAM_MODEL_THINKING: ${MUSIC_AGENT_STREAM_MODEL_THINKING:-false}
+      MIDI_RENDER_WAV: ${MUSIC_AGENT_MIDI_RENDER_WAV:-true}
+      MIDI_RENDER_MP3: ${MUSIC_AGENT_MIDI_RENDER_MP3:-false}
+      FLUIDSYNTH_PATH: fluidsynth
+      FFMPEG_PATH: ffmpeg
+      SOUNDFONT_SF2_PATH: ${MUSIC_AGENT_SOUNDFONT_SF2_PATH:-/usr/share/sounds/sf2/FluidR3_GM.sf2}
+      MPLBACKEND: ${MUSIC_AGENT_MPLBACKEND:-Agg}
+      COMPOSE_BACKEND: ${MUSIC_AGENT_COMPOSE_BACKEND:-auto}
+      NEURAL_MUSIC_ENABLED: ${MUSIC_AGENT_NEURAL_ENABLED:-true}
+      NEURAL_MODEL_ID: ${MUSIC_AGENT_NEURAL_MODEL_ID:-facebook/musicgen-small}
+      NEURAL_DEVICE: ${MUSIC_AGENT_NEURAL_DEVICE:-auto}
+      NEURAL_FP16: ${MUSIC_AGENT_NEURAL_FP16:-true}
+      NEURAL_MAX_DURATION_GPU: ${MUSIC_AGENT_NEURAL_MAX_DURATION_GPU:-15}
+      NEURAL_MAX_DURATION_CPU: ${MUSIC_AGENT_NEURAL_MAX_DURATION_CPU:-30}
+      NEURAL_COMPOSE_PREFERRED: ${MUSIC_AGENT_NEURAL_COMPOSE_PREFERRED:-true}
+      HF_ENDPOINT: ${MUSIC_AGENT_HF_ENDPOINT:-https://hf-mirror.com}
+      HF_HOME: /music/.data/huggingface
+      TRANSFORMERS_CACHE: /music/.data/huggingface/hub
+    gpus: ${MUSIC_AGENT_GPUS:-all}
+    volumes:
+      - ./.data/soundfonts:/music/.data/soundfonts:ro
+      - music_out:/music/.data/music/out
+      - music_hf_cache:/music/.data/huggingface
+
+volumes:
+  music_out:
+  music_hf_cache:

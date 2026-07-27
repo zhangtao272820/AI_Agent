@@ -1,0 +1,136 @@
+const NAV_GROUPS = [
+  {
+    id: "ops",
+    label: "运维",
+    items: [
+      { id: "overview", label: "总览", desc: "健康探活 · 集群状态 · 编排指标" },
+      { id: "manager", label: "总管 & 子 Agent", desc: "Token 消耗 · 阶段耗时 · 调用流水" },
+      { id: "monitor", label: "监控大屏", desc: "总管 & 子 Agent · Prometheus 实时图表" },
+      { id: "tasks", label: "任务编排", desc: "Manager WebSocket 转发执行" },
+    ],
+  },
+  {
+    id: "config",
+    label: "配置",
+    items: [
+      { id: "config", label: "Agent 配置", desc: "端点与模型参数同步" },
+      { id: "agents", label: "Agent 管控", desc: "舰队启停 · Drain · 滚动重启" },
+      { id: "skills", label: "技能中心", desc: "发布 · 安装 · 执行技能" },
+    ],
+  },
+  {
+    id: "gov",
+    label: "治理",
+    items: [{ id: "settings", label: "系统设置", desc: "配额 · 密钥 · 审计 · 告警" }],
+  },
+];
+
+const NAV_FLAT = NAV_GROUPS.flatMap((g) => g.items);
+
+const WS_LABEL = {
+  connected: "已连接",
+  connecting: "连接中",
+  disconnected: "已断开",
+  error: "异常",
+};
+
+const WIDE_ROUTES = new Set(["monitor"]);
+const FILL_ROUTES = new Set(["monitor", "config", "agents"]);
+
+export default function AdminShell({
+  route,
+  onNavigate,
+  wsState,
+  role,
+  onLogout,
+  children,
+  clusterSummary,
+}) {
+  const current = NAV_FLAT.find((n) => n.id === route) || NAV_FLAT[0];
+  const isWide = WIDE_ROUTES.has(route);
+  const isFill = FILL_ROUTES.has(route);
+  const summary = clusterSummary || {};
+
+  const frameMods = [
+    isWide ? "admin-content__frame--wide" : "",
+    isFill ? "admin-content__frame--fill" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const topbarFrameMods = isWide ? "admin-topbar__frame--wide" : "";
+
+  return (
+    <div className="admin-app">
+      <aside className="admin-sidebar">
+        <div className="admin-brand">
+          <span className="admin-brand__mark" aria-hidden>
+            CH
+          </span>
+          <div>
+            <strong>ClawHive</strong>
+            <span>Agent 控制面</span>
+          </div>
+        </div>
+        <nav className="admin-nav" aria-label="主导航">
+          {NAV_GROUPS.map((group) => (
+            <div className="admin-nav__group" key={group.id}>
+              <div className="admin-nav__group-label">{group.label}</div>
+              {group.items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`admin-nav__item ${route === item.id ? "admin-nav__item--active" : ""}`}
+                  onClick={() => onNavigate(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          ))}
+        </nav>
+        <div className="admin-sidebar__foot">
+          <span className={`badge badge--ws ${wsState}`}>
+            {WS_LABEL[wsState] || wsState}
+          </span>
+          <span className="admin-role">{role}</span>
+        </div>
+      </aside>
+      <div className="admin-main">
+        <header className="admin-topbar">
+          <div className={`admin-topbar__frame ${topbarFrameMods}`}>
+            <div className="admin-topbar__text">
+              <h1 className="admin-topbar__title">{current.label}</h1>
+              <p className="admin-topbar__sub">{current.desc}</p>
+            </div>
+            <div className="admin-topbar__chips" aria-label="集群摘要">
+              <span className="shell-chip">
+                运行 <strong>{summary.running ?? "—"}</strong>
+                <span className="shell-chip__muted">/{summary.total ?? "—"}</span>
+              </span>
+              <span className={`shell-chip ${summary.alerts ? "shell-chip--warn" : ""}`}>
+                告警 <strong>{summary.alerts ?? 0}</strong>
+              </span>
+              <span className="shell-chip shell-chip--mono" title={summary.configVersion || ""}>
+                cfg <strong>{summary.configVersion ? String(summary.configVersion).slice(0, 8) : "—"}</strong>
+              </span>
+            </div>
+            <div className="admin-topbar__actions">
+              {route !== "monitor" ? (
+                <button type="button" className="btn-ghost" onClick={() => onNavigate("monitor")}>
+                  监控大屏
+                </button>
+              ) : null}
+              <button type="button" className="btn-ghost btn-ghost--muted" onClick={onLogout}>
+                退出
+              </button>
+            </div>
+          </div>
+        </header>
+        <div className={`admin-content ${isFill ? "admin-content--fill" : ""}`}>
+          <div className={`admin-content__frame ${frameMods}`}>{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}

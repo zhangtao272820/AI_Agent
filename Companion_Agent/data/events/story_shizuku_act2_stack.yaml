@@ -1,0 +1,24 @@
+id: story_shizuku_act2_stack
+label: 书车与借还
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shizuku]
+  stage_min: close_friend
+  affinity_min: 68
+  flags_absent: [sz_booklist]
+  flags_present: [sz_first_irl]
+prompt_snippet: |
+  【专属故事 · 书脊后的声线 · 第2幕 · 书车与借还】
+  archive_cart；她开始把推荐书单给你
+  立绘气质参考：archive_cart, return_slot, stamp_catalog。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sz_booklist, video_call_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

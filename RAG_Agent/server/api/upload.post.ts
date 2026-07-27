@@ -1,0 +1,62 @@
+import { processDocument } from "../utils/vectorStore";
+import { applyPlatformModelOverrides } from "../utils/platform_config";
+
+export default defineEventHandler(async (event) => {
+  await applyPlatformModelOverrides({});
+  const formData = await readMultipartFormData(event);
+  if (!formData) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No form data found",
+    });
+  }
+
+  const file = formData.find((f) => f.name === "file");
+  if (!file || !file.data) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No file provided",
+    });
+  }
+
+  // 直接传递 Buffer，避免 Blob 转换可能导致的二进制损坏
+  const buffer = file.data;
+  const maxUploadBytes = parseInt(process.env.MAX_UPLOAD_BYTES ?? "52428800");
+  if (buffer.length > maxUploadBytes) {
+    throw createError({
+      statusCode: 413,
+      statusMessage: `File too large: ${buffer.length} > ${maxUploadBytes}`,
+    });
+  }
+  const normalizeUploadFilename = (name: string) => {
+    const s = String(name || "").trim();
+    if (!s) return "unknown";
+    // h3 multipart 在某些环境会把 filename 按 latin1 解码，导致中文文件名变成乱码控制字符。
+    // 这里做一次“可逆尝试”：若包含控制字符/高位 latin1，则尝试按 latin1->utf8 还原。
+    const looksBroken = /[\u0000-\u001f\u007f-\u00ff]/.test(s);
+    if (!looksBroken) return s;
+    try {
+      const recovered = Buffer.from(s, "latin1").toString("utf8").trim();
+      return recovered || s;
+    } catch {
+      return s;
+    }
+  };
+
+  const fileName = normalizeUploadFilename(file.filename || "unknown");
+
+  try {
+    const chunkCount = await processDocument(buffer, fileName);
+    return {
+      message: "Document processed successfully",
+      chunks: chunkCount,
+      fileName: fileName,
+    };
+  } catch (error: any) {
+    console.error(`[Upload Error] File: ${fileName}, Error:`, error.message);
+    throw createError({
+      statusCode: 500,
+      statusMessage: `Error processing document: ${error.message}`,
+    });
+  }
+});

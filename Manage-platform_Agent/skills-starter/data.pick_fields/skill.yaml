@@ -1,0 +1,15 @@
+apiVersion: clawhive/v1
+kind: Skill
+metadata:
+  id: data.pick_fields
+  name: 结构化字段提取
+  version: 1.0.0
+  description: 从对象数组中按字段白名单提取子集，便于下游展示与存储
+  owner: platform
+  tags: [data, transform, utility]
+spec:
+  runtime: python3.11
+  entry: entrypoint/main.py:run
+  io:
+    inputSchema: schemas/input.schema.json
+    outputSchema: schemas/output.schema.json

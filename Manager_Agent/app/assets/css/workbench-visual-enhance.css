@@ -1,0 +1,1582 @@
+/* ═══════════════════════════════════════════════════════════════
+   工作台视觉增强 · 对话模式 vs 专业模式双轨 UI
+   对话 → 网页式聊天（ChatGPT/Claude 风格）
+   专业 → IDEA 编排工作台（流程卡片 + 可视化）
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 共享动画 ── */
+@keyframes wb-flow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes wb-step-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(56, 189, 248, 0.35); }
+}
+
+@keyframes wb-chat-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wb-pro-scan {
+  0% { transform: translateX(-100%); opacity: 0; }
+  20% { opacity: 0.6; }
+  100% { transform: translateX(200%); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   对话列对齐 · 修复「歪」的布局
+   ═══════════════════════════════════════════════════════════════ */
+.spring-root.cursor-workbench .chat-thread.chat-messenger {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll {
+  align-items: stretch !important;
+}
+
+.spring-root.cursor-workbench .spring-turn {
+  width: 100% !important;
+  align-items: stretch !important;
+  transform: none !important;
+}
+
+.spring-root.cursor-workbench .spring-turn > .chat-user-row,
+.spring-root.cursor-workbench .spring-turn > .chat-agent-row,
+.spring-root.cursor-workbench .spring-turn > .chat-agent-stack,
+.spring-root.cursor-workbench .spring-turn > .turn-agent-pipeline,
+.spring-root.cursor-workbench .spring-turn > .cursor-thought-panel,
+.spring-root.cursor-workbench .spring-turn > .reply-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  align-self: stretch !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
+}
+
+.spring-root.cursor-workbench .chat-user-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+.spring-root.cursor-workbench .chat-user-row .spring-log-bubble,
+.spring-root.cursor-workbench .chat-user-row .cosmic-bubble-user {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+.spring-root.cursor-workbench .chat-agent-row,
+.spring-root.cursor-workbench .chat-agent-stack {
+  display: flex !important;
+  justify-content: flex-start !important;
+}
+
+.spring-root.cursor-workbench .reply-panel .reply-panel-inner,
+.spring-root.cursor-workbench .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.spring-root.cursor-workbench .spring-input.cosmic-input-dock {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.spring-root.mode-professional .cosmic-hud-shell::before,
+.spring-root.mode-professional .cosmic-hud-shell::after {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   思考过程标题 · 图二优化
+   ═══════════════════════════════════════════════════════════════ */
+.spring-root.cursor-workbench .cursor-thought-panel > .process-panel-summary {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  padding: 10px 14px !important;
+}
+
+.process-panel-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+
+.process-panel-summary-row .process-panel-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.process-panel-summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.spring-root.cursor-workbench .process-panel-preview {
+  display: block;
+  width: 100%;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  color: #64748b !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 22px;
+}
+
+.spring-root.thought-view-developer .cursor-thought-panel.thought-panel-developer > .process-panel-summary .process-panel-label::after {
+  content: ' · DEV';
+  font-size: 10px;
+  font-weight: 700;
+  color: #fdba74;
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Agent 任务编排 · 独立于思考过程（图三）
+   ═══════════════════════════════════════════════════════════════ */
+.turn-agent-pipeline {
+  width: 100%;
+  margin: 4px 0 10px;
+}
+
+.turn-agent-pipeline-inner {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: linear-gradient(165deg, rgba(8, 22, 52, 0.72), rgba(6, 14, 36, 0.65));
+  backdrop-filter: blur(16px) saturate(1.15);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.turn-agent-pipeline.is-running .turn-agent-pipeline-inner {
+  border-color: rgba(56, 189, 248, 0.42);
+  box-shadow: 0 6px 32px rgba(14, 165, 233, 0.12);
+}
+
+.turn-agent-pipeline-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), transparent);
+}
+
+.turn-agent-pipeline-icon {
+  color: #38bdf8;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.turn-agent-pipeline-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7dd3fc;
+  letter-spacing: 0.04em;
+}
+
+.turn-agent-pipeline-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.turn-agent-pipeline-live {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #7dd3fc;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  animation: wb-flow-pulse 1.4s ease-in-out infinite;
+}
+
+.turn-agent-route-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 2px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.turn-agent-route-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.turn-agent-route-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(14, 165, 233, 0.1);
+  color: #bae6fd;
+}
+
+.turn-agent-route-node.agent-tone-db .turn-agent-route-label { border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.12); color: #93c5fd; }
+.turn-agent-route-node.agent-tone-clean .turn-agent-route-label { border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.1); color: #6ee7b7; }
+.turn-agent-route-node.agent-tone-code .turn-agent-route-label { border-color: rgba(251, 191, 36, 0.35); background: rgba(251, 191, 36, 0.1); color: #fcd34d; }
+.turn-agent-route-node.agent-tone-visualize .turn-agent-route-label { border-color: rgba(45, 212, 191, 0.35); background: rgba(45, 212, 191, 0.1); color: #5eead4; }
+.turn-agent-route-node.agent-tone-admin .turn-agent-route-label { border-color: rgba(244, 114, 182, 0.35); background: rgba(244, 114, 182, 0.1); color: #f9a8d4; }
+
+.turn-agent-route-arrow {
+  color: rgba(148, 163, 184, 0.55);
+  font-size: 11px;
+  padding: 0 2px;
+}
+
+.turn-agent-step-list {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.turn-agent-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.turn-agent-step + .turn-agent-step::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: -2px;
+  width: 2px;
+  height: 8px;
+  background: rgba(56, 189, 248, 0.25);
+}
+
+.turn-agent-step-marker {
+  flex-shrink: 0;
+  width: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.turn-agent-step-idx {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  background: rgba(51, 65, 85, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.turn-agent-step.is-success .turn-agent-step-idx {
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.turn-agent-step.is-running .turn-agent-step-idx {
+  color: #7dd3fc;
+  background: rgba(14, 165, 233, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+  animation: wb-step-glow 2s ease-in-out infinite;
+}
+
+.turn-agent-step.is-failed .turn-agent-step-idx {
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.turn-agent-step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.turn-agent-step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.turn-agent-step-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.turn-agent-step-status {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #64748b;
+  background: rgba(51, 65, 85, 0.45);
+}
+
+.turn-agent-step.is-success .turn-agent-step-status { color: #6ee7b7; background: rgba(52, 211, 153, 0.12); }
+.turn-agent-step.is-running .turn-agent-step-status { color: #7dd3fc; background: rgba(14, 165, 233, 0.12); }
+.turn-agent-step.is-failed .turn-agent-step-status { color: #fca5a5; background: rgba(248, 113, 113, 0.12); }
+
+.turn-agent-step-query,
+.turn-agent-step-summary {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #94a3b8;
+  word-break: break-word;
+}
+
+.turn-agent-step-summary {
+  color: #cbd5e1;
+}
+
+.turn-agent-clauses {
+  padding: 0 14px 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.turn-agent-clauses-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  padding: 10px 0 6px;
+}
+
+.turn-agent-clause-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.turn-agent-clause-list li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.turn-agent-clause-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.turn-agent-pipeline-dev {
+  margin: 0 12px 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 146, 60, 0.22);
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.turn-agent-pipeline-dev > summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fdba74;
+  list-style: none;
+}
+
+.turn-agent-pipeline-dev > summary::-webkit-details-marker {
+  display: none;
+}
+
+.turn-agent-dev-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.turn-agent-dev-k {
+  font-weight: 700;
+  color: #64748b;
+}
+
+.turn-agent-dev-code {
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: #cbd5e1;
+  word-break: break-all;
+}
+
+.turn-agent-dev-lint {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  font-size: 11px;
+  color: #fbbf24;
+}
+
+.spring-root:not(.mode-professional) .turn-agent-pipeline-inner {
+  border-color: rgba(167, 139, 250, 0.28);
+  background: linear-gradient(165deg, rgba(30, 27, 75, 0.65), rgba(15, 12, 40, 0.6));
+}
+
+.spring-root:not(.mode-professional) .turn-agent-pipeline-head {
+  border-bottom-color: rgba(167, 139, 250, 0.12);
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.1), transparent);
+}
+
+.spring-root:not(.mode-professional) .turn-agent-pipeline-title {
+  color: #c4b5fd;
+}
+
+.spring-root:not(.mode-professional) .turn-agent-route-label {
+  border-color: rgba(167, 139, 250, 0.3);
+  background: rgba(139, 92, 246, 0.12);
+  color: #ddd6fe;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   对话模式 · 网页式聊天
+   ═══════════════════════════════════════════════════════════════ */
+.spring-root.cursor-workbench.cosmic-theme:not(.mode-professional) {
+  --wb-accent: #a78bfa;
+  --wb-accent-soft: rgba(167, 139, 250, 0.18);
+  --wb-accent-glow: rgba(139, 92, 246, 0.25);
+  --chat-col-width: min(780px, calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 56px));
+  --chat-user-max: min(520px, 82%);
+  --chat-agent-max: 100%;
+  --chat-turn-gap: 1.75rem;
+}
+
+/* 模式横幅 · 对话 */
+.spring-root:not(.mode-professional) .workbench-mode-banner {
+  background: linear-gradient(135deg, rgba(49, 46, 129, 0.55), rgba(30, 27, 75, 0.35));
+  border-color: rgba(167, 139, 250, 0.3);
+  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.12);
+}
+
+.spring-root:not(.mode-professional) .workbench-mode-banner-icon {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(99, 102, 241, 0.35));
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #e9d5ff;
+}
+
+/* 对话区 · 干净居中列 */
+.spring-root:not(.mode-professional) .spring-log.chat-scroll {
+  padding: 1.25rem 1.5rem 2rem !important;
+  background: linear-gradient(180deg, rgba(15, 10, 40, 0.08) 0%, transparent 12%) !important;
+}
+
+.spring-root:not(.mode-professional) .chat-thread {
+  gap: var(--chat-turn-gap) !important;
+}
+
+/* 轮次分隔线 */
+.spring-root:not(.mode-professional) .spring-turn {
+  position: relative;
+  padding-bottom: 0.5rem;
+  animation: wb-chat-fade-in 0.35s ease-out both;
+}
+
+.spring-root:not(.mode-professional) .spring-turn + .spring-turn::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 auto 1.25rem;
+  max-width: min(480px, 60%);
+  background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.18), transparent);
+}
+
+/* 用户气泡 · 右对齐胶囊 */
+.spring-root:not(.mode-professional) .cosmic-bubble-user {
+  max-width: var(--chat-user-max) !important;
+  padding: 11px 16px 10px !important;
+  border-radius: 20px 20px 4px 20px !important;
+  background: linear-gradient(145deg, rgba(109, 40, 217, 0.72), rgba(79, 70, 229, 0.58)) !important;
+  border: 1px solid rgba(167, 139, 250, 0.42) !important;
+  box-shadow:
+    0 4px 20px rgba(109, 40, 217, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.spring-root:not(.mode-professional) .cosmic-bubble-user .spring-log-text {
+  color: #f5f3ff !important;
+  font-size: 15px !important;
+  line-height: 1.65 !important;
+}
+
+/* 总管回复 · 左对齐简洁卡片 */
+.spring-root:not(.mode-professional) .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  max-width: 100% !important;
+  width: 100% !important;
+  border-radius: 4px 18px 18px 18px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  background: rgba(15, 18, 35, 0.62) !important;
+  backdrop-filter: blur(14px) saturate(1.15) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18) !important;
+}
+
+.spring-root:not(.mode-professional) .reply-panel-header {
+  padding: 10px 16px 6px !important;
+}
+
+.spring-root:not(.mode-professional) .reply-panel-avatar {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.35)) !important;
+  border: 1px solid rgba(167, 139, 250, 0.35) !important;
+}
+
+.spring-root:not(.mode-professional) .reply-panel-body {
+  padding: 4px 18px 16px !important;
+}
+
+.spring-root:not(.mode-professional) .reply-chat,
+.spring-root:not(.mode-professional) .reply-chat .md-p {
+  font-size: 15px !important;
+  line-height: 1.78 !important;
+  color: #eceff4 !important;
+}
+
+/* 思考过程 · 对话模式极简内联 */
+.spring-root:not(.mode-professional) .cursor-thought-panel.process-panel {
+  max-width: 100% !important;
+  margin: 2px 0 6px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.spring-root:not(.mode-professional) .cursor-thought-panel > .process-panel-summary {
+  padding: 6px 8px 6px 0 !important;
+  font-size: 12px !important;
+  color: #64748b !important;
+  border-bottom: none !important;
+  background: transparent !important;
+}
+
+.spring-root:not(.mode-professional) .cursor-thought-panel > .process-panel-summary:hover {
+  color: #94a3b8 !important;
+  background: transparent !important;
+}
+
+.spring-root:not(.mode-professional) .cursor-thought-panel[open] > .process-panel-summary {
+  color: #a5b4fc !important;
+  background: transparent !important;
+}
+
+.spring-root:not(.mode-professional) .cursor-thought-panel .process-panel-body {
+  max-height: min(32vh, 360px) !important;
+  padding: 6px 0 8px 10px !important;
+  border-left: 2px solid rgba(167, 139, 250, 0.2) !important;
+  margin-left: 4px !important;
+}
+
+/* 空状态 · 对话 */
+.spring-root:not(.mode-professional) .cosmic-chat-empty {
+  border-color: rgba(167, 139, 250, 0.35) !important;
+  background:
+    radial-gradient(circle at 25% 35%, rgba(139, 92, 246, 0.15) 0 2px, transparent 3px),
+    radial-gradient(circle at 75% 25%, rgba(99, 102, 241, 0.12) 0 1.5px, transparent 2.5px),
+    radial-gradient(ellipse at center, rgba(139, 92, 246, 0.08), transparent 70%) !important;
+}
+
+.spring-root:not(.mode-professional) .cosmic-chat-empty-icon {
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.6));
+}
+
+.spring-root:not(.mode-professional) .cosmic-chat-empty-title {
+  color: #e9d5ff !important;
+  text-shadow: 0 0 20px rgba(167, 139, 250, 0.45) !important;
+  letter-spacing: 0.12em !important;
+}
+
+/* 输入区 · 对话胶囊 */
+.spring-root:not(.mode-professional) .spring-input.cosmic-input-dock {
+  margin: 0 !important;
+  border-radius: 16px !important;
+  border-color: rgba(167, 139, 250, 0.32) !important;
+  background: linear-gradient(180deg, rgba(30, 27, 75, 0.75), rgba(15, 12, 40, 0.88)) !important;
+  box-shadow:
+    0 -2px 32px rgba(139, 92, 246, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.35) !important;
+}
+
+.spring-root:not(.mode-professional) .spring-input.cosmic-input-dock .spring-input-field {
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  border-radius: 18px !important;
+  background: rgba(15, 10, 40, 0.65) !important;
+}
+
+.spring-root:not(.mode-professional) .spring-input.cosmic-input-dock .spring-input-field:focus {
+  border-color: rgba(167, 139, 250, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2), 0 0 24px rgba(139, 92, 246, 0.15) !important;
+}
+
+.spring-root:not(.mode-professional) .spring-input.cosmic-input-dock .spring-btn:not(.alt) {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.35) !important;
+  border-radius: 18px !important;
+}
+
+.spring-root:not(.mode-professional) .cosmic-input-label,
+.spring-root:not(.mode-professional) .workbench-input-mode-tabs button.is-active {
+  color: #c4b5fd !important;
+}
+
+/* 阶段徽章 · 对话紫色 */
+.spring-root:not(.mode-professional) .spring-phase .badge.active {
+  background: rgba(139, 92, 246, 0.28) !important;
+  border-color: rgba(167, 139, 250, 0.45) !important;
+  color: #e9d5ff !important;
+}
+
+/* 图表卡片 · 对话 */
+.spring-root:not(.mode-professional) .reply-inline-analytics .chart-card {
+  border-color: rgba(167, 139, 250, 0.2) !important;
+  background: rgba(30, 27, 75, 0.35) !important;
+  border-radius: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   专业模式 · IDEA 编排工作台
+   ═══════════════════════════════════════════════════════════════ */
+.spring-root.cursor-workbench.cosmic-theme.mode-professional {
+  --wb-accent: #38bdf8;
+  --wb-accent-soft: rgba(56, 189, 248, 0.15);
+  --wb-accent-glow: rgba(14, 165, 233, 0.28);
+  --chat-col-width: min(920px, calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 40px));
+  --chat-user-max: min(560px, 75%);
+  --chat-agent-max: 100%;
+  --chat-turn-gap: 1.5rem;
+}
+
+/* 模式横幅 · 专业 HUD */
+.spring-root.mode-professional .workbench-mode-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(8, 47, 73, 0.78), rgba(12, 30, 60, 0.65));
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 32px rgba(14, 165, 233, 0.15), inset 0 1px 0 rgba(56, 189, 248, 0.12);
+}
+
+.spring-root.mode-professional .workbench-mode-banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+  animation: wb-pro-scan 4s ease-in-out infinite;
+}
+
+.spring-root.mode-professional .workbench-mode-banner-icon {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.45), rgba(37, 99, 235, 0.35));
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #7dd3fc;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+/* 专业列 · HUD 角标 */
+.spring-root.mode-professional .cosmic-hud-shell::before,
+.spring-root.mode-professional .cosmic-hud-shell::after {
+  display: block !important;
+  opacity: 0.5;
+  width: 22px;
+  height: 22px;
+}
+
+.spring-root.mode-professional .spring-log.chat-scroll {
+  padding: 1rem 1.25rem 1.75rem !important;
+}
+
+/* 用户气泡 · 专业 */
+.spring-root.mode-professional .cosmic-bubble-user {
+  border-radius: 16px 16px 4px 16px !important;
+  background: linear-gradient(145deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.48)) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.18) !important;
+}
+
+/* 总管回复 · 全宽 IDE 卡片 */
+.spring-root.mode-professional .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  max-width: 100% !important;
+  width: 100% !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  background: linear-gradient(165deg, rgba(8, 20, 48, 0.72), rgba(6, 14, 36, 0.65)) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(56, 189, 248, 0.08) !important;
+}
+
+.spring-root.mode-professional .reply-panel-avatar {
+  border-radius: 8px !important;
+  background: linear-gradient(145deg, rgba(14, 165, 233, 0.4), rgba(37, 99, 235, 0.3)) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+.spring-root.mode-professional .reply-panel-header {
+  border-bottom: 1px solid rgba(56, 189, 248, 0.1) !important;
+  padding: 12px 16px 10px !important;
+}
+
+/* 思考过程 · IDEA 核心面板 */
+.spring-root.mode-professional .cursor-thought-panel.process-panel {
+  width: 100% !important;
+  margin: 8px 0 12px !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  border-radius: 14px !important;
+  background: linear-gradient(165deg, rgba(8, 20, 48, 0.75), rgba(6, 14, 36, 0.68)) !important;
+  backdrop-filter: blur(20px) saturate(1.2) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 0 40px rgba(14, 165, 233, 0.08),
+    inset 0 1px 0 rgba(56, 189, 248, 0.1) !important;
+  overflow: hidden !important;
+}
+
+.spring-root.mode-professional .cursor-thought-panel > .process-panel-summary {
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  color: #7dd3fc !important;
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.12), transparent) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12) !important;
+}
+
+.spring-root.mode-professional .cursor-thought-panel > .process-panel-summary::before {
+  content: none !important;
+}
+
+.spring-root.mode-professional .cursor-thought-panel[open] > .process-panel-summary {
+  color: #bae6fd !important;
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.18), transparent) !important;
+}
+
+.spring-root.mode-professional .cursor-thought-panel.is-running > .process-panel-summary {
+  animation: wb-step-glow 2s ease-in-out infinite;
+}
+
+.spring-root.mode-professional .cursor-thought-panel .process-panel-body {
+  max-height: min(52vh, 560px) !important;
+  padding: 14px 16px 16px !important;
+  background: rgba(2, 8, 24, 0.35);
+}
+
+/* Agent 轨迹 chip 彩色编码 */
+.spring-root.mode-professional .process-agent-trail .agent-chip-sm:nth-child(1) { border-color: rgba(56, 189, 248, 0.4) !important; color: #7dd3fc !important; }
+.spring-root.mode-professional .process-agent-trail .agent-chip-sm:nth-child(2) { border-color: rgba(167, 139, 250, 0.4) !important; color: #c4b5fd !important; }
+.spring-root.mode-professional .process-agent-trail .agent-chip-sm:nth-child(3) { border-color: rgba(251, 146, 60, 0.4) !important; color: #fdba74 !important; }
+.spring-root.mode-professional .process-agent-trail .agent-chip-sm:nth-child(4) { border-color: rgba(52, 211, 153, 0.4) !important; color: #6ee7b7 !important; }
+
+/* 编排诊断块 · 流程可视化 */
+.spring-root.mode-professional .process-orchestration-block {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 16px;
+  border-left: 2px solid rgba(56, 189, 248, 0.35);
+}
+
+.spring-root.mode-professional .process-orchestration-block::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.spring-root.mode-professional .process-orchestration-card {
+  position: relative;
+  padding: 12px 14px !important;
+  border-radius: 12px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.spring-root.mode-professional .process-orchestration-card:hover {
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.12);
+}
+
+.spring-root.mode-professional .process-orchestration-route {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  background: linear-gradient(165deg, rgba(8, 47, 73, 0.45), rgba(15, 23, 42, 0.55)) !important;
+}
+
+.spring-root.mode-professional .process-orchestration-route-detail {
+  border-color: rgba(56, 189, 248, 0.28) !important;
+  background: linear-gradient(165deg, rgba(12, 40, 70, 0.4), rgba(15, 23, 42, 0.5)) !important;
+}
+
+.spring-root.mode-professional .process-orchestration-plan {
+  border-color: rgba(167, 139, 250, 0.32) !important;
+  background: linear-gradient(165deg, rgba(30, 27, 75, 0.4), rgba(15, 23, 42, 0.5)) !important;
+}
+
+.spring-root.mode-professional .process-orch-title {
+  color: #7dd3fc !important;
+  font-size: 11px !important;
+}
+
+.spring-root.mode-professional .process-orch-title::before {
+  content: '▸ ';
+  color: #38bdf8;
+}
+
+/* 执行计划步骤 · 流程连线 */
+.spring-root.mode-professional .process-orch-steps {
+  position: relative;
+  padding-left: 4px;
+}
+
+.spring-root.mode-professional .process-orch-step {
+  position: relative;
+  grid-template-columns: 28px auto 1fr !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  border-color: rgba(56, 189, 248, 0.15) !important;
+  background: rgba(2, 8, 24, 0.45) !important;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.spring-root.mode-professional .process-orch-step:hover {
+  background: rgba(14, 165, 233, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.28) !important;
+}
+
+.spring-root.mode-professional .process-orch-step + .process-orch-step::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: -8px;
+  width: 2px;
+  height: 8px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.5), rgba(56, 189, 248, 0.15));
+}
+
+.spring-root.mode-professional .process-orch-step-idx {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.35), rgba(37, 99, 235, 0.25));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+/* 步骤执行结果卡 · 专业 */
+.spring-root.mode-professional .cursor-step-results-head {
+  color: #38bdf8 !important;
+  font-size: 11px !important;
+  padding: 0 2px 6px !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  margin-bottom: 4px;
+}
+
+.spring-root.mode-professional .cursor-step-results-head::before {
+  content: '⬡ ';
+  opacity: 0.7;
+}
+
+.spring-root.mode-professional .cursor-tool-card.step-result-card {
+  border-radius: 10px !important;
+  background: rgba(2, 8, 24, 0.55) !important;
+}
+
+.spring-root.mode-professional .cursor-tool-card.step-result-success {
+  border-left-width: 3px !important;
+  border-left-color: rgba(52, 211, 153, 0.65) !important;
+}
+
+.spring-root.mode-professional .cursor-tool-card.step-result-failed {
+  border-left-width: 3px !important;
+  border-left-color: rgba(248, 113, 113, 0.65) !important;
+}
+
+/* 时间线 · 运行中脉冲 */
+.spring-root.mode-professional .process-step.is-latest-live .process-step-dot {
+  background: #38bdf8 !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65) !important;
+  animation: wb-flow-pulse 1.2s ease-in-out infinite;
+}
+
+.spring-root.mode-professional .process-timeline {
+  border-left-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+/* 计划预览卡 · 专业强化 */
+.spring-root.mode-professional .conv-plan-preview.is-professional-plan {
+  border-radius: 16px !important;
+  border-width: 1px !important;
+  padding: 16px 18px !important;
+}
+
+.spring-root.mode-professional .conv-plan-preview.is-professional-plan .conv-plan-preview-head strong {
+  color: #7dd3fc;
+  font-size: 15px;
+}
+
+.spring-root.mode-professional .conv-plan-preview.is-professional-plan .conv-plan-preview-head strong::before {
+  content: '◈ ';
+  color: #38bdf8;
+}
+
+.spring-root.mode-professional .conv-plan-preview-item {
+  grid-template-columns: 150px 1fr !important;
+  border-color: rgba(56, 189, 248, 0.15) !important;
+  background: rgba(2, 8, 24, 0.45) !important;
+  transition: border-color 0.15s;
+}
+
+.spring-root.mode-professional .conv-plan-preview-item:hover {
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+/* 执行计划轨道 */
+.spring-root.mode-professional .spring-plan-todo {
+  border-color: rgba(56, 189, 248, 0.28) !important;
+  background: linear-gradient(165deg, rgba(8, 47, 73, 0.45), rgba(15, 23, 42, 0.55)) !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+}
+
+.spring-root.mode-professional .spring-plan-todo-title {
+  color: #7dd3fc !important;
+}
+
+.spring-root.mode-professional .spring-plan-todo-title::before {
+  content: '▸ ';
+  color: #38bdf8;
+}
+
+.spring-root.mode-professional .spring-plan-todo-item.is-running {
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  background: rgba(14, 165, 233, 0.1) !important;
+  animation: wb-step-glow 2s ease-in-out infinite;
+}
+
+.spring-root.mode-professional .spring-plan-todo-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(51, 65, 85, 0.5);
+  font-size: 10px !important;
+}
+
+.spring-root.mode-professional .spring-plan-todo-item.is-running .spring-plan-todo-check {
+  background: rgba(14, 165, 233, 0.35);
+  color: #7dd3fc !important;
+}
+
+.spring-root.mode-professional .spring-plan-todo-item.is-success .spring-plan-todo-check {
+  background: rgba(52, 211, 153, 0.25);
+}
+
+/* 阶段进度 · 专业连线 */
+.spring-root.mode-professional .conv-phase-badges {
+  position: relative;
+  gap: 2px !important;
+}
+
+.spring-root.mode-professional .conv-phase-badges .badge {
+  position: relative;
+  z-index: 1;
+}
+
+.spring-root.mode-professional .conv-phase-badges .badge.active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.55), rgba(37, 99, 235, 0.4)) !important;
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  color: #f0f9ff !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35) !important;
+}
+
+.spring-root.mode-professional .conv-live-bar.active {
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  background: rgba(8, 47, 73, 0.45) !important;
+}
+
+/* 空状态 · 专业 */
+.spring-root.mode-professional .cosmic-chat-empty {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(56, 189, 248, 0.14) 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.1) 0 1.5px, transparent 2.5px),
+    radial-gradient(ellipse at center, rgba(14, 165, 233, 0.1), transparent 70%) !important;
+}
+
+.spring-root.mode-professional .cosmic-chat-empty-title {
+  color: #7dd3fc !important;
+  text-shadow: 0 0 24px rgba(56, 189, 248, 0.5) !important;
+  letter-spacing: 0.16em !important;
+}
+
+/* 输入区 · 专业控制台 */
+.spring-root.mode-professional .spring-input.cosmic-input-dock {
+  margin: 0 !important;
+  border-radius: 16px !important;
+  border-color: rgba(56, 189, 248, 0.38) !important;
+  background: linear-gradient(180deg, rgba(8, 20, 48, 0.88), rgba(6, 14, 36, 0.92)) !important;
+  box-shadow:
+    0 -4px 40px rgba(14, 165, 233, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(56, 189, 248, 0.1) !important;
+}
+
+.spring-root.mode-professional .spring-input.cosmic-input-dock .spring-input-field {
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  border-radius: 12px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 14px !important;
+}
+
+.spring-root.mode-professional .spring-input.cosmic-input-dock .spring-btn:not(.alt) {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+  box-shadow: 0 0 24px rgba(14, 165, 233, 0.4) !important;
+  border-radius: 12px !important;
+}
+
+.spring-root.mode-professional .cosmic-input-head {
+  border-bottom-color: rgba(56, 189, 248, 0.2) !important;
+}
+
+/* 侧栏 Token 耗时条 · 可视化增强 */
+.spring-root.mode-professional .spring-run-phase-fill {
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8, #6366f1) !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.spring-root:not(.mode-professional) .spring-run-phase-fill {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa, #6366f1) !important;
+}
+
+/* 快捷示例 · 模式色 */
+.spring-root:not(.mode-professional) .quick-card {
+  border-color: rgba(167, 139, 250, 0.28) !important;
+}
+
+.spring-root:not(.mode-professional) .quick-card:hover {
+  border-color: rgba(167, 139, 250, 0.5) !important;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.2) !important;
+}
+
+.spring-root.mode-professional .quick-card {
+  border-color: rgba(56, 189, 248, 0.28) !important;
+}
+
+.spring-root.mode-professional .quick-card:hover {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   列级布局 · 对话列 vs 专业列
+   ═══════════════════════════════════════════════════════════════ */
+.spring-root .wb-chat-column .cosmic-examples-strip {
+  margin: 0 12px 8px;
+  border-radius: 14px !important;
+}
+
+.spring-root .wb-professional-column .conv-plan-panel,
+.spring-root .wb-professional-column .conv-plan-preview {
+  margin: 0 !important;
+}
+
+.spring-root .wb-professional-column .cosmic-examples-strip {
+  margin: 0 8px 6px;
+  border-color: rgba(56, 189, 248, 0.22) !important;
+}
+
+.spring-root .wb-chat-column .spring-examples-summary {
+  color: #c4b5fd !important;
+}
+
+.spring-root .wb-professional-column .spring-examples-summary {
+  color: #7dd3fc !important;
+}
+
+/* 历史侧栏 · 模式色 */
+.spring-root:not(.mode-professional) .spring-history-row.active {
+  background: rgba(139, 92, 246, 0.12) !important;
+  border-color: rgba(167, 139, 250, 0.28) !important;
+  box-shadow: inset 3px 0 0 rgba(139, 92, 246, 0.75) !important;
+}
+
+.spring-root.mode-professional .spring-history-row.active {
+  background: rgba(14, 165, 233, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.28) !important;
+  box-shadow: inset 3px 0 0 rgba(56, 189, 248, 0.75) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   共享增强 · 模式横幅图标 / 图表 / 响应式
+   ═══════════════════════════════════════════════════════════════ */
+.workbench-mode-banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.workbench-mode-banner {
+  gap: 14px !important;
+}
+
+/* 图表可视化增强 */
+.spring-root .echarts-container {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.spring-root .reply-inline-analytics .chart-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spring-root .reply-inline-analytics .chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--wb-accent, #38bdf8), transparent);
+  opacity: 0.6;
+}
+
+/* 流式回复指示 */
+.spring-root .conv-stream-bubble {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.spring-root:not(.mode-professional) .conv-stream-bubble {
+  border-color: rgba(167, 139, 250, 0.2) !important;
+  background: rgba(30, 27, 75, 0.35) !important;
+}
+
+.spring-root.mode-professional .conv-stream-bubble {
+  border-color: rgba(56, 189, 248, 0.25) !important;
+  background: rgba(8, 20, 48, 0.55) !important;
+}
+
+.spring-root .conv-stream-dot {
+  background: var(--wb-accent, #38bdf8) !important;
+  box-shadow: 0 0 8px var(--wb-accent-glow, rgba(56, 189, 248, 0.5));
+}
+
+/* 模式切换按钮图标感 */
+.spring-workbench-mode-toggle button.is-active,
+.workbench-input-mode-tabs button.is-active {
+  position: relative;
+}
+
+.spring-root:not(.mode-professional) .spring-workbench-mode-toggle button.is-active:first-child::before,
+.spring-root:not(.mode-professional) .workbench-input-mode-tabs button.is-active:first-child::before {
+  content: '💬 ';
+  font-size: 11px;
+}
+
+.spring-root.mode-professional .spring-workbench-mode-toggle button.is-active:last-child::before,
+.spring-root.mode-professional .workbench-input-mode-tabs button.is-active:last-child::before {
+  content: '⚡ ';
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .spring-root:not(.mode-professional) {
+    --chat-col-width: 100%;
+    --chat-user-max: 90%;
+  }
+
+  .spring-root.mode-professional {
+    --chat-col-width: 100%;
+  }
+
+  .workbench-mode-banner-desc {
+    display: none;
+  }
+
+  .spring-root:not(.mode-professional) .spring-input.cosmic-input-dock,
+  .spring-root.mode-professional .spring-input.cosmic-input-dock {
+    margin: 0 !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spring-root .spring-turn,
+  .spring-root.mode-professional .workbench-mode-banner::after,
+  .spring-root.mode-professional .spring-plan-todo-item.is-running,
+  .spring-root.mode-professional .cursor-thought-panel.is-running > .process-panel-summary,
+  .spring-root.mode-professional .process-step.is-latest-live .process-step-dot,
+  .spring-run-phase-fill--animated,
+  .spring-run-token-fill--animated {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   思考视图切换 · 用户 vs 开发
+   ═══════════════════════════════════════════════════════════════ */
+.spring-thought-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 23, 0.65);
+}
+
+.spring-thought-view-toggle button {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.spring-thought-view-toggle button.is-active {
+  color: #f8fafc;
+  font-weight: 700;
+  background: rgba(51, 65, 85, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.spring-root.thought-view-user .spring-thought-view-toggle button.is-active:first-child {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.35), rgba(16, 185, 129, 0.25));
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #d1fae5;
+}
+
+.spring-root.thought-view-developer .spring-thought-view-toggle button.is-active:last-child {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.35), rgba(234, 88, 12, 0.25));
+  border-color: rgba(251, 146, 60, 0.4);
+  color: #ffedd5;
+}
+
+/* 用户思考叙事 */
+.user-thought-narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 2px;
+}
+
+.user-thought-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.35);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.user-thought-line.is-done {
+  border-color: rgba(148, 163, 184, 0.08);
+  background: rgba(15, 23, 42, 0.22);
+}
+
+.user-thought-line.is-active {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(14, 165, 233, 0.08);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.12);
+}
+
+.user-thought-line.is-failed {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.12);
+}
+
+.user-thought-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: rgba(100, 116, 139, 0.65);
+}
+
+.user-thought-line.is-done .user-thought-dot {
+  background: rgba(52, 211, 153, 0.75);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+}
+
+.user-thought-line.is-active .user-thought-dot {
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+  animation: wb-flow-pulse 1.2s ease-in-out infinite;
+}
+
+.user-thought-line.is-failed .user-thought-dot {
+  background: #f87171;
+}
+
+.user-thought-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #e2e8f0;
+  word-break: break-word;
+}
+
+.user-thought-line.is-done .user-thought-text {
+  color: #cbd5e1;
+}
+
+.user-thought-sources {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.user-thought-sources > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  list-style: none;
+}
+
+.user-thought-sources > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* 用户视图 · 思考面板外观 */
+.spring-root.thought-view-user .cursor-thought-panel.thought-panel-user {
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  background: rgba(15, 20, 32, 0.55) !important;
+  box-shadow: none !important;
+}
+
+.spring-root.thought-view-user .cursor-thought-panel.thought-panel-user > .process-panel-summary {
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+}
+
+.spring-root.thought-view-user .cursor-thought-panel.thought-panel-user > .process-panel-summary::before {
+  content: none !important;
+}
+
+.spring-root.thought-view-user .process-panel-badge-live {
+  color: #7dd3fc !important;
+  background: rgba(14, 165, 233, 0.15) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+.spring-root.thought-view-developer .cursor-thought-panel.thought-panel-developer {
+  border-color: rgba(251, 146, 60, 0.22) !important;
+}
+
+/* 旧规则已由 summary-row 替代 */
+.spring-root.thought-view-developer .cursor-thought-panel.thought-panel-developer > .process-panel-summary .process-panel-label::after {
+  content: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   右侧 · Token / 耗时可视化
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes wb-bar-grow {
+  from {
+    transform: scaleX(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.spring-run-obs-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.spring-run-obs-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.spring-run-obs-stat-icon {
+  font-size: 14px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.spring-run-obs-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.spring-run-obs-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.spring-run-obs-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.spring-run-chart-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.spring-run-phase-chart,
+.spring-run-token-chart {
+  margin-bottom: 12px;
+}
+
+.spring-run-phase-list--viz .spring-run-phase-row,
+.spring-run-token-list--viz .spring-run-token-row {
+  margin-bottom: 10px;
+}
+
+.spring-run-phase-list--viz .spring-run-phase-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+  overflow: hidden;
+}
+
+.spring-run-phase-fill--animated {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--phase-color, #38bdf8), color-mix(in srgb, var(--phase-color, #38bdf8) 60%, #fff));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--phase-color, #38bdf8) 40%, transparent);
+  transform-origin: left center;
+  animation: wb-bar-grow 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--bar-delay, 0s);
+}
+
+.spring-run-token-list--viz {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.spring-run-token-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.spring-run-token-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.1);
+  overflow: hidden;
+}
+
+.spring-run-token-fill--animated {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--token-color, #64748b), color-mix(in srgb, var(--token-color, #64748b) 55%, #fff));
+  transform-origin: left center;
+  animation: wb-bar-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--bar-delay, 0s);
+}
+
+.spring-root:not(.mode-professional) .spring-run-obs-stat-card {
+  border-color: rgba(167, 139, 250, 0.18);
+}
+
+.spring-root.mode-professional .spring-run-obs-stat-card {
+  border-color: rgba(56, 189, 248, 0.18);
+}
+
+.spring-root.mode-professional .spring-run-obs-stat-value {
+  color: #7dd3fc;
+}
+
+@media (max-width: 720px) {
+  .spring-thought-view-toggle {
+    display: none;
+  }
+}

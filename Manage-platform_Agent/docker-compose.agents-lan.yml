@@ -1,0 +1,1471 @@
+# 模型 SSOT：Manage-platform_Agent/.env.capability-models → scripts/apply-capability-models.ps1
+# 同步到各 Agent/.env；Docker 仅通过 env_file 注入，勿在 services.environment 写 OPENAI_MODEL/CAP_* 等模型键。
+services:
+  clawhive_postgres:
+    image: docker.1ms.run/pgvector/pgvector:pg16
+    container_name: clawhive_postgres
+    environment:
+      POSTGRES_USER: ${CLAWHIVE_PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${CLAWHIVE_PG_PASSWORD:-postgres}
+      POSTGRES_DB: ${CLAWHIVE_PG_DB:-clawhive}
+    ports:
+      - "${CLAWHIVE_PG_PORT:-15432}:5432"
+    volumes:
+      - clawhive_pg_data:/var/lib/postgresql/data
+      - ./monitoring/postgres/init-langfuse-db.sh:/docker-entrypoint-initdb.d/02-langfuse.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CLAWHIVE_PG_USER:-postgres} -d ${CLAWHIVE_PG_DB:-clawhive}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    restart: unless-stopped
+
+  clawhive_redis:
+    image: docker.1ms.run/library/redis:7-alpine
+    container_name: clawhive_redis
+    ports:
+      - "${CLAWHIVE_REDIS_PORT:-16379}:6379"
+    volumes:
+      - clawhive_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    restart: unless-stopped
+
+  clawhive_backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${CLAWHIVE_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.11-slim-bookworm}
+        PIP_INDEX_URL: ${CLAWHIVE_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        APT_DEBIAN_MIRROR: ${CLAWHIVE_APT_DEBIAN_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}
+        APT_SECURITY_MIRROR: ${CLAWHIVE_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}
+    image: clawhive/clawhive_backend:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: clawhive_backend
+    env_file:
+      - path: .env.agents-lan
+        required: false
+    volumes:
+      - ../:/workspace
+      - clawhive_runtime_data:/app/.local/runtime
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DEPLOY_MODE: docker
+      COMPOSE_FILE_PATH: /workspace/Manage-platform_Agent/docker-compose.agents-lan.yml
+      COMPOSE_ENV_FILE_PATH: /workspace/Manage-platform_Agent/.env.agents-lan
+      AGENT_CONTROL_MODE: docker
+      PROMETHEUS_BASE_URL: http://prometheus:9090
+      GRAFANA_PUBLIC_URL: ${GRAFANA_PUBLIC_URL:-http://127.0.0.1:13000}
+      TEMPO_BASE_URL: http://tempo:3200
+      LOKI_BASE_URL: http://loki:3100
+      LITELLM_ENABLED: ${LITELLM_ENABLED:-0}
+      LITELLM_BASE_URL: ${LITELLM_BASE_URL:-http://litellm:4000/v1}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-clawhive-litellm}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-http://langfuse:3000}
+      LANGFUSE_PUBLIC_URL: ${LANGFUSE_PUBLIC_URL:-http://127.0.0.1:13001}
+      OIDC_ENABLED: ${OIDC_ENABLED:-0}
+      OIDC_ISSUER: ${OIDC_ISSUER:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email}
+      OIDC_ROLE_CLAIM: ${OIDC_ROLE_CLAIM:-roles}
+      OIDC_TENANT_CLAIM: ${OIDC_TENANT_CLAIM:-tenant_id}
+      OIDC_FRONTEND_CALLBACK_URL: ${OIDC_FRONTEND_CALLBACK_URL:-http://127.0.0.1:18073/}
+      DATABASE_URL: postgresql+psycopg2://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_PG_DB:-clawhive}
+      REDIS_URL: redis://clawhive_redis:6379/0
+      CLAWHIVE_FRONTEND_PORT: ${CLAWHIVE_FRONTEND_PORT:-18073}
+      CLAWHIVE_BACKEND_PORT: ${CLAWHIVE_BACKEND_PORT:-18000}
+      ALLOW_ORIGINS: ${CLAWHIVE_ALLOW_ORIGINS:-http://localhost:5173,http://localhost:18073,http://127.0.0.1:18073,http://localhost:18000,http://127.0.0.1:18000}
+      DB_AGENT_HOST: db_agent
+      RAG_AGENT_HOST: rag_agent
+      CODE_AGENT_HOST: code_assistent_agent
+      EXTRACTOR_AGENT_HOST: extractor_agent
+      AI_ADMIN_AGENT_HOST: ai_admin_agent
+      MANAGER_AGENT_HOST: manager_agent
+      MULTIMODAL_AGENT_HOST: multimodal_agent
+      LOBSTER_AGENT_HOST: lobster_agent
+      TAVERN_AGENT_HOST: tavern_agent
+      COMPANION_AGENT_HOST: companion_agent
+      MUSIC_AGENT_HOST: music_agent
+      VIDEO_AGENT_HOST: video_agent
+      AI_AGENT_HOST: ai_agent
+      ADMIN_USERNAME: ${CLAWHIVE_ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${CLAWHIVE_ADMIN_PASSWORD:-admin123}
+      JWT_SECRET: ${CLAWHIVE_JWT_SECRET:-change-this-secret}
+      WORKSPACE_ROOT: ${CLAWHIVE_WORKSPACE_ROOT:-/workspace}
+      RUNTIME_ROOT: ${CLAWHIVE_RUNTIME_ROOT:-/app/.local/runtime}
+      DB_PORT: ${DB_PORT:-13101}
+      RAG_PORT: ${RAG_PORT:-13102}
+      CODE_PORT: ${CODE_PORT:-13103}
+      CRAWLER_PORT: ${CRAWLER_PORT:-13104}
+      AI_ADMIN_PORT: ${AI_ADMIN_PORT:-13105}
+      MANAGER_PORT: ${MANAGER_PORT:-13106}
+      MULTIMODAL_PORT: ${MULTIMODAL_PORT:-13107}
+      LOBSTER_PORT: ${LOBSTER_PORT:-13108}
+      TAVERN_PORT: ${TAVERN_PORT:-13109}
+      COMPANION_PORT: ${COMPANION_PORT:-13115}
+      MUSIC_AGENT_PORT: ${MUSIC_AGENT_PORT:-13110}
+      VIDEO_AGENT_PORT: ${VIDEO_AGENT_PORT:-13111}
+      AI_AGENT_PORT: ${AI_AGENT_PORT:-13112}
+      MAX_TASK_RETRIES: ${CLAWHIVE_MAX_TASK_RETRIES:-2}
+      # QWEN_* 模型名：由 env_file（.env.agents-lan，sync-capability-models 同步）注入
+      QWEN_TEMPERATURE: ${QWEN_TEMPERATURE:-0.2}
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      SKILL_REGISTRY_URLS: ${SKILL_REGISTRY_URLS:-}
+      SKILL_REGISTRY_TOKEN: ${SKILL_REGISTRY_TOKEN:-}
+      SKILL_REGISTRY_CACHE_TTL_SEC: ${SKILL_REGISTRY_CACHE_TTL_SEC:-300}
+      SKILL_SYNC_ON_INSTALL: ${SKILL_SYNC_ON_INSTALL:-1}
+      SKILL_SYNC_AGENT_RELOAD: ${SKILL_SYNC_AGENT_RELOAD:-0}
+      SKILL_SYNC_RELOAD_TIMEOUT_SEC: ${SKILL_SYNC_RELOAD_TIMEOUT_SEC:-10}
+      SKILL_INSTALL_REQUIRE_PUBLISHED: ${SKILL_INSTALL_REQUIRE_PUBLISHED:-1}
+      SKILL_REGISTRY_DB_CACHE: ${SKILL_REGISTRY_DB_CACHE:-1}
+    ports:
+      - "${CLAWHIVE_BACKEND_PORT:-18000}:8000"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=5); d=r.read(); sys.exit(0 if b'\\\"ready\\\": true' in d or b'\\\"ready\\\":true' in d else 1)\""
+        ]
+      interval: 10s
+      timeout: 8s
+      retries: 12
+      start_period: 45s
+    depends_on:
+      clawhive_postgres:
+        condition: service_healthy
+      clawhive_redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  clawhive_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: clawhive/clawhive_frontend:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: clawhive_frontend
+    ports:
+      - "${CLAWHIVE_FRONTEND_PORT:-18073}:80"
+    depends_on:
+      clawhive_backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db_agent:
+    build:
+      context: ..
+      dockerfile: Manage-platform_Agent/docker/nuxt-agent/Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        AGENT_DIR: DB_Agent
+        DEFAULT_PORT: ${DB_PORT:-13101}
+    image: clawhive/db_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: db_agent
+    env_file:
+      - path: ../DB_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      PORT: ${DB_PORT:-13101}
+      DB_PORT: ${DB_PORT:-13101}
+      NITRO_PORT: ${DB_PORT:-13101}
+      HOST: 0.0.0.0
+      NITRO_HOST: 0.0.0.0
+      MYSQL_HOST: ${DB_AGENT_MYSQL_HOST:-host.docker.internal}
+      MYSQL_PORT: ${DB_AGENT_MYSQL_PORT:-3306}
+      MYSQL_USER: ${DB_AGENT_MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${DB_AGENT_MYSQL_PASSWORD:-123456}
+      MYSQL_DATABASE: ${DB_AGENT_MYSQL_DATABASE:-p2026}
+      DEFAULT_DB_ID: ${DB_AGENT_DEFAULT_DB_ID:-default}
+      DB_AGENT_LOCK_DB_ID: ${DB_AGENT_LOCK_DB_ID:-}
+      AGENT_DOMAIN: ${DB_AGENT_DOMAIN:-p2026}
+      DB_AGENT_DOMAIN: ${DB_AGENT_DOMAIN:-p2026}
+      DB_AGENT_PROFILE: ${DB_AGENT_PROFILE:-balanced}
+      ENABLE_SCHEMA_FIRST_ROUTE: ${ENABLE_SCHEMA_FIRST_ROUTE:-1}
+      ENABLE_SCHEMA_TABLE_JUDGE: ${ENABLE_SCHEMA_TABLE_JUDGE:-1}
+      ENABLE_STRUCTURAL_PLAN: ${ENABLE_STRUCTURAL_PLAN:-0}
+      ENABLE_METRICS_DIRECT: ${ENABLE_METRICS_DIRECT:-0}
+      AGENT_FALLBACK_ONLY_ON_HARD_FAIL: ${AGENT_FALLBACK_ONLY_ON_HARD_FAIL:-1}
+      ENABLE_DOMAIN_SKILLS: ${DB_AGENT_ENABLE_DOMAIN_SKILLS:-false}
+      DB_AGENT_ENABLE_DOMAIN_TOOLS: ${DB_AGENT_ENABLE_DOMAIN_TOOLS:-false}
+      DB_AGENT_TABLE_HINTS_JSON: ${DB_AGENT_TABLE_HINTS_JSON:-}
+      DB_AGENT_MODEL_TABLE_RERANK: ${DB_AGENT_MODEL_TABLE_RERANK:-false}
+      ENABLE_EXPLAIN_PREFLIGHT: ${DB_ENABLE_EXPLAIN_PREFLIGHT:-1}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-0}
+      # LLM 模型/API：由 env_file（DB_Agent/.env + .env.agents-lan）注入，勿在此覆盖
+      NUXT_MYSQL_HOST: ${DB_AGENT_MYSQL_HOST:-host.docker.internal}
+      NUXT_MYSQL_PORT: ${DB_AGENT_MYSQL_PORT:-3306}
+      NUXT_MYSQL_USER: ${DB_AGENT_MYSQL_USER:-root}
+      NUXT_MYSQL_PASSWORD: ${DB_AGENT_MYSQL_PASSWORD:-123456}
+      NUXT_MYSQL_DATABASE: ${DB_AGENT_MYSQL_DATABASE:-p2026}
+      AGENT_DATABASE_URL: postgresql://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_PG_DB:-clawhive}
+      DB_AGENT_STORAGE_BACKEND: ${DB_AGENT_STORAGE_BACKEND:-postgres}
+      DB_VECTOR_BACKEND: ${DB_VECTOR_BACKEND:-pgvector}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+    ports:
+      - "${DB_PORT:-13101}:${DB_PORT:-13101}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      clawhive_postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.PORT||13101;require('http').get('http://127.0.0.1:'+p+'/api/ready',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.ready===true?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  rag_agent:
+    build:
+      context: ..
+      dockerfile: Manage-platform_Agent/docker/nuxt-agent/Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        AGENT_DIR: RAG_Agent
+        DEFAULT_PORT: ${RAG_PORT:-13102}
+    image: clawhive/rag_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: rag_agent
+    env_file:
+      - path: ../RAG_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    volumes:
+      - rag_agent_data:/app/.data
+    environment:
+      PORT: ${RAG_PORT:-13102}
+      RAG_PORT: ${RAG_PORT:-13102}
+      NITRO_PORT: ${RAG_PORT:-13102}
+      HOST: 0.0.0.0
+      NITRO_HOST: 0.0.0.0
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-0}
+      # LLM 模型/API：由 env_file（RAG_Agent/.env + .env.agents-lan）注入
+      RAG_VECTOR_BACKEND: pgvector
+      RAG_PG_CONNECTION_STRING: ${RAG_PG_CONNECTION_STRING:-postgresql://postgres:postgres@rag_pgvector:5432/rag_vector}
+      RAG_PG_TABLE_NAME: ${RAG_PG_TABLE_NAME:-rag_documents}
+      RAG_MIGRATE_LEGACY_MEMORY_ON_BOOT: ${RAG_MIGRATE_LEGACY_MEMORY_ON_BOOT:-1}
+      RAG_ENABLE_BM25: ${RAG_ENABLE_BM25:-1}
+      RAG_RRF_BM25_WEIGHT: ${RAG_RRF_BM25_WEIGHT:-0.85}
+      AGENT_DATABASE_URL: postgresql://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_PG_DB:-clawhive}
+      RAG_AGENT_STORAGE_BACKEND: ${RAG_AGENT_STORAGE_BACKEND:-postgres}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+      RAG_MCP_SERVER: ${RAG_MCP_SERVER:-1}
+    ports:
+      - "${RAG_PORT:-13102}:${RAG_PORT:-13102}"
+    depends_on:
+      rag_pgvector:
+        condition: service_healthy
+      clawhive_postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.PORT||13102;require('http').get('http://127.0.0.1:'+p+'/api/ready',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.ready===true?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))\""
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 120s
+    restart: unless-stopped
+
+  rag_pgvector:
+    image: docker.1ms.run/pgvector/pgvector:pg16
+    container_name: rag_pgvector
+    environment:
+      POSTGRES_USER: ${RAG_PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${RAG_PG_PASSWORD:-postgres}
+      POSTGRES_DB: ${RAG_PG_DB:-rag_vector}
+    ports:
+      - "${RAG_PG_PORT:-15433}:5432"
+    volumes:
+      - rag_pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RAG_PG_USER:-postgres} -d ${RAG_PG_DB:-rag_vector}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    restart: unless-stopped
+
+  code_assistent_agent:
+    build:
+      context: ..
+      dockerfile: Manage-platform_Agent/docker/nuxt-agent/Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        AGENT_DIR: code_assistent_Agent
+        DEFAULT_PORT: ${CODE_PORT:-13103}
+    image: clawhive/code_assistent_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: code_assistent_agent
+    env_file:
+      - path: ../code_assistent_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      PORT: ${CODE_PORT:-13103}
+      NITRO_PORT: ${CODE_PORT:-13103}
+      HOST: 0.0.0.0
+      NITRO_HOST: 0.0.0.0
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-1}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+      # Agent 矩阵升级 Wave 3（Code MCP + understand）
+      CODE_MCP_SERVER: ${CODE_MCP_SERVER:-1}
+      CODE_TASK_UNDERSTAND: ${CODE_TASK_UNDERSTAND:-1}
+      COMMAND_TOOL_ENABLED: ${COMMAND_TOOL_ENABLED:-1}
+      WRITE_TOOL_ENABLED: ${WRITE_TOOL_ENABLED:-1}
+      CODE_REPO_MAP_TOKENS: ${CODE_REPO_MAP_TOKENS:-1024}
+      CODE_EDIT_VALIDATE_REQUIRED: ${CODE_EDIT_VALIDATE_REQUIRED:-1}
+      CODE_EDIT_FORMAT: ${CODE_EDIT_FORMAT:-search_replace}
+      # 宿主 monorepo → 容器内 /workspace（Workbench「项目根目录」填 /workspace）
+      PROJECT_DIR: ${CODE_PROJECT_DIR:-/workspace}
+      ALLOWED_ROOTS: ${CODE_ALLOWED_ROOTS:-/workspace,/app}
+      # LLM 模型/API：由 env_file（code_assistent_Agent/.env + .env.agents-lan）注入，勿在此覆盖
+    ports:
+      - "${CODE_PORT:-13103}:${CODE_PORT:-13103}"
+    volumes:
+      - ../:/workspace
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"const p=process.env.PORT||13103;require('http').get('http://127.0.0.1:'+p+'/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>require('http').get('http://127.0.0.1:'+p,r2=>process.exit(r2.statusCode<500?0:1)).on('error',()=>process.exit(1)))\""]
+      interval: 10s
+      timeout: 8s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+
+  extractor_agent:
+    build:
+      context: ..
+      dockerfile: Extractor_Agent/Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        DEBIAN_APT_MIRROR: ${DEBIAN_APT_MIRROR:-mirrors.aliyun.com}
+        DEFAULT_PORT: ${CRAWLER_PORT:-13104}
+        PLAYWRIGHT_VERSION: ${EXTRACTOR_PLAYWRIGHT_VERSION:-1.59.1}
+    image: clawhive/extractor_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: extractor_agent
+    env_file:
+      - path: ../Extractor_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      PORT: ${CRAWLER_PORT:-13104}
+      CRAWLER_PORT: ${CRAWLER_PORT:-13104}
+      NUXT_TELEMETRY_DISABLED: "1"
+      HOST: 0.0.0.0
+      NITRO_HOST: 0.0.0.0
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,extractor_agent,manager_agent,db_agent,rag_agent,code_assistent_agent,ai_admin_agent,video_agent,ai_agent,searxng,crw}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-1}
+      # 爬虫 LLM 对齐能力层 SSOT（T0 route / T3 vision），避免被 .env.agents-lan 全局 QWEN_MODEL 覆盖
+      QWEN_MODEL: ${CAP_ROUTE:-qwen3-14b}
+      QWEN_VL_MODEL: ${CAP_VISION:-qwen-vl-plus}
+      # 其余 LLM/API 由 env_file 注入
+      EXTRACTOR_DOMAIN_POLITE_DELAY_MS: ${EXTRACTOR_DOMAIN_POLITE_DELAY_MS:-1200}
+      CRAWLER_MAX_CONCURRENCY: ${CRAWLER_MAX_CONCURRENCY:-3}
+      REDIS_URL: ${REDIS_URL:-redis://clawhive_redis:6379/0}
+      EXTRACTOR_QUEUE_BACKEND: ${EXTRACTOR_QUEUE_BACKEND:-local}
+      EXTRACTOR_ASYNC_QUEUE: ${EXTRACTOR_ASYNC_QUEUE:-1}
+      # 独立 UI 联网找页 → seed_urls（与总管 SearXNG 同源）
+      EXTRACTOR_WEB_SEARCH: ${EXTRACTOR_WEB_SEARCH:-1}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://searxng:8080}
+      SEARXNG_TIMEOUT_MS: ${SEARXNG_TIMEOUT_MS:-25000}
+      # 云抓取兜底：默认 CRW 自托管（Firecrawl 兼容），不再依赖商业配额
+      MCP_PROVIDER: ${MCP_PROVIDER:-firecrawl}
+      MCP_BASE_URL: ${MCP_BASE_URL:-http://crw:3000/v1/scrape}
+      MCP_API_KEY: ${MCP_API_KEY:-local}
+      MCP_RENDER: ${MCP_RENDER:-on}
+      EXTRACTOR_MCP_MAX_CALLS: ${EXTRACTOR_MCP_MAX_CALLS:-12}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/chromium
+    ports:
+      - "${CRAWLER_PORT:-13104}:${CRAWLER_PORT:-13104}"
+    depends_on:
+      crw:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.CRAWLER_PORT||13104;require('http').get('http://127.0.0.1:'+p+'/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 12
+      start_period: 120s
+    restart: unless-stopped
+
+  # 本地热更新开发：docker compose --profile extractor-dev up extractor_agent_dev
+  extractor_agent_dev:
+    profiles: ["extractor-dev"]
+    image: docker.1ms.run/library/node:20-bullseye
+    container_name: extractor_agent_dev
+    working_dir: /app
+    env_file:
+      - path: ../Extractor_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    volumes:
+      - ../Extractor_Agent:/app
+      - extractor_agent_node_modules:/app/node_modules
+      - extractor_agent_nuxt:/app/.nuxt
+      - extractor_agent_playwright:/ms-playwright
+    environment:
+      PORT: ${CRAWLER_PORT:-13104}
+      CRAWLER_PORT: ${CRAWLER_PORT:-13104}
+      NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+      PLAYWRIGHT_DOWNLOAD_HOST: ${PLAYWRIGHT_DOWNLOAD_HOST:-https://npmmirror.com/mirrors/playwright}
+      PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: ${PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT:-180000}
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,extractor_agent,manager_agent,db_agent,rag_agent,code_assistent_agent,ai_admin_agent,video_agent,ai_agent,searxng,crw}
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      NUXT_TELEMETRY_DISABLED: "1"
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-1}
+      EXTRACTOR_WEB_SEARCH: ${EXTRACTOR_WEB_SEARCH:-1}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://searxng:8080}
+      SEARXNG_TIMEOUT_MS: ${SEARXNG_TIMEOUT_MS:-25000}
+      MCP_PROVIDER: ${MCP_PROVIDER:-firecrawl}
+      MCP_BASE_URL: ${MCP_BASE_URL:-http://crw:3000/v1/scrape}
+      MCP_API_KEY: ${MCP_API_KEY:-local}
+      MCP_RENDER: ${MCP_RENDER:-on}
+    command: ["sh", "/app/scripts/docker-entrypoint.sh"]
+    ports:
+      - "${CRAWLER_PORT:-13104}:${CRAWLER_PORT:-13104}"
+    depends_on:
+      crw:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.CRAWLER_PORT||13104;require('http').get('http://127.0.0.1:'+p+'/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""
+        ]
+      interval: 10s
+      timeout: 8s
+      retries: 24
+      start_period: 900s
+    restart: unless-stopped
+
+  ai_admin_agent:
+    build:
+      context: ../AI_admin_Agent/backend
+      dockerfile: Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${AI_ADMIN_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.11-slim-bookworm}
+        PIP_INDEX_URL: ${AI_ADMIN_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+    image: clawhive/ai_admin_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: ai_admin_agent
+    working_dir: /app
+    env_file:
+      # 共享 LAN 配置；backend/.env 改挂载见 volumes（restart 即可生效，勿重复 env_file 避免 stale）
+      - path: .env.agents-lan
+        required: false
+    volumes:
+      - ../AI_admin_Agent/frontend/dist:/frontend-dist:ro
+      - ../AI_admin_Agent/backend/workspace:/app/workspace
+      - ../AI_admin_Agent/backend/data:/app/data
+      - ../AI_admin_Agent/backend/.env:/app/.env:ro
+    environment:
+      FRONTEND_DIST_DIR: /frontend-dist
+      WORKSPACE_DIR: /app/workspace
+      ADMIN_DATA_DIR: /app/data
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: ${CLAWHIVE_CONFIG_SYNC:-1}
+      # MODEL_NAME 由挂载的 backend/.env 提供（sync-capability-models.py 同步 SSOT）
+      RAG_AGENT_URL: http://rag_agent:13102
+      ADMIN_PROMPT_EVOLUTION: ${ADMIN_PROMPT_EVOLUTION:-1}
+      ADMIN_AUTO_CURATE: ${ADMIN_AUTO_CURATE:-1}
+      ADMIN_PROMOTE_MIN_HITS: ${ADMIN_PROMOTE_MIN_HITS:-3}
+      ADMIN_MCP_ENABLED: ${ADMIN_MCP_ENABLED:-0}
+      # 总管编排时写操作 HITL 由 Manager 控制；禁止 Admin 侧无条件 auto_confirm
+      ADMIN_MANAGER_AUTO_CONFIRM: ${ADMIN_MANAGER_AUTO_CONFIRM:-0}
+      ADMIN_LANGGRAPH_CHECKPOINTER: ${ADMIN_LANGGRAPH_CHECKPOINTER:-0}
+      ADMIN_STORAGE_BACKEND: ${ADMIN_STORAGE_BACKEND:-postgres}
+      ADMIN_PLAN_FASTPATH: ${ADMIN_PLAN_FASTPATH:-1}
+      ADMIN_MEMORY_FAST: ${ADMIN_MEMORY_FAST:-1}
+      ADMIN_TURN_SCOPE_LLM: ${ADMIN_TURN_SCOPE_LLM:-1}
+      AGENT_DATABASE_URL: postgresql://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_PG_DB:-clawhive}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+      DB_AGENT_HTTP_URL: http://db_agent:13101
+      DB_AGENT_DB_ID: ${DB_AGENT_DB_ID:-default}
+      LOBSTER_AGENT_HTTP_URL: ${LOBSTER_AGENT_HTTP_URL:-http://lobster_agent:13108}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://searxng:8080}
+      ADMIN_SEARCH_PROVIDER: ${ADMIN_SEARCH_PROVIDER:-auto}
+      WEB_SEARCH_ALLOW_DDG_FALLBACK: ${WEB_SEARCH_ALLOW_DDG_FALLBACK:-1}
+      ADMIN_MCP_GATEWAY_URL: ${ADMIN_MCP_GATEWAY_URL:-http://admin_mcp_gateway:8790}
+      MINERU_API_URL: ${MINERU_API_URL:-}
+    command: uvicorn app.main:app --host 0.0.0.0 --port ${AI_ADMIN_PORT:-13105}
+    ports:
+      - "${AI_ADMIN_PORT:-13105}:${AI_ADMIN_PORT:-13105}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:${AI_ADMIN_PORT:-13105}/api/health',timeout=5); sys.exit(0 if r.status==200 else 1)\""
+        ]
+      interval: 10s
+      timeout: 8s
+      retries: 12
+      start_period: 45s
+    depends_on:
+      clawhive_postgres:
+        condition: service_healthy
+      searxng:
+        condition: service_started
+    restart: unless-stopped
+
+  # 自建云抓取（CRW，Firecrawl 兼容 API）：Extractor MCP_* 指向此服务，免商业配额
+  crw:
+    image: ${CRW_IMAGE:-ghcr.io/us/crw:latest}
+    container_name: crw
+    environment:
+      PORT: "3000"
+      # 本地任意；Extractor MCP_API_KEY 需与此一致（可空表示不校验）
+      CRW_API_KEY: ${CRW_API_KEY:-local}
+    # 宿主机端口避开 Grafana(:13000)；容器内 extractor 仍用 http://crw:3000
+    ports:
+      - "${CRW_PORT:-13114}:3000"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || curl -sf http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 0"
+        ]
+      interval: 20s
+      timeout: 8s
+      retries: 6
+      start_period: 20s
+    restart: unless-stopped
+
+  # 自建联网检索（SearXNG）：总管 WEB_SEARCH_PROVIDER=searxng 时调用
+  searxng:
+    image: ${SEARXNG_IMAGE:-docker.1ms.run/searxng/searxng:latest}
+    container_name: searxng
+    environment:
+      SEARXNG_BASE_URL: ${SEARXNG_PUBLIC_URL:-http://localhost:${SEARXNG_PORT:-8088}/}
+    volumes:
+      - ./docker/searxng:/etc/searxng:rw
+    ports:
+      - "${SEARXNG_PORT:-8088}:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:8080/healthz >/dev/null 2>&1 || wget -qO- 'http://127.0.0.1:8080/search?q=health&format=json' >/dev/null 2>&1 || exit 1"
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 45s
+    restart: unless-stopped
+
+  # Phase 2/3：Admin MCP 趣味八件套侧车（supergateway + nginx）
+  admin_mcp_gateway:
+    profiles: ["fun-mcp"]
+    build:
+      context: ../AI_admin_Agent/mcp-gateway
+      dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${MCP_GATEWAY_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bookworm}
+    image: clawhive/admin_mcp_gateway:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: admin_mcp_gateway
+    volumes:
+      - admin_mcp_memory:/data/memory
+      - admin_mcp_cron:/data/cron
+    ports:
+      - "${ADMIN_MCP_GATEWAY_PORT:-8790}:8790"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8790/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 8
+      start_period: 120s
+    restart: unless-stopped
+
+  # Phase 3：MinerU 兼容 API（轻量 PDF 提取；可换真实 MinerU）
+  mineru_api:
+    profiles: ["fun-mcp"]
+    build:
+      context: ../AI_admin_Agent/mineru-api
+      dockerfile: Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${MINERU_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.11-slim-bookworm}
+    image: clawhive/mineru_api:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: mineru_api
+    environment:
+      MINERU_WORKSPACE_DIR: /data/workspace
+    volumes:
+      - ../AI_admin_Agent/backend/workspace:/data/workspace:ro
+    ports:
+      - "${MINERU_API_PORT:-8798}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)\""]
+      interval: 15s
+      timeout: 6s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+
+  manager_agent:
+    build:
+      context: ..
+      dockerfile: Manage-platform_Agent/docker/nuxt-agent/Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        NPM_CONFIG_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        AGENT_DIR: Manager_Agent
+        DEFAULT_PORT: ${MANAGER_PORT:-13106}
+    image: clawhive/manager_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: manager_agent
+    env_file:
+      - path: ../Manager_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    volumes:
+      - manager_agent_data:/app/.data
+    environment:
+      NODE_OPTIONS: ${MANAGER_NODE_OPTIONS:---max-old-space-size=4096}
+      NUXT_TELEMETRY_DISABLED: "1"
+      PORT: ${MANAGER_PORT:-13106}
+      MANAGER_PORT: ${MANAGER_PORT:-13106}
+      NITRO_PORT: ${MANAGER_PORT:-13106}
+      HOST: 0.0.0.0
+      NITRO_HOST: 0.0.0.0
+      MANAGER_RUNTIME: docker
+      MANAGER_ROUTE_MODE: ${MANAGER_ROUTE_MODE:-convergence}
+      MANAGER_PRO_MODE: ${MANAGER_PRO_MODE:-strong}
+      EVO_MODE: ${EVO_MODE:-convergence}
+      ARTIFACT_FEEDBACK_MODE: ${ARTIFACT_FEEDBACK_MODE:-strict}
+      DB_AGENT_WS_URL: ws://db_agent:13101/api/chat.ws
+      DB_AGENT_HTTP_URL: http://db_agent:13101
+      RAG_AGENT_HTTP_URL: http://rag_agent:13102
+      CODE_AGENT_WS_URL: ws://code_assistent_agent:13103/_ws
+      CRAWLER_AGENT_WS_URL: ws://extractor_agent:13104/_ws
+      CRAWLER_AGENT_HTTP_URL: http://extractor_agent:13104
+      AI_ADMIN_AGENT_WS_URL: ws://ai_admin_agent:13105/api/chat/ws
+      MULTIMODAL_AGENT_HTTP_URL: http://multimodal_agent:13107
+      MUSIC_AGENT_WS_URL: ws://music_agent:13110/ws
+      VIDEO_AGENT_WS_URL: ws://video_agent:13111/ws/video
+      MUSIC_AGENT_HTTP_URL: http://music_agent:13110
+      VIDEO_AGENT_HTTP_URL: http://video_agent:13111
+      LOBSTER_AGENT_WS_URL: ws://lobster_agent:13108/_ws
+      LOBSTER_ADMIN_TOKEN: ${LOBSTER_ADMIN_TOKEN:-${CLAWHIVE_INTERNAL_TOKEN:-}}
+      AGENT_TIMEOUT_MS: ${AGENT_TIMEOUT_MS:-240000}
+      MANAGER_DOCKER_TIMEOUT_MS: ${MANAGER_DOCKER_TIMEOUT_MS:-240000}
+      MANAGER_LLM_REQUEST_TIMEOUT_MS: ${MANAGER_LLM_REQUEST_TIMEOUT_MS:-120000}
+      MANAGER_LLM_MAX_RETRIES: ${MANAGER_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-2048}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      MANAGER_DOCKER_LATENCY_MUL: ${MANAGER_DOCKER_LATENCY_MUL:-1.2}
+      MANAGER_RAG_SKIP_EVIDENCE_SELECT: ${MANAGER_RAG_SKIP_EVIDENCE_SELECT:-1}
+      MANAGER_RAG_PREFETCH_TIMEOUT_MS: ${MANAGER_RAG_PREFETCH_TIMEOUT_MS:-30000}
+      MANAGER_DB_PREFETCH_TIMEOUT_MS: ${MANAGER_DB_PREFETCH_TIMEOUT_MS:-45000}
+      MANAGER_ORCHESTRATOR_SKIP_RAG_RECALL: ${MANAGER_ORCHESTRATOR_SKIP_RAG_RECALL:-1}
+      MANAGER_RAG_PREFETCH_SKIP_RETRIEVE_ON_MISS: ${MANAGER_RAG_PREFETCH_SKIP_RETRIEVE_ON_MISS:-0}
+      MANAGER_DB_PROBE_HINTS_LLM: ${MANAGER_DB_PROBE_HINTS_LLM:-0}
+      MANAGER_RAG_PROBE_TIMEOUT_MS: ${MANAGER_RAG_PROBE_TIMEOUT_MS:-20000}
+      MANAGER_INTERNAL_AGENT_TIMEOUT_MS: ${MANAGER_INTERNAL_AGENT_TIMEOUT_MS:-45000}
+      MANAGER_INTERNAL_AGENT_TIMEOUT_MAX_MS: ${MANAGER_INTERNAL_AGENT_TIMEOUT_MAX_MS:-90000}
+      MANAGER_INTERNAL_DEADLINE_RESERVE_MS: ${MANAGER_INTERNAL_DEADLINE_RESERVE_MS:-50000}
+      MANAGER_CLEAN_ALIGN_TIMEOUT_MS: ${MANAGER_CLEAN_ALIGN_TIMEOUT_MS:-25000}
+      MANAGER_PIPELINE_HINTS_LLM: ${MANAGER_PIPELINE_HINTS_LLM:-0}
+      MANAGER_CLAUSE_DECOMPOSE: ${MANAGER_CLAUSE_DECOMPOSE:-0}
+      MANAGER_STEP_SANITIZE_LLM: ${MANAGER_STEP_SANITIZE_LLM:-0}
+      MANAGER_WEB_SEARCH_MODE: ${MANAGER_WEB_SEARCH_MODE:-open}
+      WEB_SEARCH_PROVIDER: ${WEB_SEARCH_PROVIDER:-searxng}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://searxng:8080}
+      SEARXNG_TIMEOUT_MS: ${SEARXNG_TIMEOUT_MS:-25000}
+      WEB_SEARCH_ALLOW_DDG_FALLBACK: ${WEB_SEARCH_ALLOW_DDG_FALLBACK:-0}
+      MANAGER_INTENT_RAG_TOP_K: ${MANAGER_INTENT_RAG_TOP_K:-2}
+      MANAGER_TASK_STACK_LLM_EXTRACT: ${MANAGER_TASK_STACK_LLM_EXTRACT:-0}
+      MANAGER_TASK_STACK_LLM_EXTRACT_ON_FINALIZE: ${MANAGER_TASK_STACK_LLM_EXTRACT_ON_FINALIZE:-0}
+      MANAGER_PARALLEL_INDEPENDENT: ${MANAGER_PARALLEL_INDEPENDENT:-1}
+      MANAGER_PREFETCH_DB_PLAN: ${MANAGER_PREFETCH_DB_PLAN:-1}
+      MANAGER_STREAM_DELTA: ${MANAGER_STREAM_DELTA:-1}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      MANAGER_DB_ID: ${MANAGER_DB_ID:-default}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      MANAGER_CHECKPOINT_BACKEND: ${MANAGER_CHECKPOINT_BACKEND:-dual}
+      REDIS_URL: ${REDIS_URL:-redis://clawhive_redis:6379/0}
+      AGENT_DATABASE_URL: postgresql://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_PG_DB:-clawhive}
+      AGENT_PG_POOL_MAX: ${AGENT_PG_POOL_MAX:-16}
+      AGENT_PG_CONNECT_TIMEOUT_MS: ${AGENT_PG_CONNECT_TIMEOUT_MS:-8000}
+      MANAGER_STORAGE_BACKEND: ${MANAGER_STORAGE_BACKEND:-postgres}
+      MANAGER_LANGGRAPH_CHECKPOINTER: ${MANAGER_LANGGRAPH_CHECKPOINTER:-postgres}
+      MGR_CHECKPOINTER_AUTO: ${MGR_CHECKPOINTER_AUTO:-1}
+      MGR_TOOL_CALL_AUDIT: ${MGR_TOOL_CALL_AUDIT:-1}
+      MGR_PROCESS_MEMORY: ${MGR_PROCESS_MEMORY:-1}
+      MGR_FEDERATION_REQUIRE_FEEDBACK: ${MGR_FEDERATION_REQUIRE_FEEDBACK:-1}
+      MGR_CODE_EXPERIENCE_SYNC: ${MGR_CODE_EXPERIENCE_SYNC:-1}
+      MGR_CRAWLER_EXPERIENCE_SYNC: ${MGR_CRAWLER_EXPERIENCE_SYNC:-1}
+      MGR_GUI_EXPERIENCE_SYNC: ${MGR_GUI_EXPERIENCE_SYNC:-1}
+      MANAGER_DUAL_MODEL_QA: ${MANAGER_DUAL_MODEL_QA:-1}
+      MGR_MCP_REGISTRY: ${MGR_MCP_REGISTRY:-1}
+      MGR_ONLINE_EVAL: ${MGR_ONLINE_EVAL:-1}
+      EVO_ONLINE_EVAL_GATE: ${EVO_ONLINE_EVAL_GATE:-1}
+      MGR_TOOL_CALL_POLICY: ${MGR_TOOL_CALL_POLICY:-1}
+      MGR_KG_MEMORY: ${MGR_KG_MEMORY:-1}
+      MGR_TENANT_SCOPE: ${MGR_TENANT_SCOPE:-1}
+      MANAGER_VECTOR_BACKEND: ${MANAGER_VECTOR_BACKEND:-pgvector}
+      MANAGER_CONVERSATION_LLM_SUMMARIZE: ${MANAGER_CONVERSATION_LLM_SUMMARIZE:-1}
+      EVO_VERIFY_BEFORE_PROMOTE: ${EVO_VERIFY_BEFORE_PROMOTE:-1}
+      EVO_ROUTE_MATRIX_GATE: ${EVO_ROUTE_MATRIX_GATE:-1}
+      EVO_AGENT_PROMPT_EXECUTION_ONLY: ${EVO_AGENT_PROMPT_EXECUTION_ONLY:-1}
+      EVO_PROMOTE_REQUIRES_VERIFY: ${EVO_PROMOTE_REQUIRES_VERIFY:-1}
+      EVO_AUDIT_JOB: ${EVO_AUDIT_JOB:-1}
+      MGR_SESSION_ARCHIVE_JOB: ${MGR_SESSION_ARCHIVE_JOB:-1}
+      MANAGER_GUI_HTTP_POLL: ${MANAGER_GUI_HTTP_POLL:-0}
+      MANAGER_GUI_TIMEOUT_MS: ${MANAGER_GUI_TIMEOUT_MS:-360000}
+      MANAGER_GUI_TIMEOUT_HANDOFF_MS: ${MANAGER_GUI_TIMEOUT_HANDOFF_MS:-480000}
+      MANAGER_MUSIC_HTTP_POLL: ${MANAGER_MUSIC_HTTP_POLL:-1}
+      MANAGER_CRAWLER_HTTP_ASYNC: ${MANAGER_CRAWLER_HTTP_ASYNC:-1}
+      MANAGER_OTEL_EXPORT: ${MANAGER_OTEL_EXPORT:-1}
+      MANAGER_OTEL_TRACEPARENT: ${MANAGER_OTEL_TRACEPARENT:-1}
+      MANAGER_OTLP_PUSH: ${MANAGER_OTLP_PUSH:-1}
+      MANAGER_OTLP_ENDPOINT: ${MANAGER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
+      MANAGER_LANGFUSE_OTLP_ENDPOINT: ${MANAGER_LANGFUSE_OTLP_ENDPOINT:-http://langfuse:3000/api/public/otel/v1/traces}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-pk-lf-clawhive}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-sk-lf-clawhive}
+      MANAGER_STRUCTURED_LOG: ${MANAGER_STRUCTURED_LOG:-1}
+      MANAGER_MAX_RUN_PHASES: ${MANAGER_MAX_RUN_PHASES:-3}
+      MANAGER_PHASE_STEP_BUDGET: ${MANAGER_PHASE_STEP_BUDGET:-8}
+      # Agent 矩阵升级 Wave 3–4（协议 envelope + MCP 主路径）
+      MANAGER_TASK_ENVELOPE_V2: ${MANAGER_TASK_ENVELOPE_V2:-1}
+      MANAGER_MCP_ENABLED: ${MANAGER_MCP_ENABLED:-1}
+      MANAGER_GUI_MCP_FIRST: ${MANAGER_GUI_MCP_FIRST:-1}
+      MANAGER_CODE_MCP_FIRST: ${MANAGER_CODE_MCP_FIRST:-1}
+      MANAGER_RAG_MCP_FIRST: ${MANAGER_RAG_MCP_FIRST:-1}
+      MANAGER_MCP_TOOL_NODE: ${MANAGER_MCP_TOOL_NODE:-1}
+      MANAGER_CODE_DEFAULT_MODE: ${MANAGER_CODE_DEFAULT_MODE:-inspect}
+      # 总管→Code 工程根：与 code_assistent_agent 的 /workspace 挂载一致（宿主 Agent 仓库）
+      MANAGER_CODE_PROJECT_ROOT: ${MANAGER_CODE_PROJECT_ROOT:-/workspace}
+      CODE_TASK_UNDERSTAND: ${CODE_TASK_UNDERSTAND:-1}
+      LOBSTER_TASK_UNDERSTAND: ${LOBSTER_TASK_UNDERSTAND:-1}
+    ports:
+      - "${MANAGER_PORT:-13106}:${MANAGER_PORT:-13106}"
+    depends_on:
+      searxng:
+        condition: service_healthy
+      clawhive_postgres:
+        condition: service_healthy
+      clawhive_redis:
+        condition: service_healthy
+      db_agent:
+        condition: service_healthy
+      rag_agent:
+        condition: service_healthy
+      code_assistent_agent:
+        condition: service_healthy
+      extractor_agent:
+        condition: service_started
+      ai_admin_agent:
+        condition: service_healthy
+      lobster_agent:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.PORT||13106;require('http').get('http://127.0.0.1:'+p+'/api/ready',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.ready===true?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  multimodal_agent:
+    profiles: ["extended"]
+    build:
+      context: ../Multimodal_Agent
+      dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${MULTIMODAL_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        PYTHON_BASE_IMAGE: ${MULTIMODAL_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.12-slim-bookworm}
+        PIP_INDEX_URL: ${MULTIMODAL_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        APT_DEBIAN_MIRROR: ${MULTIMODAL_APT_DEBIAN_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}
+        APT_SECURITY_MIRROR: ${MULTIMODAL_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}
+    image: clawhive/multimodal_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: multimodal_agent
+    working_dir: /multimodal/backend
+    env_file:
+      - path: ../Multimodal_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      # 仅容器路径与平台同步；密钥/模型见 Multimodal_Agent/.env + .env.agents-lan
+      API_PORT: "13107"
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+      # LLM 模型/API：由 env_file（Multimodal_Agent/.env + .env.agents-lan）注入，勿在此覆盖
+      USE_HELPER_FOR_VISION: ${USE_HELPER_FOR_VISION:-true}
+      MULTIMODAL_FRONTEND_DIST: /multimodal/frontend/dist
+      OUTPUT_DIR: .data/multimodal/out
+      UPLOAD_DIR: .data/multimodal/uploads
+    ports:
+      - "${MULTIMODAL_PORT:-13107}:13107"
+    volumes:
+      - multimodal_agent_data:/multimodal/.data
+    depends_on:
+      music_agent:
+        condition: service_started
+      video_agent:
+        condition: service_started
+    restart: unless-stopped
+
+  # 可选：Browserless 远程 CDP 池（lobster 设 LOBSTER_CDP_URL=ws://browserless:3000?token=...）
+  browserless:
+    profiles: ["extended"]
+    image: browserless/chrome:latest
+    container_name: browserless
+    environment:
+      MAX_CONCURRENT_SESSIONS: "3"
+      TOKEN: ${BROWSERLESS_TOKEN:-lobster-dev}
+      ENABLE_DEBUGGER: "true"
+    ports:
+      - "${BROWSERLESS_PORT:-3000}:3000"
+    restart: unless-stopped
+
+  # Playwright MCP sidecar：供 lobster_agent 的 LOBSTER_MCP_URL 使用（无障碍树浏览器自动化）
+  playwright_mcp:
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    container_name: playwright_mcp
+    working_dir: /app
+    command:
+      - bash
+      - -c
+      - |
+        CHROME=$$(find /ms-playwright -path '*/chrome-linux64/chrome' -type f 2>/dev/null | head -1)
+        if [ -z "$$CHROME" ]; then echo "playwright_mcp: chromium binary not found under /ms-playwright" >&2; exit 1; fi
+        exec npx -y @playwright/mcp@latest --port 8931 --host 0.0.0.0 --allowed-hosts '*' --headless --executable-path="$$CHROME"
+    ports:
+      - "${PLAYWRIGHT_MCP_PORT:-18931}:8931"
+    restart: unless-stopped
+
+  lobster_agent:
+    build:
+      context: ..
+      dockerfile: Lobster_Agent/Dockerfile
+    image: clawhive/lobster_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: lobster_agent
+    working_dir: /app
+    env_file:
+      - path: ../Lobster_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      LOBSTER_HEADLESS: "false"
+      LOBSTER_BROWSER_PROFILE: ${LOBSTER_BROWSER_PROFILE:-managed}
+      LOBSTER_BROWSER_CDP_URL: ${LOBSTER_BROWSER_CDP_URL:-}
+      LOBSTER_DESKTOP_MCP_ENABLED: ${LOBSTER_DESKTOP_MCP_ENABLED:-0}
+      LOBSTER_DESKTOP_MCP_SERVERS: ${LOBSTER_DESKTOP_MCP_SERVERS:-}
+      LOBSTER_DESKTOP_MCP_MAX_STEPS: ${LOBSTER_DESKTOP_MCP_MAX_STEPS:-14}
+      LOBSTER_ANDROID_MCP_ENABLED: ${LOBSTER_ANDROID_MCP_ENABLED:-0}
+      LOBSTER_ANDROID_MCP_SERVERS: ${LOBSTER_ANDROID_MCP_SERVERS:-}
+      LOBSTER_ADMIN_TOKEN: ${LOBSTER_ADMIN_TOKEN:-${CLAWHIVE_INTERNAL_TOKEN:-}}
+      LOBSTER_WORKBENCH_PREFILL_TOKEN: ${LOBSTER_WORKBENCH_PREFILL_TOKEN:-1}
+      LOBSTER_VNC_PORT: ${LOBSTER_VNC_PORT:-6080}
+      LOBSTER_EXECUTION_MODE: ${LOBSTER_EXECUTION_MODE:-auto}
+      LOBSTER_MCP_ENABLED: ${LOBSTER_MCP_ENABLED:-1}
+      LOBSTER_ENGINE_SELECTOR: ${LOBSTER_ENGINE_SELECTOR:-1}
+      LOBSTER_STAGEHAND_ENABLED: ${LOBSTER_STAGEHAND_ENABLED:-1}
+      LOBSTER_ENGINE_CLASSIFIER: ${LOBSTER_ENGINE_CLASSIFIER:-1}
+      LOBSTER_ENGINE_CLASSIFIER_MIN_CONF: ${LOBSTER_ENGINE_CLASSIFIER_MIN_CONF:-0.6}
+      LOBSTER_MCP_STALL_RECOVERY: ${LOBSTER_MCP_STALL_RECOVERY:-1}
+      LOBSTER_MCP_AUTO_RECOVER: ${LOBSTER_MCP_AUTO_RECOVER:-1}
+      LOBSTER_MCP_COMPLEX_STEP_BONUS: ${LOBSTER_MCP_COMPLEX_STEP_BONUS:-8}
+      LOBSTER_MCP_FINISH_MIN_CHARS: ${LOBSTER_MCP_FINISH_MIN_CHARS:-8}
+      LOBSTER_MCP_MAX_STEPS_FORM: ${LOBSTER_MCP_MAX_STEPS_FORM:-32}
+      LOBSTER_MCP_URL: http://playwright_mcp:8931/mcp
+      LOBSTER_MCP_HEADLESS_SIDECAR: "1"
+      # 低风控 MCP 调试：设为 1 时容器内 Xvfb 有头 MCP（覆盖 sidecar，noVNC 可见）
+      LOBSTER_MCP_USE_LOCAL_HEADED: ${LOBSTER_MCP_USE_LOCAL_HEADED:-0}
+      LOBSTER_CDP_URL: ${LOBSTER_CDP_URL:-}
+      LOBSTER_SESSION_DIR: ${LOBSTER_SESSION_DIR:-/app/.data/sessions}
+      LOBSTER_STORAGE_DIR: ${LOBSTER_STORAGE_DIR:-/app/.data/lobster}
+      DISPLAY: ":99"
+      APP_PORT: ${LOBSTER_PORT:-13108}
+      HOST: "0.0.0.0"
+      PORT: ${LOBSTER_PORT:-13108}
+      NITRO_PORT: ${LOBSTER_PORT:-13108}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+      LOBSTER_MCP_EXPORT: ${LOBSTER_MCP_EXPORT:-1}
+      LOBSTER_TASK_UNDERSTAND: ${LOBSTER_TASK_UNDERSTAND:-1}
+      # Wave 7 · 网页 LLM-first
+      LOBSTER_CLASSIC_STEP_DECIDE: ${LOBSTER_CLASSIC_STEP_DECIDE:-1}
+      LOBSTER_CLASSIC_GOALS_HEURISTIC: ${LOBSTER_CLASSIC_GOALS_HEURISTIC:-0}
+      LOBSTER_STEP_DECIDE_MIN_CONF: ${LOBSTER_STEP_DECIDE_MIN_CONF:-0.5}
+      LOBSTER_RESULT_PAGE_GATE: ${LOBSTER_RESULT_PAGE_GATE:-1}
+      LOBSTER_ENGINE_TRUTH_LOG: ${LOBSTER_ENGINE_TRUTH_LOG:-1}
+      LOBSTER_NLU_METRICS: ${LOBSTER_NLU_METRICS:-1}
+      NOVNC_PORT: ${LOBSTER_VNC_PORT:-6080}
+      VNC_PORT: "5900"
+    ports:
+      - "${LOBSTER_PORT:-13108}:${LOBSTER_PORT:-13108}"
+      - "${LOBSTER_VNC_PORT:-6080}:${LOBSTER_VNC_PORT:-6080}"
+      # 5900 在部分 Windows 主机被系统保留；需直连 VNC 客户端时可设 LOBSTER_RAW_VNC_PORT=15900
+      - "${LOBSTER_RAW_VNC_PORT:-15900}:5900"
+    depends_on:
+      playwright_mcp:
+        condition: service_started
+    volumes:
+      - lobster_agent_sessions:/app/.data/sessions
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const p=process.env.APP_PORT||13108;require('http').get('http://127.0.0.1:'+p+'/api/ready',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.ready===true?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))\""
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
+    restart: unless-stopped
+
+  tavern_agent:
+    profiles: ["extended"]
+    build:
+      context: ../Tavern_Agent
+      dockerfile: Dockerfile
+    image: clawhive/tavern_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: tavern_agent
+    env_file:
+      - path: ../Tavern_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      # 仅容器路径与平台同步；密钥/模型见 Tavern_Agent/.env + .env.agents-lan
+      TAVERN_FRONTEND_DIST: /tavern/frontend/dist
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+    ports:
+      - "${TAVERN_PORT:-13109}:13109"
+    volumes:
+      - tavern_agent_data:/tavern/.data
+    restart: unless-stopped
+
+  companion_agent:
+    profiles: ["extended"]
+    build:
+      context: ../Companion_Agent
+      dockerfile: Dockerfile
+    image: clawhive/companion_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: companion_agent
+    env_file:
+      - path: ../Companion_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: "13115"
+      CORS_ORIGINS: ${COMPANION_CORS_ORIGINS:-http://localhost:13115,http://127.0.0.1:13115}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+    ports:
+      - "${COMPANION_PORT:-13115}:13115"
+    volumes:
+      # 本地新增/替换 Live2D 模型后无需重建镜像
+      - ../Companion_Agent/live2d/models:/companion/live2d/models:ro
+      # data 需可写：SQLite 存档 · TTS cache · unlocked endings
+      - ../Companion_Agent/data:/companion/data
+      - ../Companion_Agent/backend/app:/companion/backend/app:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:13115/api/health',timeout=5); sys.exit(0 if r.status==200 else 1)\""
+        ]
+      interval: 20s
+      timeout: 8s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+
+  music_agent:
+    profiles: ["extended"]
+    build:
+      context: ../Music_Agent
+      dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${MUSIC_AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        PYTHON_BASE_IMAGE: ${MUSIC_AGENT_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.10-slim-bookworm}
+        PIP_INDEX_URL: ${MUSIC_AGENT_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        APT_DEBIAN_MIRROR: ${MUSIC_AGENT_APT_DEBIAN_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}
+        APT_SECURITY_MIRROR: ${MUSIC_AGENT_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}
+        INSTALL_DEMUCS: ${MUSIC_AGENT_INSTALL_DEMUCS:-1}
+        INSTALL_NEURAL_DEPS: ${MUSIC_AGENT_INSTALL_NEURAL:-0}
+        TORCH_INDEX_URL: ${MUSIC_AGENT_TORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
+    image: clawhive/music_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: music_agent
+    working_dir: /music/backend
+    env_file:
+      - path: ../Music_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      API_PORT: "13110"
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+      # LLM 模型/API：由 env_file（Music_Agent/.env + .env.agents-lan）注入，勿在此覆盖
+      USE_QWEN3_VL_FOR_INTENT: ${USE_QWEN3_VL_FOR_INTENT:-true}
+      USE_QWEN3_VL_FOR_JUDGE: ${USE_QWEN3_VL_FOR_JUDGE:-true}
+      JUDGE_AUDIO_WITH_OMNI: ${JUDGE_AUDIO_WITH_OMNI:-true}
+      ENABLE_LLM_JUDGE: ${ENABLE_LLM_JUDGE:-true}
+      COMPOSE_MAX_ATTEMPTS: ${COMPOSE_MAX_ATTEMPTS:-3}
+      QUALITY_SCORE_THRESHOLD: ${QUALITY_SCORE_THRESHOLD:-7}
+      JUDGE_OMNI_ONCE_AFTER_COMPOSE: ${JUDGE_OMNI_ONCE_AFTER_COMPOSE:-true}
+      STREAM_MODEL_THINKING: ${MUSIC_AGENT_STREAM_MODEL_THINKING:-false}
+      OUTPUT_DIR: .data/music/out
+      MUSIC_FRONTEND_DIST: /music/frontend/dist
+      CORS_ORIGINS: ${MUSIC_AGENT_CORS_ORIGINS:-http://localhost:13110,http://127.0.0.1:13110}
+      MIDI_RENDER_WAV: ${MUSIC_AGENT_MIDI_RENDER_WAV:-true}
+      MIDI_RENDER_MP3: ${MUSIC_AGENT_MIDI_RENDER_MP3:-false}
+      SOUNDFONT_SF2_PATH: ${MUSIC_AGENT_SOUNDFONT_SF2_PATH:-/usr/share/sounds/sf2/FluidR3_GM.sf2}
+      FLUIDSYNTH_PATH: ${MUSIC_AGENT_FLUIDSYNTH_PATH:-fluidsynth}
+      FFMPEG_PATH: ${MUSIC_AGENT_FFMPEG_PATH:-ffmpeg}
+      MPLBACKEND: ${MUSIC_AGENT_MPLBACKEND:-Agg}
+      # 默认纯算法作曲（rule）；MusicGen 见 NEURAL_MUSIC_ENABLED
+      COMPOSE_BACKEND: ${MUSIC_AGENT_COMPOSE_BACKEND:-rule}
+      NEURAL_MUSIC_ENABLED: ${MUSIC_AGENT_NEURAL_ENABLED:-false}
+      NEURAL_COMPOSE_PREFERRED: ${MUSIC_AGENT_NEURAL_COMPOSE_PREFERRED:-false}
+      NEURAL_PRELOAD: ${MUSIC_AGENT_NEURAL_PRELOAD:-false}
+      NEURAL_MODEL_ID: ${MUSIC_AGENT_NEURAL_MODEL_ID:-facebook/musicgen-small}
+      NEURAL_DEVICE: ${MUSIC_AGENT_NEURAL_DEVICE:-auto}
+      NEURAL_FP16: ${MUSIC_AGENT_NEURAL_FP16:-true}
+      NEURAL_MAX_DURATION_GPU: ${MUSIC_AGENT_NEURAL_MAX_DURATION_GPU:-12}
+      NEURAL_MAX_DURATION_CPU: ${MUSIC_AGENT_NEURAL_MAX_DURATION_CPU:-15}
+      NEURAL_MAX_NEW_TOKENS: ${MUSIC_AGENT_NEURAL_MAX_NEW_TOKENS:-768}
+      NEURAL_CPU_FALLBACK: ${MUSIC_AGENT_NEURAL_CPU_FALLBACK:-false}
+      ENABLE_AUDIO_REMIX: ${MUSIC_AGENT_ENABLE_AUDIO_REMIX:-false}
+      ENABLE_MIDI_SWAP: ${MUSIC_AGENT_ENABLE_MIDI_SWAP:-true}
+      ENABLE_MUSIC_THEORY: ${MUSIC_AGENT_ENABLE_THEORY:-true}
+      ENABLE_DEMUCS_STEMS: ${MUSIC_AGENT_ENABLE_DEMUCS:-true}
+      DEMUCS_MODEL: ${MUSIC_AGENT_DEMUCS_MODEL:-htdemucs}
+      NEURAL_ENGINE: ${MUSIC_AGENT_NEURAL_ENGINE:-stable_audio}
+      STABLE_AUDIO_MODEL_ID: ${MUSIC_AGENT_STABLE_AUDIO_MODEL:-stabilityai/stable-audio-open-1.0}
+      STABLE_AUDIO_MAX_DURATION_GPU: ${MUSIC_AGENT_STABLE_AUDIO_MAX_GPU:-30}
+      HF_HOME: /music/.cache/huggingface
+      TRANSFORMERS_CACHE: /music/.cache/huggingface
+      TORCH_HOME: /music/.cache/torch
+    ports:
+      - "${MUSIC_AGENT_PORT:-13110}:13110"
+    volumes:
+      - ../Music_Agent/.data/soundfonts:/music/.data/soundfonts:ro
+      - music_agent_out:/music/.data/music/out
+      - music_agent_hf_cache:/music/.cache/huggingface
+      - music_agent_torch_cache:/music/.cache/torch
+    restart: unless-stopped
+
+  video_agent:
+    profiles: ["extended"]
+    build:
+      context: ../Video_Agent
+      dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${VIDEO_AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        PYTHON_BASE_IMAGE: ${VIDEO_AGENT_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.12-slim-bookworm}
+        PIP_INDEX_URL: ${VIDEO_AGENT_PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        APT_DEBIAN_MIRROR: ${VIDEO_AGENT_APT_DEBIAN_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian}
+        APT_SECURITY_MIRROR: ${VIDEO_AGENT_APT_SECURITY_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/debian-security}
+    image: clawhive/video_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: video_agent
+    working_dir: /video/backend
+    env_file:
+      - path: ../Video_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      API_PORT: "13111"
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "1"
+      # LLM 模型/API：由 env_file（Video_Agent/.env + .env.agents-lan）注入，勿在此覆盖
+      VIDEO_FRONTEND_DIST: /video/frontend/dist
+      OUTPUT_DIR: .data/video/out
+      CORS_ORIGINS: ${VIDEO_AGENT_CORS_ORIGINS:-http://localhost:13111,http://127.0.0.1:13111}
+      # 容器内 127.0.0.1 指向本容器，须用 Compose 服务名访问 music_agent（覆盖 ../Video_Agent/.env 的本机端口）
+      MUSIC_AGENT_HTTP_URL: ${VIDEO_AGENT_MUSIC_AGENT_HTTP_URL:-http://music_agent:13110}
+      BGM_ENABLED: ${VIDEO_AGENT_BGM_ENABLED:-true}
+    ports:
+      - "${VIDEO_AGENT_PORT:-13111}:13111"
+    volumes:
+      - video_agent_out:/video/.data/video/out
+    depends_on:
+      music_agent:
+        condition: service_started
+    restart: unless-stopped
+
+  # AI_Agent 本地对口型（Ultralight / MuseTalk / Wav2Lip）；需 GPU，默认不随 extended 启动
+  # 启用：docker compose --profile extended --profile lipsync up -d ai_agent_lipsync ai_agent
+  ai_agent_lipsync:
+    profiles: ["lipsync"]
+    build:
+      context: ../AI_Agent/services/lipsync
+      dockerfile: Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${AI_AGENT_LIPSYNC_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.11-slim-bookworm}
+        PIP_INDEX_URL: ${AI_AGENT_PIP_INDEX_URL:-${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}}
+        LIPSYNC_GPU: ${LIPSYNC_GPU:-0}
+    image: clawhive/ai_agent_lipsync:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: ai_agent_lipsync
+    environment:
+      LIPSYNC_PORT: "8091"
+      LIPSYNC_BACKEND: ${LIPSYNC_BACKEND:-auto}
+      LIPSYNC_PREFER_CUDA: ${LIPSYNC_PREFER_CUDA:-true}
+      ULTRALIGHT_DATA_PATH: /data/ultralight
+      LIPSYNC_FACE_VIDEO: /app/video/ai.mp4
+      WAV2LIP_ROOT: /opt/Wav2Lip
+      MUSETALK_ROOT: /opt/MuseTalk
+      MUSETALK_PYTHON: ${MUSETALK_PYTHON:-}
+      MUSETALK_USE_FLOAT16: ${MUSETALK_USE_FLOAT16:-true}
+      MUSETALK_BBOX_SHIFT: ${MUSETALK_BBOX_SHIFT:-0}
+    volumes:
+      - ../AI_Agent/video:/app/video:ro
+      - ../AI_Agent/assets/ultralight_avatar:/data/ultralight:ro
+      - ${WAV2LIP_HOST_PATH:-../AI_Agent/.external/Wav2Lip}:/opt/Wav2Lip:ro
+      - ${MUSETALK_HOST_PATH:-../AI_Agent/.external/MuseTalk}:/opt/MuseTalk:ro
+    ports:
+      - "${LIPSYNC_PORT:-8091}:8091"
+    # GPU（可选）：宿主机安装 NVIDIA 驱动 + nvidia-container-toolkit 后设 LIPSYNC_GPU=1 重建镜像，并取消下行注释
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8091/health >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped
+
+  ai_agent:
+    profiles: ["extended"]
+    build:
+      context: ../AI_Agent
+      dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${AI_AGENT_NODE_IMAGE:-docker.m.daocloud.io/library/node:20-bullseye}
+        PYTHON_BASE_IMAGE: ${AI_AGENT_PYTHON_IMAGE:-docker.m.daocloud.io/library/python:3.12-slim-bookworm}
+        NPM_CONFIG_REGISTRY: ${AI_AGENT_NPM_REGISTRY:-${NPM_CONFIG_REGISTRY:-https://registry.npmmirror.com}}
+        PIP_INDEX_URL: ${AI_AGENT_PIP_INDEX_URL:-${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}}
+    image: clawhive/ai_agent:${CLAWHIVE_IMAGE_TAG:-prod}
+    container_name: ai_agent
+    working_dir: /app/backend
+    env_file:
+      - path: ../AI_Agent/.env
+        required: false
+      - path: .env.agents-lan
+        required: false
+    environment:
+      # 模型名以 ../AI_Agent/.env 为准，勿在此覆盖 LLM_MODEL/ASR_MODEL/TTS_MODEL
+      LIP_SYNC_MODE: ${AI_AGENT_LIP_SYNC_MODE:-client_rhythm}
+      CLAWHIVE_BACKEND_URL: http://clawhive_backend:8000
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      AGENT_LLM_REQUEST_TIMEOUT_MS: ${AGENT_LLM_REQUEST_TIMEOUT_MS:-120000}
+      AGENT_LLM_MAX_RETRIES: ${AGENT_LLM_MAX_RETRIES:-0}
+      AGENT_LLM_JSON_MAX_TOKENS: ${AGENT_LLM_JSON_MAX_TOKENS:-896}
+      AGENT_LLM_SYNTH_MAX_TOKENS: ${AGENT_LLM_SYNTH_MAX_TOKENS:-2048}
+      CLAWHIVE_CONFIG_SYNC: "0"
+      # LLM 模型/API：由挂载的 ../AI_Agent/.env 注入，勿在此覆盖
+    ports:
+      # 容器内监听端口须与 AI_Agent/.env 中 API_PORT 一致（默认 8080）
+      - "${AI_AGENT_PORT:-13112}:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../AI_Agent/.env:/app/.env:ro
+      - ../AI_Agent/assets:/app/assets
+      - ../AI_Agent/video:/app/video:ro
+    restart: unless-stopped
+
+  tempo:
+    image: docker.1ms.run/grafana/tempo:2.6.1
+    container_name: clawhive_tempo
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
+      - clawhive_tempo_data:/var/tempo
+    ports:
+      - "${CLAWHIVE_TEMPO_PORT:-3200}:3200"
+      - "${CLAWHIVE_TEMPO_OTLP_HTTP_PORT:-4318}:4318"
+    restart: unless-stopped
+
+  loki:
+    image: docker.1ms.run/grafana/loki:3.1.1
+    container_name: clawhive_loki
+    command: ["-config.file=/etc/loki/loki.yml"]
+    volumes:
+      - ./monitoring/loki/loki.yml:/etc/loki/loki.yml:ro
+      - clawhive_loki_data:/loki
+    ports:
+      - "${CLAWHIVE_LOKI_PORT:-3100}:3100"
+    restart: unless-stopped
+
+  promtail:
+    image: docker.1ms.run/grafana/promtail:3.1.1
+    container_name: clawhive_promtail
+    command: ["-config.file=/etc/promtail/promtail.yml"]
+    volumes:
+      - ./monitoring/promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      loki:
+        condition: service_started
+    restart: unless-stopped
+
+  prometheus:
+    image: docker.1ms.run/prom/prometheus:v2.55.1
+    container_name: clawhive_prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/rules:/etc/prometheus/rules:ro
+      - clawhive_prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "${CLAWHIVE_PROMETHEUS_PORT:-19090}:9090"
+    depends_on:
+      clawhive_backend:
+        condition: service_started
+      alertmanager:
+        condition: service_started
+    restart: unless-stopped
+
+  alertmanager:
+    image: docker.1ms.run/prom/alertmanager:v0.27.0
+    container_name: clawhive_alertmanager
+    environment:
+      CLAWHIVE_INTERNAL_TOKEN: ${CLAWHIVE_INTERNAL_TOKEN:-}
+      CLAWHIVE_ALERT_WEBHOOK_URL: ${CLAWHIVE_ALERT_WEBHOOK_URL:-}
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./monitoring/alertmanager/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    ports:
+      - "${CLAWHIVE_ALERTMANAGER_PORT:-19093}:9093"
+    depends_on:
+      clawhive_backend:
+        condition: service_started
+    restart: unless-stopped
+
+  grafana:
+    image: docker.1ms.run/grafana/grafana:11.2.2
+    container_name: clawhive_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${CLAWHIVE_GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${CLAWHIVE_GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - clawhive_grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "${CLAWHIVE_GRAFANA_PORT:-13000}:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
+    restart: unless-stopped
+
+  litellm:
+    profiles: ["litellm"]
+    image: ${LITELLM_IMAGE:-ghcr.io/berriai/litellm:main-latest}
+    container_name: clawhive_litellm
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-${QWEN_API_KEY:-}}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-clawhive-litellm}
+    volumes:
+      - ./monitoring/litellm/config.yaml:/app/config.yaml:ro
+    ports:
+      - "${CLAWHIVE_LITELLM_PORT:-14000}:4000"
+    restart: unless-stopped
+
+  langfuse:
+    image: ${LANGFUSE_IMAGE:-docker.1ms.run/langfuse/langfuse:2}
+    container_name: clawhive_langfuse
+    environment:
+      DATABASE_URL: postgresql://${CLAWHIVE_PG_USER:-postgres}:${CLAWHIVE_PG_PASSWORD:-postgres}@clawhive_postgres:5432/${CLAWHIVE_LANGFUSE_DB:-langfuse}
+      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://127.0.0.1:13001}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-change-langfuse-nextauth-secret}
+      SALT: ${LANGFUSE_SALT:-change-langfuse-salt}
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_INIT_ORG_ID: ${LANGFUSE_INIT_ORG_ID:-clawhive}
+      LANGFUSE_INIT_ORG_NAME: ${LANGFUSE_INIT_ORG_NAME:-ClawHive}
+      LANGFUSE_INIT_PROJECT_ID: ${LANGFUSE_INIT_PROJECT_ID:-clawhive}
+      LANGFUSE_INIT_PROJECT_NAME: ${LANGFUSE_INIT_PROJECT_NAME:-ClawHive}
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-pk-lf-clawhive}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-sk-lf-clawhive}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:-admin@clawhive.local}
+      LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-admin}
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-admin123}
+    ports:
+      - "${CLAWHIVE_LANGFUSE_PORT:-13001}:3000"
+    depends_on:
+      clawhive_postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dex:
+    profiles: ["oidc"]
+    image: docker.1ms.run/dexidp/dex:v2.41.1
+    container_name: clawhive_dex
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    volumes:
+      - ./monitoring/dex/config.yaml:/etc/dex/config.yaml:ro
+    ports:
+      - "${CLAWHIVE_DEX_PORT:-5556}:5556"
+    restart: unless-stopped
+
+volumes:
+  clawhive_pg_data:
+  clawhive_redis_data:
+  clawhive_runtime_data:
+  clawhive_prometheus_data:
+  clawhive_grafana_data:
+  clawhive_alertmanager_data:
+  clawhive_tempo_data:
+  clawhive_loki_data:
+  manager_agent_data:
+  rag_agent_data:
+  rag_agent_node_modules:
+  rag_agent_nuxt:
+  rag_agent_output:
+  rag_pgvector_data:
+  extractor_agent_node_modules:
+  extractor_agent_nuxt:
+  extractor_agent_playwright:
+  tavern_agent_data:
+  music_agent_out:
+  music_agent_hf_cache:
+  music_agent_torch_cache:
+  video_agent_out:
+  multimodal_agent_data:
+  lobster_agent_sessions:
+  manager_agent_node_modules:
+  db_agent_node_modules:
+  db_agent_nuxt:
+  admin_mcp_memory:
+  admin_mcp_cron:

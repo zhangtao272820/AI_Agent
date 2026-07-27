@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "description": "离线门禁样例集；结构路由与快捷路径回归。",
+  "cases": [
+    {
+      "id": "route-db-anchor",
+      "user": "查一下张三上个月在院的用药记录",
+      "expect": { "intentHint": "db", "mustNotClarify": false }
+    },
+    {
+      "id": "route-rag-doc",
+      "user": "根据知识库说明一下我们机构的探视制度",
+      "expect": { "intentHint": "rag", "mustNotClarify": false }
+    },
+    {
+      "id": "route-db-chart",
+      "user": "查询近7天各地区销售Top5并画柱状图",
+      "expect": { "intentHint": "multi", "mustNotClarify": false }
+    },
+    {
+      "id": "route-db-only-shortcut",
+      "user": "在数据库中查询林婉清足底压力测试记录",
+      "expect": { "intentHint": "db", "maxPlanSteps": 2, "mustNotClarify": false }
+    }
+  ]
+}

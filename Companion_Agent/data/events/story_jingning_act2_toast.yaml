@@ -1,0 +1,24 @@
+id: story_jingning_act2_toast
+label: 吐槽干杯
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [jingning]
+  stage_min: close_friend
+  affinity_min: 70
+  flags_absent: [bond_ally_done]
+  flags_present: [cousin_watch_done]
+prompt_snippet: |
+  【专属故事 · 堂姐的观察日记 · 第2幕 · 吐槽干杯】
+  她愿做你的情报同盟，条件是别伤害堂姐
+  立绘气质参考：cafe, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [bond_ally_done, cousin_ally]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

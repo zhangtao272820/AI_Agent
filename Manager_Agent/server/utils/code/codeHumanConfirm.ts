@@ -1,0 +1,146 @@
+import { waitGuiConfirm } from '../gui/guiConfirmBridge'
+import {
+  assertPostureAllows,
+  resolveCollaborationPosture
+} from '../platform/collaborationPosture'
+import {
+  gateCopy,
+  resolveRiskExecutionPolicy
+} from '../../graph/core/policy/riskExecutionPolicy'
+
+export type CodeEditPreview = {
+  files?: string[]
+  unified_diff?: string
+  diff_stat?: string
+  branch?: string
+}
+
+export function isCodeEditHitlEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return String(env.MANAGER_CODE_EDIT_HITL ?? env.CODE_WRITE_REQUIRE_CONFIRM ?? '0').trim() === '1'
+}
+
+export function codeEditAutoConfirmEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  return String(env.MANAGER_CODE_EDIT_AUTO_CONFIRM ?? '0').trim() === '1'
+}
+
+export function extractCodeEditPreview(input: {
+  meta?: Record<string, unknown> | null
+  raw?: unknown
+}): CodeEditPreview | null {
+  const meta = input.meta && typeof input.meta === 'object' ? input.meta : {}
+  const metaPreview =
+    meta.edit_preview && typeof meta.edit_preview === 'object'
+      ? (meta.edit_preview as CodeEditPreview)
+      : null
+  const filesFromMeta = Array.isArray(meta.files_touched)
+    ? meta.files_touched.map(String).filter(Boolean)
+    : []
+  const raw =
+    input.raw && typeof input.raw === 'object' ? (input.raw as Record<string, unknown>) : null
+  const artifacts =
+    raw?.artifacts && typeof raw.artifacts === 'object'
+      ? (raw.artifacts as Record<string, unknown>)
+      : null
+  const filesFromArtifacts = Array.isArray(artifacts?.files_changed)
+    ? artifacts!.files_changed!.map(String).filter(Boolean)
+    : []
+  const files = [...new Set([...(metaPreview?.files ?? []), ...filesFromMeta, ...filesFromArtifacts])]
+  if (!files.length && !metaPreview?.unified_diff && !artifacts?.unified_diff) return null
+  return {
+    files,
+    unified_diff: String(
+      metaPreview?.unified_diff ?? artifacts?.unified_diff ?? meta.unified_diff ?? '',
+    ).trim() || undefined,
+    diff_stat: String(metaPreview?.diff_stat ?? artifacts?.diff_stat ?? meta.diff_stat ?? '').trim() || undefined,
+    branch: String(metaPreview?.branch ?? artifacts?.branch ?? meta.branch ?? '').trim() || undefined,
+  }
+}
+
+export function buildCodeEditConfirmMessage(preview: CodeEditPreview, task: string): {
+  title: string
+  message: string
+} {
+  const files = preview.files ?? []
+  const diffSnippet = String(preview.unified_diff || preview.diff_stat || '').slice(0, 1800)
+  return {
+    title: '代码变更需人工确认',
+    message: [
+      `Code Agent 已修改 ${files.length || '若干'} 个文件，请审阅 diff 后确认保留或撤销。`,
+      files.length ? `文件：${files.slice(0, 6).join(', ')}${files.length > 6 ? '…' : ''}` : '',
+      preview.branch ? `分支：${preview.branch}` : '',
+      diffSnippet ? `\n\`\`\`diff\n${diffSnippet}\n\`\`\`` : '',
+      task ? `任务：${task.slice(0, 240)}` : '',
+      '确认 = 保留变更；取消 = 撤销写盘（git restore）。',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  }
+}
+
+/** 总管 Code edit HITL：审 diff 后确认保留或撤销 */
+export async function requestCodeEditHumanConfirm(input: {
+  runId?: string
+  preview: CodeEditPreview
+  task: string
+  meta?: unknown
+  sendThinking?: (t: string) => void
+  sendEvent?: (event: { event: string; data?: unknown; from?: string }) => void
+  timeoutMs?: number
+}): Promise<boolean> {
+  const posture = resolveCollaborationPosture(input.meta)
+  const gate = assertPostureAllows(posture, 'code_edit_apply', input.meta)
+  if (!gate.ok) {
+    input.sendThinking?.(gate.reason)
+    return false
+  }
+  const riskPolicy = resolveRiskExecutionPolicy({
+    actionKind: 'code_edit',
+    meta: input.meta,
+    securityRiskLevel:
+      input.meta && typeof input.meta === 'object'
+        ? ((input.meta as { security?: { riskLevel?: 'low' | 'medium' | 'high' } }).security?.riskLevel as
+            | 'low'
+            | 'medium'
+            | 'high'
+            | undefined)
+        : undefined
+  })
+  if (riskPolicy.preferDryRun || riskPolicy.actionGate === 'dry_run_then_confirm') {
+    input.sendThinking?.(`Code Agent：${gateCopy('dry_run')} — 变更预览如下`)
+    input.sendEvent?.({
+      event: 'dry_run_result',
+      data: {
+        agent: 'code',
+        badge: gateCopy('dry_run'),
+        message: `拟写入 ${input.preview.files?.length || 0} 个文件（未确认前可撤销）`,
+        files: input.preview.files ?? [],
+        riskPolicy
+      },
+      from: 'manager'
+    })
+  }
+  /** 高档策略禁止 Auto；中档 dry-run 后仍须人批 */
+  if (codeEditAutoConfirmEnabled() && riskPolicy.allowAutoConfirm) return true
+  const runId = String(input.runId || '').trim()
+  if (!runId) return true
+  const confirmId = crypto.randomUUID()
+  const copy = buildCodeEditConfirmMessage(input.preview, input.task)
+  input.sendThinking?.(`Code Agent：${gateCopy('action')}，等待您确认…`)
+  input.sendEvent?.({
+    event: 'human_confirm_request',
+    data: {
+      confirmId,
+      title: copy.title,
+      message: `${gateCopy('action')}\n${copy.message}`,
+      agent: 'code',
+      failureType: 'code_edit_review',
+      files: input.preview.files ?? [],
+      diffStat: input.preview.diff_stat,
+      unifiedDiff: String(input.preview.unified_diff || '').slice(0, 8000),
+      branch: input.preview.branch,
+      riskTier: riskPolicy.tier
+    },
+    from: 'manager',
+  })
+  return waitGuiConfirm(runId, confirmId, input.timeoutMs ?? 300_000)
+}

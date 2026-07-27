@@ -1,0 +1,24 @@
+id: story_shizuku_act3_voice
+label: 出声
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shizuku]
+  stage_min: crush
+  affinity_min: 82
+  flags_absent: [sz_spoke_aloud]
+  flags_present: [sz_booklist]
+prompt_snippet: |
+  【专属故事 · 书脊后的声线 · 第3幕 · 出声】
+  闭馆后她第一次大声说喜欢
+  立绘气质参考：study_carrel, date, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sz_spoke_aloud, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

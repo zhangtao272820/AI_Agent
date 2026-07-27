@@ -1,0 +1,24 @@
+id: story_taotao_act3_plain
+label: 卸妆之后
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [taotao]
+  stage_min: crush
+  affinity_min: 82
+  flags_absent: [tt_plain_face]
+  flags_present: [tt_stage_night]
+prompt_snippet: |
+  【专属故事 · 灯牌与素颜 · 第3幕 · 卸妆之后】
+  她问你爱舞台还是爱她；专一压力
+  立绘气质参考：stretch_break, date, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [tt_plain_face, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

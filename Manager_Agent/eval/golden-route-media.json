@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "description": "multimodal / music / video 路由 golden（结构性门禁 + 手工 NLU 回归）",
+  "cases": [
+    {
+      "id": "multimodal_image_describe",
+      "query": "请描述这张图片里的主要内容和文字",
+      "hasAttachment": true,
+      "expectIntent": "multimodal",
+      "expectAllowedIncludes": ["multimodal"],
+      "expectAllowedExcludes": ["music", "video", "gui", "crawler"]
+    },
+    {
+      "id": "multimodal_then_music",
+      "query": "先分析附件图片的风格，再生成一段相关氛围的纯音乐",
+      "hasAttachment": true,
+      "expectIntent": "multi",
+      "expectAllowedIncludes": ["multimodal", "music"],
+      "expectAllowedExcludes": ["gui"]
+    },
+    {
+      "id": "music_only_no_attachment",
+      "query": "生成一段 30 秒轻快钢琴纯音乐 BGM",
+      "expectIntent": "music",
+      "expectAllowedIncludes": ["music"],
+      "expectAllowedExcludes": ["multimodal", "gui"]
+    },
+    {
+      "id": "media_web_reference",
+      "query": "参考 2025 年流行电子曲风，生成一段 20 秒 BGM",
+      "expectIntent": "music",
+      "expectAllowedIncludes": ["music"],
+      "expectNeedsWebSearch": true,
+      "expectAllowedExcludes": ["multimodal", "gui"]
+    }
+  ]
+}

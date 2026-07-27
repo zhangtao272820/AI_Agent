@@ -1,0 +1,24 @@
+id: story_qingcai_act2_festival
+label: 夏祭
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [qingcai]
+  stage_min: close_friend
+  affinity_min: 78
+  flags_absent: [qc_festival]
+  flags_present: [qc_mirror]
+prompt_snippet: |
+  【专属故事 · 练舞室的夏 · 第2幕 · 夏祭】
+  文化祭/舞台；确认或婉拒
+  立绘气质参考：stage_bow, date, festival_spring。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [qc_festival, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

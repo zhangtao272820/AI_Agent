@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "description": "P1/P2 联网与编排回归用例：在 Manager UI 或 WS 中逐条提问，对照 thinking 事件与最终答案。",
+  "prerequisites": {
+    "env": [
+      "MANAGER_WEB_SEARCH=1",
+      "WEB_SEARCH_PROVIDER=tavily",
+      "TAVILY_API_KEY=<必填，或改用 SERPER_API_KEY + serper>"
+    ],
+    "optional_p2": [
+      "MANAGER_SEARCH_LOOP=1",
+      "MANAGER_SEARCH_VERIFY=1",
+      "MANAGER_SEARCH_MAX_ROUNDS=3"
+    ],
+    "services": ["manager_agent", "extractor_agent", "db_agent", "rag_agent"]
+  },
+  "cases": [
+    {
+      "id": "p1-realtime-fx",
+      "category": "P1 单轮联网",
+      "user": "今天美元兑人民币汇率是多少？",
+      "expect": {
+        "phases": ["web_search"],
+        "thinkingContains": ["联网搜索", "种子 URL"],
+        "route": { "needsWebSearch": true, "intentHint": "crawler" },
+        "mustNot": ["开放式发现搜索（无 seed 时）"]
+      }
+    },
+    {
+      "id": "p1-multi-policy-compare",
+      "category": "P1 multi + SERP",
+      "user": "对比 A 股和美股最近一周政策，写简要报告",
+      "expect": {
+        "phases": ["decompose", "web_search", "planner", "multi"],
+        "thinkingContains": ["子任务拆解", "Multi", "联网搜索"],
+        "route": { "intentHint": "multi", "allowedAgentsIncludes": ["crawler", "code", "report"] },
+        "crawler": { "hasSeedUrls": true, "extractorLogContains": "Manager SERP 种子" }
+      }
+    },
+    {
+      "id": "p1-news-headline",
+      "category": "P1 实时新闻",
+      "user": "搜索一下本周人工智能领域的重要新闻，列 3 条并附链接",
+      "expect": {
+        "phases": ["web_search"],
+        "thinkingContains": ["联网搜索", "命中"],
+        "finalContains": ["http"]
+      }
+    },
+    {
+      "id": "p1-off-switch",
+      "category": "P1 关闭联网",
+      "envOverride": { "MANAGER_WEB_SEARCH": "0" },
+      "user": "今天上海天气怎么样？",
+      "expect": {
+        "thinkingNotContains": ["联网搜索：tavily"],
+        "meta": { "webSearchMode": "skip" }
+      }
+    },
+    {
+      "id": "p2-search-loop",
+      "category": "P2 多轮补搜",
+      "envOverride": {
+        "MANAGER_SEARCH_LOOP": "1",
+        "MANAGER_SEARCH_VERIFY": "1"
+      },
+      "user": "分别检索欧盟和美国对电动车最新关税政策，对比差异并给出结论",
+      "expect": {
+        "thinkingContains": ["多轮模式", "第 1/", "覆盖"],
+        "meta": { "searchRoundsMin": 1 },
+        "route": { "intentHint": "multi" }
+      }
+    },
+    {
+      "id": "e1-probe-crawler",
+      "category": "E1 probe",
+      "user": "从互联网查一下特斯拉最新股价",
+      "expect": {
+        "phases": ["probe", "web_search"],
+        "thinkingContains": ["crawler_health"]
+      }
+    },
+    {
+      "id": "e1-db-plan",
+      "category": "E1 DB plan",
+      "user": "查一下张三上个月在院的用药记录",
+      "expect": {
+        "phases": ["probe", "planner"],
+        "route": { "intentHint": "db" },
+        "note": "plan 阶段应成功调用 DB /api/plan（不再 404）"
+      }
+    },
+    {
+      "id": "p0-rag-no-web",
+      "category": "负例：不应联网",
+      "user": "根据知识库说明一下我们机构的探视制度",
+      "expect": {
+        "route": { "intentHint": "rag" },
+        "thinkingNotContains": ["判定需要联网搜索"],
+        "meta": { "webSearchMode": "skip" }
+      }
+    },
+    {
+      "id": "p0-db-no-web",
+      "category": "负例：不应联网",
+      "user": "统计数据库里本月新增患者人数",
+      "expect": {
+        "route": { "intentHint": "db" },
+        "meta": { "webSearchMode": "skip" }
+      }
+    },
+    {
+      "id": "p4-music-style-web",
+      "category": "P4 媒体联网",
+      "user": "参考 2026 年流行电子音乐风格，生成一段 30 秒科技感 BGM",
+      "expect": {
+        "phases": ["web_search", "execute:music"],
+        "route": { "needsWebSearch": true, "intentHint": "music" },
+        "thinkingContains": ["联网搜索", "音乐 Agent"]
+      }
+    },
+    {
+      "id": "p4-video-scene-web",
+      "category": "P4 媒体联网",
+      "user": "查一下上海外滩夜景的公开描述，据此生成一段 5 秒夜景氛围短视频",
+      "expect": {
+        "phases": ["web_search"],
+        "route": { "needsWebSearch": true },
+        "thinkingContains": ["联网搜索", "视频 Agent"]
+      }
+    },
+    {
+      "id": "p4-music-no-web",
+      "category": "负例：纯氛围音乐不联网",
+      "user": "生成一段舒缓的钢琴纯音乐，适合阅读",
+      "expect": {
+        "route": { "intentHint": "music" },
+        "meta": { "webSearchMode": "skip" }
+      }
+    }
+  ]
+}

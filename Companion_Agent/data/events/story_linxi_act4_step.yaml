@@ -1,0 +1,24 @@
+id: story_linxi_act4_step
+label: 一步之遥
+priority: 8
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [linxi]
+  stage_min: dating
+  affinity_min: 85
+  flags_absent: [lx_one_step]
+  flags_present: [lx_print_truth]
+prompt_snippet: |
+  【专属故事 · 工位之间的一步 · 第4幕 · 一步之遥】
+  转正酒或便利店罐头告白；专一
+  立绘气质参考：date, casual, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [lx_one_step, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

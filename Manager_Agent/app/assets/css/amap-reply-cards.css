@@ -1,0 +1,261 @@
+/* Amap rich reply cards (synced with AI_admin_Agent) */
+.amap-reply-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.amap-card {
+  border-radius: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background: linear-gradient(145deg, rgba(8, 47, 73, 0.55) 0%, rgba(15, 23, 42, 0.42) 100%);
+  padding: 14px 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+.amap-card__head {
+  margin-bottom: 10px;
+}
+
+.amap-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.amap-card__badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #e0f2fe;
+  background: rgba(14, 165, 233, 0.28);
+  border: 1px solid rgba(125, 211, 252, 0.35);
+}
+
+.amap-card__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.amap-card__subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.amap-card__route-endpoints {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.amap-card__arrow {
+  color: rgba(125, 211, 252, 0.85);
+  font-weight: 600;
+}
+
+.amap-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.amap-stat-pill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 72px;
+}
+
+.amap-stat-pill__label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.amap-stat-pill__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.amap-route-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.amap-route-step {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-left: 2px solid rgba(125, 211, 252, 0.25);
+  margin-left: 10px;
+  padding-left: 14px;
+  position: relative;
+}
+
+.amap-route-step:first-child {
+  padding-top: 0;
+}
+
+.amap-route-step:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+
+.amap-route-step__icon {
+  position: absolute;
+  left: -11px;
+  top: 8px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 50%;
+  border: 1px solid rgba(125, 211, 252, 0.35);
+}
+
+.amap-route-step__text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.amap-card__foot {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.amap-map-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7dd3fc;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.amap-map-link:hover {
+  color: #bae6fd;
+  text-decoration: underline;
+}
+
+.amap-card__hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.amap-place-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.amap-place-item {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+}
+
+.amap-place-item__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.amap-place-item__index {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7dd3fc;
+  background: rgba(14, 165, 233, 0.15);
+}
+
+.amap-place-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.amap-place-item__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.amap-place-item__addr {
+  margin-top: 3px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.45;
+}
+
+.amap-place-item__dist {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: rgba(125, 211, 252, 0.9);
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.12);
+}
+
+.amap-place-item__link {
+  display: inline-block;
+  margin-top: 8px;
+  margin-left: 32px;
+  font-size: 12px;
+  color: #7dd3fc;
+  text-decoration: none;
+}
+
+.amap-place-item__link:hover {
+  text-decoration: underline;
+}
+
+.amap-address-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.amap-address-coord {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

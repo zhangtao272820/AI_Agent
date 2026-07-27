@@ -1,0 +1,616 @@
+/* ═══ 宇宙主题 · 统一设计系统（非 scoped，覆盖旧样式） ═══ */
+.spring-root.cosmic-theme {
+  --cosmic-cyan: #38bdf8;
+  --cosmic-violet: #8b5cf6;
+  --cosmic-pink: #ec4899;
+  --cosmic-emerald: #34d399;
+  --cosmic-font-ui: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --cosmic-font-hud: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --cosmic-glass: rgba(6, 12, 36, 0.48);
+  --cosmic-border: rgba(56, 189, 248, 0.38);
+  --cosmic-glow: 0 0 24px rgba(56, 189, 248, 0.35);
+  font-family: var(--cosmic-font-ui);
+}
+
+.spring-root.cosmic-theme .cosmic-command-deck {
+  position: relative;
+}
+
+.spring-root.cosmic-theme .cosmic-hud-readout {
+  position: absolute;
+  top: 2px;
+  right: 14px;
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.55;
+}
+
+.spring-root.cosmic-theme .cosmic-hud-tag {
+  font-family: var(--cosmic-font-hud);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(125, 211, 252, 0.85);
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+}
+
+/* ── 字体层级 ── */
+.spring-root.cosmic-theme .spring-title {
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.24em !important;
+  background: linear-gradient(92deg, #f0f9ff, #bae6fd 30%, #c4b5fd 65%, #7dd3fc) !important;
+  background-size: 200% auto !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 0 14px rgba(125, 211, 252, 0.45));
+  animation: cosmic-title-shimmer 8s linear infinite;
+}
+
+@keyframes cosmic-title-shimmer {
+  to { background-position: 200% center; }
+}
+
+.spring-root.cosmic-theme .spring-side-title,
+.spring-root.cosmic-theme .spring-more-label {
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.16em !important;
+  color: #7dd3fc !important;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.spring-root.cosmic-theme .spring-thoughts > summary,
+.spring-root.cosmic-theme .spring-examples-summary,
+.spring-root.cosmic-theme .spring-evolution > summary,
+.spring-root.cosmic-theme .spring-task-stack > summary {
+  font-family: var(--cosmic-font-hud) !important;
+  letter-spacing: 0.1em !important;
+}
+
+.spring-root.cosmic-theme .meta-time,
+.spring-root.cosmic-theme .spring-trace-id {
+  font-family: var(--cosmic-font-hud) !important;
+}
+
+/* ── 统一按钮 ── */
+.spring-root.cosmic-theme .spring-btn {
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  border-radius: 11px !important;
+  padding: 9px 16px !important;
+  border: 1px solid rgba(147, 197, 253, 0.45) !important;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(139, 92, 246, 0.92), rgba(99, 102, 241, 0.9)) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.spring-root.cosmic-theme .spring-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.14) 50%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.45s ease;
+  pointer-events: none;
+}
+
+.spring-root.cosmic-theme .spring-btn:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+
+.spring-root.cosmic-theme .spring-btn:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 32px rgba(56, 189, 248, 0.5), 0 0 18px rgba(167, 139, 250, 0.35) !important;
+}
+
+.spring-root.cosmic-theme .spring-btn.alt,
+.spring-root.cosmic-theme .spring-attach-btn {
+  background: rgba(6, 12, 40, 0.72) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  color: #bae6fd !important;
+  box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.06), 0 0 14px rgba(56, 189, 248, 0.12) !important;
+}
+
+.spring-root.cosmic-theme .spring-btn.alt:hover:not(:disabled),
+.spring-root.cosmic-theme .spring-attach-btn:hover:not(:disabled) {
+  border-color: rgba(125, 211, 252, 0.6) !important;
+  color: #e0f2fe !important;
+  box-shadow: inset 0 0 28px rgba(56, 189, 248, 0.1), 0 0 24px rgba(56, 189, 248, 0.28) !important;
+}
+
+.spring-root.cosmic-theme .spring-btn-sm {
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  border-radius: 10px !important;
+}
+
+.spring-root.cosmic-theme .spring-btn-xs {
+  padding: 4px 9px !important;
+  font-size: 10px !important;
+  border-radius: 8px !important;
+}
+
+.spring-root.cosmic-theme .spring-btn:disabled {
+  opacity: 0.42 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.spring-root.cosmic-theme .spring-sidebar-toggle.active {
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  color: #7dd3fc !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), inset 0 0 16px rgba(56, 189, 248, 0.08) !important;
+}
+
+/* 分段按钮 / 反馈 */
+.spring-root.cosmic-theme .spring-seg {
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  background: rgba(6, 12, 40, 0.65) !important;
+  color: #94a3b8 !important;
+  box-shadow: inset 0 0 16px rgba(56, 189, 248, 0.04) !important;
+  transition: all 0.18s ease !important;
+}
+
+.spring-root.cosmic-theme .spring-seg:hover:not(:disabled) {
+  color: #bae6fd !important;
+  border-color: rgba(125, 211, 252, 0.45) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2) !important;
+}
+
+.spring-root.cosmic-theme .spring-seg.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(139, 92, 246, 0.88)) !important;
+  border-color: rgba(191, 219, 254, 0.5) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* 阶段徽章 */
+.spring-root.cosmic-theme .spring-phase .badge {
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  background: rgba(4, 8, 28, 0.55) !important;
+  color: #94a3b8 !important;
+  padding: 5px 11px !important;
+  border-radius: 999px !important;
+  transition: all 0.22s ease !important;
+}
+
+.spring-root.cosmic-theme .spring-phase .badge.active {
+  background: linear-gradient(135deg, #38bdf8, #8b5cf6) !important;
+  border-color: rgba(191, 219, 254, 0.55) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.55), 0 0 12px rgba(167, 139, 250, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+/* 连接状态 */
+.spring-root.cosmic-theme .spring-conn {
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  background: rgba(6, 12, 40, 0.6) !important;
+  color: #94a3b8 !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+}
+
+.spring-root.cosmic-theme .spring-conn.on {
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #6ee7b7 !important;
+  background: rgba(6, 78, 59, 0.35) !important;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.25) !important;
+}
+
+.spring-root.cosmic-theme .spring-conn.on .spring-conn-dot {
+  background: #34d399 !important;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8), 0 0 16px rgba(52, 211, 153, 0.4) !important;
+}
+
+/* 标签 / 芯片 */
+.spring-root.cosmic-theme .meta-pill,
+.spring-root.cosmic-theme .collab-mini,
+.spring-root.cosmic-theme .health-chip,
+.spring-root.cosmic-theme .evo-pill {
+  font-family: var(--cosmic-font-hud) !important;
+  letter-spacing: 0.06em !important;
+  border: 1px solid rgba(56, 189, 248, 0.2) !important;
+  background: rgba(8, 14, 40, 0.55) !important;
+}
+
+.spring-root.cosmic-theme .meta-pill.glow {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(139, 92, 246, 0.25)) !important;
+  border-color: rgba(147, 197, 253, 0.35) !important;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.25) !important;
+}
+
+/* 侧栏 / 顶栏 HUD */
+.spring-root.cosmic-theme .cosmic-bridge-header,
+.spring-root.cosmic-theme .cosmic-bridge-sidebar {
+  position: relative;
+}
+
+.spring-root.cosmic-theme .cosmic-bridge-sidebar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, rgba(167, 139, 250, 0.6), rgba(56, 189, 248, 0.5), transparent);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.35);
+  pointer-events: none;
+}
+
+.spring-root.cosmic-theme .spring-side-section {
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(56, 189, 248, 0.12) !important;
+  background: rgba(4, 8, 28, 0.35) !important;
+  border-bottom: none !important;
+  margin-bottom: 4px;
+}
+
+.spring-root.cosmic-theme .spring-task-constraints .spring-side-title {
+  color: #7dd3fc !important;
+}
+
+.spring-root.cosmic-theme .spring-constraints-list {
+  color: #e2e8f0 !important;
+}
+
+.spring-root.cosmic-theme .spring-constraints-k {
+  color: #7dd3fc !important;
+}
+
+.spring-root.cosmic-theme .spring-side-fold,
+.spring-root.cosmic-theme .spring-evolution,
+.spring-root.cosmic-theme .spring-task-stack {
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+  border-radius: 12px !important;
+  background: rgba(4, 8, 28, 0.4) !important;
+}
+
+/* 工具按钮 */
+.spring-root.cosmic-theme .reply-tool-btn,
+.spring-root.cosmic-theme .media-btn {
+  font-family: var(--cosmic-font-hud) !important;
+  letter-spacing: 0.06em !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  background: rgba(6, 12, 40, 0.65) !important;
+  color: #93c5fd !important;
+  transition: all 0.18s ease !important;
+}
+
+.spring-root.cosmic-theme .reply-tool-btn:hover,
+.spring-root.cosmic-theme .media-btn:hover {
+  border-color: rgba(125, 211, 252, 0.55) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25) !important;
+  color: #e0f2fe !important;
+}
+
+/* 输入框统一 */
+.spring-root.cosmic-theme .spring-task-stack-input,
+.spring-root.cosmic-theme .spring-ops-token-input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.spring-root.cosmic-theme .spring-task-stack-body .spring-btn,
+.spring-root.cosmic-theme .spring-task-stack-actions .spring-btn {
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.spring-root.cosmic-theme .reply-chat .md-h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e0f2fe;
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.spring-root.cosmic-theme .reply-chat .md-h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #c7d2fe;
+  margin: 16px 0 8px;
+}
+
+.spring-root.cosmic-theme .reply-chat .md-h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a5b4fc;
+  margin: 12px 0 6px;
+}
+
+.spring-root.cosmic-theme .spring-input-field,
+.spring-root.cosmic-theme .spring-task-stack-input,
+.spring-root.cosmic-theme .spring-ops-token-input {
+  font-family: var(--cosmic-font-ui) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  background: rgba(2, 6, 23, 0.72) !important;
+  color: #f1f5f9 !important;
+  box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.06) !important;
+}
+
+.spring-root.cosmic-theme .spring-input-field:focus {
+  border-color: rgba(125, 211, 252, 0.65) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15), 0 0 24px rgba(56, 189, 248, 0.2), inset 0 0 24px rgba(56, 189, 248, 0.08) !important;
+}
+
+/* 快捷卡片 */
+.spring-root.cosmic-theme .quick-card {
+  font-family: var(--cosmic-font-ui) !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  background: rgba(6, 12, 40, 0.55) !important;
+  border-radius: 12px !important;
+}
+
+.spring-root.cosmic-theme .quick-card-title {
+  font-family: var(--cosmic-font-hud) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.06em !important;
+  color: #bae6fd !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spring-root.cosmic-theme .spring-title,
+  .spring-root.cosmic-theme .spring-btn::after {
+    animation: none !important;
+  }
+}
+
+/* 思考过程 · 由 claude-chat-theme.css 统一 */
+.spring-root.cosmic-theme .process-panel::before {
+  display: none !important;
+}
+
+.spring-root.cosmic-theme .process-step.kind-thinking .process-step-text {
+  color: #bae6fd !important;
+}
+
+.spring-root.cosmic-theme .process-panel-summary {
+  font-family: var(--cosmic-font-ui) !important;
+}
+
+.spring-root.cosmic-theme.cursor-workbench .chat-thread {
+  max-width: var(--chat-col-width) !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+/* Cursor 工作台：压过本页旧版 HUD / 全宽块样式 */
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-panel,
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-hud-panel,
+.spring-root.cursor-workbench.cosmic-theme .spring-log.chat-scroll {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  animation: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-panel::before,
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-panel::after,
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-hud-panel::before,
+.spring-root.cursor-workbench.cosmic-theme .spring-log.cosmic-hud-panel::after {
+  display: none !important;
+  content: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chart-wrap {
+  background: rgba(15, 23, 42, 0.24) !important;
+  border: 1px solid rgba(148, 163, 184, 0.1) !important;
+  box-shadow: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .data-table-wrap {
+  background: rgba(15, 23, 42, 0.28) !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .cosmic-bubble-user {
+  animation: none !important;
+  max-width: var(--chat-user-max) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-panel .reply-panel-inner,
+.spring-root.cursor-workbench.cosmic-theme .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* 详细报告附录：禁止 width:auto 塌缩 + 块级纵排 */
+.spring-root.cursor-workbench.cosmic-theme .reply-inline-report,
+.spring-root.cursor-workbench.cosmic-theme .report-card,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .report-card-body {
+  writing-mode: horizontal-tb !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  text-align: left !important;
+  columns: auto !important;
+  column-count: auto !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-h1,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-h2,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-h3,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-h4,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-p,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-ul,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-ol,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-quote,
+.spring-root.cursor-workbench.cosmic-theme .report-card-body .md-table-scroll {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  float: none !important;
+  clear: both !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .report-card-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chat-messenger .chat-agent-stack,
+.spring-root.cursor-workbench.cosmic-theme .step-results-strip {
+  width: 100% !important;
+  max-width: var(--chat-col-width) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .turn-feedback-bar,
+.spring-root.cursor-workbench.cosmic-theme .process-panel.chat-agent-stack {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .reply-inline-analytics .chart-card {
+  padding: 8px 10px 10px !important;
+  border-radius: 8px !important;
+  background: rgba(15, 23, 42, 0.2) !important;
+  border: 1px solid rgba(148, 163, 184, 0.1) !important;
+  box-shadow: none !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .chart-card-head {
+  font-size: 11px !important;
+  margin-bottom: 6px !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-search-sources-panel {
+  margin-bottom: 6px !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-search-sources-panel > summary {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  padding: 4px 0 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .process-panel .process-agent-trail {
+  display: inline-flex !important;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: min(42%, 280px);
+}
+
+.spring-root.cursor-workbench.cosmic-theme .cosmic-chat-empty {
+  width: 100%;
+  max-width: var(--chat-col-width);
+  margin: 0 auto;
+  min-height: min(16vh, 140px) !important;
+  padding: 20px 16px !important;
+  background: rgba(15, 23, 42, 0.14) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-thoughts.spring-thoughts-system {
+  width: 100%;
+  max-width: var(--chat-col-width);
+  margin: 0 auto 0.5rem;
+  border-radius: 10px !important;
+  background: rgba(15, 23, 42, 0.22) !important;
+  border: 1px solid var(--mgr-border) !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .message-actions {
+  margin-top: 8px !important;
+  padding-top: 0 !important;
+  border-top-color: rgba(148, 163, 184, 0.08) !important;
+  opacity: 0.7 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .md-body.reply-chat {
+  font-size: 15px !important;
+  line-height: 1.72 !important;
+  color: #e8eef7 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-container {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme {
+  padding: 0 !important;
+}
+
+.spring-root.cursor-workbench.cosmic-theme .spring-body-row,
+.spring-root.cursor-workbench.cosmic-theme .spring-main {
+  gap: 0 !important;
+}
+
+.spring-root.cosmic-theme .spring-search-sources-panel {
+  margin-bottom: 6px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.08) !important;
+  background: transparent !important;
+}
+
+.spring-root.cosmic-theme .spring-search-sources-panel > summary {
+  font-family: var(--cosmic-font-ui, system-ui, sans-serif) !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  padding: 4px 0 !important;
+  list-style: none !important;
+}
+
+.spring-root.cosmic-theme .spring-search-sources-panel > summary::-webkit-details-marker {
+  display: none !important;
+}

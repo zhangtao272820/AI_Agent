@@ -1,0 +1,137 @@
+<script setup lang="ts">
+import type { ThoughtViewMode, WorkbenchMode } from '~/composables/managerChatTypes'
+
+defineProps<{
+  connected: boolean
+  currentRunId: string
+  livePhaseText: string
+  routeCapLive: { intent: string; agents: string[]; capLabel?: string } | null
+  planStepsTodo: Array<{ status: string }>
+  planStepsDoneCount: number
+  currentPhase: string
+  collabStatusItems: Array<{
+    agent: string
+    short: string
+    label: string
+    status: string
+    preview?: string
+  }>
+  stepProgressLine: string
+  activeTraceId: string
+  workbenchMode: WorkbenchMode
+  thoughtViewMode: ThoughtViewMode
+  historyPanelOpen: boolean
+  sidebarOpen: boolean
+  toolsBadgeCount: number
+  planAgentLabel: (agent: string) => string
+  collabStatusShort: (status: string) => string
+}>()
+
+const emit = defineEmits<{
+  setWorkbenchMode: [mode: WorkbenchMode]
+  setThoughtViewMode: [mode: ThoughtViewMode]
+  toggleHistory: []
+  newSession: []
+  toggleSidebar: []
+}>()
+</script>
+
+<template>
+  <header class="spring-topbar cosmic-bridge-header">
+    <div class="spring-topbar-main">
+      <h1 class="spring-title">总管/统筹Agent</h1>
+      <div class="spring-phase conv-phase-rail" aria-label="执行阶段">
+        <div class="conv-phase-track">
+          <div class="conv-live-bar" :class="{ active: !!currentRunId }">
+            <span class="conv-live-dot" aria-hidden="true"></span>
+            <span class="conv-live-label">{{ livePhaseText }}</span>
+            <span v-if="routeCapLive?.agents?.length && currentRunId" class="conv-live-route" :title="routeCapLive.capLabel">
+              {{ routeCapLive.agents.map((a) => planAgentLabel(a)).join(' · ') }}
+            </span>
+            <span v-if="planStepsTodo.length && currentRunId" class="conv-live-plan">{{ planStepsDoneCount }}/{{ planStepsTodo.length }} 步</span>
+          </div>
+          <div class="conv-phase-badges" aria-hidden="false">
+            <div class="badge" :class="{ active: currentPhase === 'route' }">理解</div>
+            <div class="badge" :class="{ active: currentPhase === 'planner' || currentPhase === 'plan_preview' }">计划</div>
+            <div class="badge" :class="{ active: currentPhase?.startsWith('execute') }">执行</div>
+            <div class="badge" :class="{ active: currentPhase === 'synth' || currentPhase === 'synth_stream' || currentPhase === 'critic' }">回答</div>
+            <div class="badge" :class="{ active: currentPhase === 'finalize' }">完成</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="spring-topbar-actions">
+      <div class="spring-collab-compact" title="固定协作：清洗 / 可视化 / 报告">
+        <span
+          v-for="item in collabStatusItems"
+          :key="item.agent"
+          class="collab-mini"
+          :class="`is-${item.status}`"
+          :title="item.preview ? `${item.label}：${item.preview}` : item.label"
+        >
+          {{ item.short }}·{{ collabStatusShort(item.status) }}
+        </span>
+      </div>
+      <div v-if="stepProgressLine" class="spring-step-progress" :title="stepProgressLine">
+        {{ stepProgressLine }}
+      </div>
+      <div v-if="activeTraceId" class="spring-trace-id" :title="`排障 trace: ${activeTraceId}`">
+        trace {{ activeTraceId.slice(0, 8) }}
+      </div>
+      <div class="spring-seg spring-workbench-mode-toggle" role="group" aria-label="工作台模式">
+        <button type="button" :class="{ 'is-active': workbenchMode === 'chat' }" title="对话模式：轻量直连" @click="emit('setWorkbenchMode', 'chat')">
+          对话
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': workbenchMode === 'professional' }"
+          title="专业模式：PU-Stack plus 读题 + 完整编排"
+          @click="emit('setWorkbenchMode', 'professional')"
+        >
+          专业
+        </button>
+      </div>
+      <div class="spring-seg spring-thought-view-toggle" role="group" aria-label="思考过程展示">
+        <button type="button" :class="{ 'is-active': thoughtViewMode === 'user' }" title="用户视图：自然语言描述进展" @click="emit('setThoughtViewMode', 'user')">
+          用户
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': thoughtViewMode === 'developer' }"
+          title="开发视图：编排诊断、Agent 追踪与原始日志"
+          @click="emit('setThoughtViewMode', 'developer')"
+        >
+          开发
+        </button>
+      </div>
+      <div class="spring-seg spring-seg-actions" role="group" aria-label="会话与侧栏">
+        <button type="button" class="spring-seg-btn" :class="{ 'is-active': historyPanelOpen }" @click="emit('toggleHistory')">
+          历史
+        </button>
+        <button type="button" class="spring-seg-btn" @click="emit('newSession')">新会话</button>
+        <button type="button" class="spring-seg-btn" :class="{ 'is-active': sidebarOpen }" @click="emit('toggleSidebar')">
+          工具
+          <span v-if="toolsBadgeCount" class="spring-tools-badge">{{ toolsBadgeCount }}</span>
+        </button>
+      </div>
+      <span class="spring-conn" :class="{ on: connected }">
+        <span class="spring-conn-dot" />
+        {{ connected ? '已连接' : '未连接' }}
+      </span>
+    </div>
+  </header>
+
+  <div class="workbench-mode-banner" :class="workbenchMode === 'professional' ? 'is-professional' : 'is-chat'" role="status">
+    <span class="workbench-mode-banner-bar" aria-hidden="true" />
+    <div class="workbench-mode-banner-text">
+      <span class="workbench-mode-banner-label">{{ workbenchMode === 'professional' ? '专业工作台' : '普通对话' }}</span>
+      <span class="workbench-mode-banner-desc">
+        {{
+          workbenchMode === 'professional'
+            ? '领域任务：PU-Stack 读题 → 冻结 cap → 分步执行（禁止闲聊）'
+            : 'DeepSeek 式对话：闲聊、联网搜最新、写代码'
+        }}
+      </span>
+    </div>
+  </div>
+</template>

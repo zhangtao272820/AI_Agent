@@ -1,0 +1,86 @@
+{{- range $name, $agent := .Values.agents }}
+{{- if $agent.enabled }}
+{{- $hpa := dig "autoscaling" "enabled" false $agent }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "clawhive.namespace" $ }}
+  labels:
+    {{- include "clawhive.labels" $ | nindent 4 }}
+    app: {{ $name }}
+    clawhive.io/agent: {{ $name }}
+spec:
+  {{- if not $hpa }}
+  replicas: {{ $agent.replicas | default 1 }}
+  {{- else }}
+  # replicas managed by HPA (initial = minReplicas)
+  replicas: {{ dig "autoscaling" "minReplicas" 1 $agent }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+        clawhive.io/agent: {{ $name }}
+    spec:
+      containers:
+        - name: agent
+          image: "{{ $agent.image }}:{{ include "clawhive.imageTag" $ }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $agent.port }}
+          envFrom:
+            - configMapRef:
+                name: clawhive-config
+            - secretRef:
+                name: clawhive-secrets
+          env:
+            - name: CLAWHIVE_BACKEND_URL
+              value: "http://clawhive-backend:8000"
+            - name: PORT
+              value: {{ $agent.port | quote }}
+            - name: NUXT_HOST
+              value: "0.0.0.0"
+            - name: HOST
+              value: "0.0.0.0"
+          resources:
+            {{- if $agent.resources }}
+            {{- toYaml $agent.resources | nindent 12 }}
+            {{- else if $.Values.resources }}
+            {{- toYaml $.Values.resources | nindent 12 }}
+            {{- else }}
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            {{- end }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ $agent.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 18
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ include "clawhive.namespace" $ }}
+  labels:
+    {{- include "clawhive.labels" $ | nindent 4 }}
+    app: {{ $name }}
+spec:
+  selector:
+    app: {{ $name }}
+  ports:
+    - port: {{ $agent.port }}
+      targetPort: {{ $agent.port }}
+      name: http
+{{- end }}
+{{- end }}

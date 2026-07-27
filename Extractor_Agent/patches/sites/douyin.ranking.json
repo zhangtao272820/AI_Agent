@@ -1,0 +1,8 @@
+{
+  "id": "douyin.ranking",
+  "targetSite": "douyin",
+  "contentType": "ranking",
+  "defaultSeedUrls": ["https://www.douyin.com/hot?tab=hot"],
+  "preferChannel": "browser",
+  "antiBotRisk": "high"
+}

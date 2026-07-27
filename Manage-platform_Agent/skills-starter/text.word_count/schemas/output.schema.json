@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["words", "characters", "lines", "non_empty_lines"],
+  "properties": {
+    "words": { "type": "integer", "minimum": 0 },
+    "characters": { "type": "integer", "minimum": 0 },
+    "lines": { "type": "integer", "minimum": 0 },
+    "non_empty_lines": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

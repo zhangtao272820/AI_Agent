@@ -1,0 +1,8 @@
+# MusicGen / Stable Audio Open（可选；Docker INSTALL_NEURAL_DEPS=1）
+# torch 由 Dockerfile 按 TORCH_INDEX_URL 安装（默认 CPU；GPU 构建传 cu124）
+transformers>=4.36.0
+diffusers>=0.27.0
+scipy>=1.10.0
+accelerate>=0.25.0
+safetensors>=0.4.0
+sentencepiece>=0.2.0

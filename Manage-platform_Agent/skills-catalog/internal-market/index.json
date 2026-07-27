@@ -1,0 +1,616 @@
+{
+  "apiVersion": "clawhive/registry/v1",
+  "registry_id": "internal_market",
+  "name": "内部免费技能市场（全集群 Playbook + Starter）",
+  "description": "扫描 e:\\Agent 各 Agent/skills 与 skills-starter，供 ClawHive 控制台一键赋能。",
+  "license": "free",
+  "updated_at": "2026-06-12T07:41:08Z",
+  "skills": [
+    {
+      "skill_id": "data.pick_fields",
+      "name": "结构化字段提取",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "executable",
+        "internal",
+        "starter"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "从对象数组中按字段白名单提取子集，便于下游展示与存储",
+      "workspace_path": "Manage-platform_Agent/skills-starter/data.pick_fields",
+      "publisher": "platform",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "text.case_transform",
+      "name": "文本大小写转换",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "executable",
+        "internal",
+        "starter"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "将输入文本按指定模式转换为大写、小写或标题格式",
+      "workspace_path": "Manage-platform_Agent/skills-starter/text.case_transform",
+      "publisher": "platform",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "text.word_count",
+      "name": "文本词数统计",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "executable",
+        "internal",
+        "starter"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "统计文本的词数、字符数、行数等基础指标",
+      "workspace_path": "Manage-platform_Agent/skills-starter/text.word_count",
+      "publisher": "platform",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "compute_assistant",
+      "name": "compute_assistant",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "compute",
+        "code_assistent"
+      ],
+      "compatible_agents": [
+        "code_assistent_Agent"
+      ],
+      "description": "总管协作 compute 路径：基于上游 facts/上下文做计算、汇总与结构化 JSON 输出。无仓库工具调用。",
+      "workspace_path": "code_assistent_Agent/skills/compute_assistant",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "crawler_slot_clarify",
+      "name": "crawler_slot_clarify",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "clarify",
+        "extractor"
+      ],
+      "compatible_agents": [
+        "Extractor_Agent"
+      ],
+      "description": "抓取任务槽位三要素（source/goal/limit）识别与澄清问句。openWebSearch 或总管下发时跳过澄清。",
+      "workspace_path": "Extractor_Agent/skills/crawler_slot_clarify",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "document-list",
+      "name": "document-list",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "playbook",
+        "rag"
+      ],
+      "compatible_agents": [
+        "RAG_Agent"
+      ],
+      "description": "列出所有已上传的文档。当用户问“有哪些文档”、“上传了什么文件”时使用。",
+      "workspace_path": "RAG_Agent/skills/document-list",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "document-query",
+      "name": "document-query",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "playbook",
+        "rag"
+      ],
+      "compatible_agents": [
+        "RAG_Agent"
+      ],
+      "description": "从上传的非结构化文档中搜索信息。当用户提问关于文档内容的问题时使用。",
+      "workspace_path": "RAG_Agent/skills/document-query",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "document-upload",
+      "name": "document-upload",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "playbook",
+        "rag"
+      ],
+      "compatible_agents": [
+        "RAG_Agent"
+      ],
+      "description": "RAG_Agent Playbook · document-upload",
+      "workspace_path": "RAG_Agent/skills/document-upload",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "failure_recovery",
+      "name": "failure_recovery",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "fix",
+        "manager"
+      ],
+      "compatible_agents": [
+        "Manager_Agent"
+      ],
+      "description": "总管失败归因后的修复建议 Playbook。按 FailureAttribution.category 给出 router/planner/execution 等 scope 的可操作修复清单。用于 failureInsights 与运维复盘。",
+      "workspace_path": "Manager_Agent/skills/failure_recovery",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "manager_structured_output",
+      "name": "manager_structured_output",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "generate",
+        "rag"
+      ],
+      "compatible_agents": [
+        "RAG_Agent"
+      ],
+      "description": "RAG generateNode 回答规范：总管流水线结构化事实列表 vs 普通对话式文档助手。由 looksLikeManagerRetrievalTask 切换。",
+      "workspace_path": "RAG_Agent/skills/manager_structured_output",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "mode_workflows",
+      "name": "mode_workflows",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "agent",
+        "code_assistent"
+      ],
+      "compatible_agents": [
+        "code_assistent_Agent"
+      ],
+      "description": "Code Assist Agent 各模式（auto/analyze/bugs/refactor/tests）系统规范与工具使用原则。用于 LangGraph agent system prompt。",
+      "workspace_path": "code_assistent_Agent/skills/mode_workflows",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "planner_playbook",
+      "name": "planner_playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "planner",
+        "manager"
+      ],
+      "compatible_agents": [
+        "Manager_Agent"
+      ],
+      "description": "Manager 总管规划 Playbook：dependsOn/parallelGroup、各 agent query 边界、典型拓扑与 JSON 输出。用于 planNode system prompt 静态部分。",
+      "workspace_path": "Manager_Agent/skills/planner_playbook",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "query_plan",
+      "name": "query_plan",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "plan",
+        "db"
+      ],
+      "compatible_agents": [
+        "DB_Agent"
+      ],
+      "description": "将用户问句拆解为结构化查询计划 JSON（intent / data_domain / 澄清边界）。用于 DB_Agent NLU 查询计划 LLM 阶段。",
+      "workspace_path": "DB_Agent/skills/query_plan",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "retrieval_pipeline",
+      "name": "retrieval_pipeline",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "retrieval",
+        "rag"
+      ],
+      "compatible_agents": [
+        "RAG_Agent"
+      ],
+      "description": "RAG 文档检索流水线规范：query plan → expansion → hybrid 召回 → rerank → evidence 选择。用于 document_retrieval.ts 各 LLM 阶段。",
+      "workspace_path": "RAG_Agent/skills/retrieval_pipeline",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "route_policy",
+      "name": "route_policy",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "route",
+        "db"
+      ],
+      "compatible_agents": [
+        "DB_Agent"
+      ],
+      "description": "DB_Agent Schema-First 路径策略：Plan 与 Schema 对齐后选择 person_health / person_info / statistics / sql_preflight / sql_agent 执行路径，并生成 route hint 块。",
+      "workspace_path": "DB_Agent/skills/route_policy",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "router_playbook",
+      "name": "router_playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "route",
+        "manager"
+      ],
+      "compatible_agents": [
+        "Manager_Agent"
+      ],
+      "description": "Manager 总管路由 Playbook：意图识别、allowedAgents、multi 判定、web_search/crawler/gui 选型、媒体任务与 JSON 约束。用于 routerNode system prompt 静态部分。",
+      "workspace_path": "Manager_Agent/skills/router_playbook",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "seed_crawl_plan",
+      "name": "seed_crawl_plan",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "plan",
+        "extractor"
+      ],
+      "compatible_agents": [
+        "Extractor_Agent"
+      ],
+      "description": "种子 URL 与抓取计划（LLM planner + 启发式 buildHeuristicPlan）。总管 seed_urls 优先于 LLM/Bing。",
+      "workspace_path": "Extractor_Agent/skills/seed_crawl_plan",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "sql_generation",
+      "name": "sql_generation",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "sql",
+        "db"
+      ],
+      "compatible_agents": [
+        "DB_Agent"
+      ],
+      "description": "DB_Agent SQL 生成与修复的统一规范（Preflight / Direct / PlanDirect / Repair）。消除 sql_preflight、sql_direct、sql_plan_direct、sql_repair 规则漂移。",
+      "workspace_path": "DB_Agent/skills/sql_generation",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "step_sanitize",
+      "name": "step_sanitize",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "planner",
+        "manager"
+      ],
+      "compatible_agents": [
+        "Manager_Agent"
+      ],
+      "description": "Manager 规划步骤 query 净化：各 agent 应保留/剔除的语义、噪声词表、LLM 裁剪规则与媒体执行约束。",
+      "workspace_path": "Manager_Agent/skills/step_sanitize",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "structured_task_plan",
+      "name": "structured_task_plan",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "plan",
+        "extractor"
+      ],
+      "compatible_agents": [
+        "Extractor_Agent"
+      ],
+      "description": "网页抓取结构化任务计划解析（targetSite/contentType/openWebSearch 等）。结构性推断优先于 LLM，见 core/plan/structural.ts。",
+      "workspace_path": "Extractor_Agent/skills/structured_task_plan",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "table_judge",
+      "name": "table_judge",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "playbook",
+        "internal",
+        "schema",
+        "db"
+      ],
+      "compatible_agents": [
+        "DB_Agent"
+      ],
+      "description": "Schema 智能选表 Judge：区分主记录表与附属/扩展表，输出 ranked/primary/auxiliary 与 sql_hint。用于 schema_table_judge LLM 阶段与 formatSchemaJudgeHint 注入 SQL 路径。",
+      "workspace_path": "DB_Agent/skills/table_judge",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "intent_routing",
+      "name": "Admin 意图路由 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "办公助理语义理解、澄清与确认指令解析",
+      "workspace_path": "AI_admin_Agent/skills/intent_routing",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "task_planning",
+      "name": "Admin 工具规划 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "办公助理工具链规划、占位符与链式调用规范",
+      "workspace_path": "AI_admin_Agent/skills/task_planning",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "verification",
+      "name": "Admin 回复校验 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "办公助理最终回复约束，禁止泄露 JSON/工具细节",
+      "workspace_path": "AI_admin_Agent/skills/verification",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "daily_briefing",
+      "name": "Admin 晨间简报",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin", "briefing"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "聚合天气/日程/待办/邮件的国内办公早报 Playbook",
+      "workspace_path": "AI_admin_Agent/skills/daily_briefing",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "email_triage",
+      "name": "Admin 邮件分拣",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin", "email"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "收件箱优先级分拣与分类 Playbook",
+      "workspace_path": "AI_admin_Agent/skills/email_triage",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "meeting_prep",
+      "name": "Admin 会前准备",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin", "meeting"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "日程 + RAG 资料的会前准备 Playbook",
+      "workspace_path": "AI_admin_Agent/skills/meeting_prep",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "ask_database",
+      "name": "Admin 问数 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin", "db"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "DB_Agent 自然语言问数规划规范",
+      "workspace_path": "AI_admin_Agent/skills/ask_database",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "weekly_report",
+      "name": "Admin 周报草稿",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "本周工作周报草稿 Playbook",
+      "workspace_path": "AI_admin_Agent/skills/weekly_report",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    },
+    {
+      "skill_id": "write_gate",
+      "name": "Admin 写操作门禁",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["playbook", "internal", "admin", "hitl"],
+      "compatible_agents": ["AI_admin_Agent"],
+      "description": "高风险工具与 HITL 确认策略",
+      "workspace_path": "AI_admin_Agent/skills/write_gate",
+      "publisher": "internal",
+      "status": "published",
+      "license": "free"
+    }
+  ]
+}

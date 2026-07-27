@@ -1,0 +1,24 @@
+id: story_linxi_act2_commute
+label: 末班车
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [linxi]
+  stage_min: close_friend
+  affinity_min: 62
+  flags_absent: [lx_commute_talk]
+  flags_present: [lx_desk_sync]
+prompt_snippet: |
+  【专属故事 · 工位之间的一步 · 第2幕 · 末班车】
+  通勤同路；她卸下职场壳
+  立绘气质参考：commute_rail, pantry_coffee, elevator_rush。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [lx_commute_talk]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

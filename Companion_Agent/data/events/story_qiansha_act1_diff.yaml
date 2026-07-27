@@ -1,0 +1,23 @@
+id: story_qiansha_act1_diff
+label: Diff
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [qiansha]
+  stage_min: friend
+  affinity_min: 50
+  flags_absent: [qs_remeet]
+prompt_snippet: |
+  【专属故事 · 旧 PR 与新分支 · 第1幕 · Diff】
+  圈子重逢，客气如代码评审
+  立绘气质参考：dual_monitor, work, hoodie_focus。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [qs_remeet]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

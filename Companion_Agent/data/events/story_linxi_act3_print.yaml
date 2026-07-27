@@ -1,0 +1,24 @@
+id: story_linxi_act3_print
+label: 打印室真相
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [linxi]
+  stage_min: crush
+  affinity_min: 75
+  flags_absent: [lx_print_truth]
+  flags_present: [lx_commute_talk]
+prompt_snippet: |
+  【专属故事 · 工位之间的一步 · 第3幕 · 打印室真相】
+  竞聘/转正压力；你是否抢功或撑她
+  立绘气质参考：print_stack, stamp_route, overtime。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [lx_print_truth]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

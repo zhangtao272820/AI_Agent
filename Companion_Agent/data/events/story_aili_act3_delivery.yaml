@@ -1,0 +1,24 @@
+id: story_aili_act3_delivery
+label: 外送的勇气
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [aili]
+  stage_min: crush
+  affinity_min: 75
+  flags_absent: [al_delivery_together]
+  flags_present: [al_talked_divorce]
+prompt_snippet: |
+  【专属故事 · 旧婚书与新花束 · 第3幕 · 外送的勇气】
+  共同送花/婚礼商单；看见她已能祝福别人
+  立绘气质参考：delivery_box, window_display, ribbon_cut。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [al_delivery_together]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

@@ -1,0 +1,23 @@
+id: story_ruolin_act1_lecture
+label: 粉笔灰
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [ruolin]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [rl_office_hours]
+prompt_snippet: |
+  【专属故事 · 讲台下的一年 · 第1幕 · 粉笔灰】
+  课堂提问、office hours 第一次单独谈话
+  立绘气质参考：lecture_pointer, office_hours, school。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [rl_office_hours]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

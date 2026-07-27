@@ -1,0 +1,71 @@
+{{- if .Values.litellm.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clawhive-litellm-config
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+{{ .Files.Get "files/litellm-config.yaml" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litellm
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: litellm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: litellm
+  template:
+    metadata:
+      labels:
+        app: litellm
+    spec:
+      containers:
+        - name: litellm
+          image: {{ .Values.litellm.image }}
+          args: ["--config", "/app/config.yaml", "--port", "4000"]
+          ports:
+            - containerPort: 4000
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clawhive-secrets
+                  key: OPENAI_API_KEY
+            - name: LITELLM_MASTER_KEY
+              value: {{ .Values.litellm.masterKey | quote }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: clawhive-litellm-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litellm
+  namespace: {{ include "clawhive.namespace" . }}
+  labels:
+    {{- include "clawhive.labels" . | nindent 4 }}
+    app: litellm
+spec:
+  type: NodePort
+  selector:
+    app: litellm
+  ports:
+    - name: http
+      port: {{ .Values.litellm.port }}
+      targetPort: 4000
+      nodePort: {{ .Values.litellm.nodePort }}
+{{- end }}

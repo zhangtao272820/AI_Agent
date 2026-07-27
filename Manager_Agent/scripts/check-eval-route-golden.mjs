@@ -1,0 +1,56 @@
+/**
+ * 路由 golden 校验：JSON 结构 + 结构性期望（不调用 LLM）。
+ * 用法：node scripts/check-eval-route-golden.mjs
+ */
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { assertRouteCaseStructural } from '../agent-repo-shared/routeStructuralHints.mjs'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const root = path.resolve(__dirname, '..')
+const evalDir = path.join(root, 'eval')
+
+const ROUTE_FILES = ['golden-gui-route.json', 'golden-route-media.json']
+
+function assert(cond, msg) {
+  if (!cond) throw new Error(msg)
+}
+
+function validateRouteCase(c, file) {
+  assert(c && typeof c === 'object', `${file}: case must be object`)
+  assert(String(c.id || '').trim(), `${file}: case.id required`)
+  assert(String(c.query || '').trim(), `${file}: case.query required for ${c.id}`)
+  assert(String(c.expectIntent || '').trim(), `${file}: case.expectIntent required for ${c.id}`)
+  if (c.expectAllowedIncludes != null) {
+    assert(Array.isArray(c.expectAllowedIncludes), `${file}:${c.id} expectAllowedIncludes must be array`)
+  }
+  if (c.expectAllowedExcludes != null) {
+    assert(Array.isArray(c.expectAllowedExcludes), `${file}:${c.id} expectAllowedExcludes must be array`)
+  }
+  assertRouteCaseStructural(c)
+}
+
+async function validateFile(name) {
+  const p = path.join(evalDir, name)
+  const raw = await fs.readFile(p, 'utf8').catch(() => '')
+  assert(raw.trim(), `missing file: ${p}`)
+  let obj
+  try {
+    obj = JSON.parse(raw)
+  } catch (e) {
+    throw new Error(`${name}: invalid JSON — ${e?.message || e}`)
+  }
+  assert(obj && typeof obj === 'object', `${name}: root must be object`)
+  assert(Array.isArray(obj.cases) && obj.cases.length >= 1, `${name}: cases must be non-empty array`)
+  for (const c of obj.cases) validateRouteCase(c, name)
+  return obj.cases.length
+}
+
+let total = 0
+for (const f of ROUTE_FILES) {
+  const n = await validateFile(f)
+  console.log(`${f} OK: ${n} cases (structural)`)
+  total += n
+}
+console.log(`eval:route OK — ${total} cases across ${ROUTE_FILES.length} files`)

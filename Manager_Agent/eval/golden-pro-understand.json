@@ -1,0 +1,83 @@
+{
+  "description": "P2 PU-Stack 读题 golden（真实域 p2026 + RAG，领域无关 taskIntent）",
+  "cases": [
+    {
+      "id": "A1_db_count",
+      "user": "老人一共有多少人",
+      "expectTaskIntent": "structured_query",
+      "expectPrimaryPlane": "db",
+      "expectPlanes": ["db"]
+    },
+    {
+      "id": "A2_health",
+      "user": "查一下张三的血压和血糖",
+      "expectTaskIntent": "structured_query",
+      "expectPrimaryPlane": "db",
+      "expectPlanes": ["db"]
+    },
+    {
+      "id": "B1_rag_policy",
+      "user": "失能老人护理员配比标准是多少",
+      "expectTaskIntent": "document_retrieval",
+      "expectPrimaryPlane": "rag",
+      "expectPlanes": ["rag"]
+    },
+    {
+      "id": "B5_finance_rag",
+      "user": "我的月收入和支出情况怎么样",
+      "expectTaskIntent": "document_retrieval",
+      "expectPrimaryPlane": "rag",
+      "expectPlanes": ["rag"]
+    },
+    {
+      "id": "D1_implicit_db",
+      "user": "统计各区域老人人数，按人数从高到低排",
+      "expectTaskIntent": "structured_query",
+      "expectPrimaryPlane": "db",
+      "expectPlanes": ["db"]
+    },
+    {
+      "id": "D2_implicit_rag",
+      "user": "失能老人补贴标准是多少",
+      "expectTaskIntent": "document_retrieval",
+      "expectPrimaryPlane": "rag",
+      "expectPlanes": ["rag"]
+    },
+    {
+      "id": "D3_db_logs",
+      "user": "情绪识别仪检测记录有多少条",
+      "expectTaskIntent": "structured_query",
+      "expectPrimaryPlane": "db",
+      "expectPlanes": ["db"]
+    },
+    {
+      "id": "E1_hybrid_chart",
+      "user": "知识库查失能老人护理员配比，数据库查张三血压血糖，对比分析并出图",
+      "expectTaskIntent": "hybrid",
+      "expectPlanes": ["rag", "db"],
+      "expectWantsVisualize": true
+    },
+    {
+      "id": "E4_hybrid_admin",
+      "user": "知识库查配比，数据库查记录，对比出图。并告诉我坐地铁从天津西站到天津站大概多久",
+      "expectTaskIntent": "hybrid",
+      "expectPlanes": ["rag", "db", "admin"],
+      "expectWantsAdmin": true,
+      "expectWantsVisualize": true
+    },
+    {
+      "id": "C3_admin_map",
+      "user": "坐地铁从天津西站到天津站大概多久",
+      "expectTaskIntent": "action",
+      "expectPrimaryPlane": "admin",
+      "expectPlanes": ["admin"]
+    },
+    {
+      "id": "C2_admin_weather",
+      "user": "今天天津天气怎么样",
+      "expectTaskIntent": "action",
+      "expectPrimaryPlane": "admin",
+      "expectPlanes": ["admin"]
+    }
+  ]
+}

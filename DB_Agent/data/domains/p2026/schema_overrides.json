@@ -1,0 +1,10 @@
+{
+  "data_domain_tables": {
+    "person_health": ["person_info", "person_health_records"],
+    "person_basic": ["person_info"]
+  },
+  "search_boost_tables": [],
+  "foot_pressure_tables": ["remote_activity_foot_log", "remote_activity_foot_measure_log"],
+  "foot_pressure_markers": ["足底", "足压", "压力测试", "平衡测量", "步态", "活动检测"],
+  "psychology_mood_tables": ["remote_psychology_mood"]
+}

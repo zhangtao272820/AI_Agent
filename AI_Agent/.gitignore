@@ -1,0 +1,17 @@
+.env
+.env.local
+backend/.venv/
+frontend/node_modules/
+frontend/dist/
+**/__pycache__/
+*.pyc
+assets/videos/
+assets/cache_index.json
+assets/utterance_links.json
+assets/audio/
+assets/avatar_image_oss.json
+assets/avatar_frame.jpg
+assets/avatar_s2v_ready.jpg
+assets/avatar_s2v_meta.json
+services/lipsync/.venv/
+services/lipsync/__pycache__/

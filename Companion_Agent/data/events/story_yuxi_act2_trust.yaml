@@ -1,0 +1,24 @@
+id: story_yuxi_act2_trust
+label: 松口
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [yuxi]
+  stage_min: close_friend
+  affinity_min: 70
+  flags_absent: [bond_ally_done]
+  flags_present: [shift_cover_done]
+prompt_snippet: |
+  【专属故事 · 顶班的死党 · 第2幕 · 松口】
+  确认你不会消耗温晚雨后，她把后厨钥匙逻辑讲给你听
+  立绘气质参考：work, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [bond_ally_done, shift_ally]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

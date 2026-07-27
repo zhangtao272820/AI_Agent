@@ -1,0 +1,11 @@
+frontend/node_modules
+frontend/dist
+backend/__pycache__
+backend/app/__pycache__
+assets/audio
+assets/videos
+assets/cache_index.json
+assets/utterance_links.json
+*.pyc
+.env
+.env.local

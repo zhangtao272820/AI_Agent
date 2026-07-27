@@ -1,0 +1,490 @@
+/* 工作台双轨：对话 vs 专业 — 高对比可见 */
+.spring-root.cursor-workbench.cosmic-theme.mode-professional {
+  --wb-accent: #38bdf8;
+  --wb-banner-bg: rgba(8, 47, 73, 0.9);
+}
+
+.spring-root.cursor-workbench.cosmic-theme:not(.mode-professional) {
+  --wb-accent: #a78bfa;
+  --wb-banner-bg: rgba(30, 27, 75, 0.88);
+}
+
+.workbench-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 12px 10px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--wb-banner-bg);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.workbench-mode-banner-bar {
+  flex-shrink: 0;
+  width: 3px;
+  align-self: stretch;
+  min-height: 28px;
+  border-radius: 2px;
+  background: var(--wb-accent);
+  opacity: 0.85;
+}
+
+.workbench-mode-banner-icon {
+  display: none;
+}
+
+.workbench-mode-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.workbench-mode-banner.is-professional {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: none;
+}
+
+.workbench-mode-banner.is-chat {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.workbench-mode-banner-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wb-accent);
+  letter-spacing: 0.03em;
+}
+
+.workbench-mode-banner-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* 顶栏统一 segmented（对话|专业、用户|开发、历史|新会话|工具） */
+.spring-root.cursor-workbench .spring-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  height: 30px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.spring-root.cursor-workbench .spring-seg button,
+.spring-root.cursor-workbench .spring-seg .spring-seg-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0 11px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.spring-root.cursor-workbench .spring-seg button.is-active,
+.spring-root.cursor-workbench .spring-seg .spring-seg-btn.is-active {
+  color: #f1f5f9;
+  background: rgba(56, 189, 248, 0.22);
+  box-shadow: none;
+}
+
+.spring-root.cursor-workbench.mode-professional .spring-workbench-mode-toggle button.is-active {
+  background: rgba(56, 189, 248, 0.28);
+  border: none;
+}
+
+.spring-root.cursor-workbench:not(.mode-professional) .spring-workbench-mode-toggle button.is-active {
+  background: rgba(139, 92, 246, 0.28);
+}
+
+.spring-workbench-mode-toggle,
+.workbench-input-mode-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(2, 6, 23, 0.75);
+}
+
+.workbench-mode-toggle-prominent {
+  padding: 4px;
+  border-width: 1px;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.workbench-mode-toggle-prominent button {
+  font-size: 12px !important;
+  padding: 0 11px !important;
+  font-weight: 600;
+}
+
+.spring-workbench-mode-toggle button,
+.workbench-input-mode-tabs button {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.spring-workbench-mode-toggle button.is-active,
+.workbench-input-mode-tabs button.is-active {
+  color: #f8fafc;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.mode-professional .spring-workbench-mode-toggle button.is-active,
+.mode-professional .workbench-input-mode-tabs button.is-active {
+  background: rgba(14, 165, 233, 0.35);
+  border: none;
+}
+
+.spring-root:not(.mode-professional) .spring-workbench-mode-toggle button.is-active,
+.spring-root:not(.mode-professional) .workbench-input-mode-tabs button.is-active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.35));
+  border: 1px solid rgba(167, 139, 250, 0.45);
+}
+
+.posture-ask-hint,
+.posture-plan-hint,
+.posture-debug-hint {
+  margin: 0 0 6px;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #94a3b8;
+}
+
+.posture-ask-hint {
+  color: #7dd3fc;
+}
+
+.posture-plan-hint {
+  color: #c4b5fd;
+}
+
+.posture-debug-hint {
+  color: #fbbf24;
+}
+
+/* Cursor 式输入坞：上文本、下工具栏；姿态菜单向上展开不裁切 */
+.composer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 2px;
+}
+
+.composer-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.composer-posture-inline-hint {
+  display: inline-block;
+  min-width: 0;
+  max-width: min(280px, 42vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #94a3b8;
+}
+
+.composer-posture-inline-hint.is-ask {
+  color: #7dd3fc;
+}
+
+.composer-posture-inline-hint.is-plan {
+  color: #c4b5fd;
+}
+
+.composer-posture-inline-hint.is-debug {
+  color: #fbbf24;
+}
+
+.composer-posture-wrap {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 30;
+}
+
+.composer-posture-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.85);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.composer-posture-trigger:hover {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(30, 41, 59, 0.95);
+}
+
+.composer-posture-trigger.is-ask {
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.composer-posture-trigger.is-plan {
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.composer-posture-trigger.is-debug {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.composer-posture-chevron {
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.composer-posture-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 80;
+  min-width: 248px;
+  max-width: min(320px, 80vw);
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(2, 6, 23, 0.98);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+.composer-posture-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 28px 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #e2e8f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.composer-posture-option:hover,
+.composer-posture-option.is-active {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.composer-posture-option-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.composer-posture-option-desc {
+  font-size: 11px;
+  line-height: 1.35;
+  color: #94a3b8;
+}
+
+.composer-posture-option-check {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7dd3fc;
+  font-size: 12px;
+}
+
+/* 输入坞打开菜单时允许溢出，避免裁成「浮在文本上的残片」 */
+.spring-root.cursor-workbench .spring-input.cosmic-input-dock,
+.spring-root.cursor-workbench .spring-input.cosmic-comms-console,
+.spring-root .spring-input.cosmic-input-dock.has-posture-menu,
+.spring-root .spring-input.cosmic-comms-console.has-posture-menu {
+  overflow: visible !important;
+}
+
+.spring-root.cursor-workbench .spring-input-col {
+  gap: 8px;
+}
+
+.spring-root.cursor-workbench .composer-toolbar .spring-attach-btn {
+  min-height: 34px;
+  min-width: auto;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.spring-root.cursor-workbench .composer-toolbar .spring-btn-send-cancel {
+  flex-shrink: 0;
+  min-height: 36px;
+  min-width: 72px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .composer-posture-inline-hint {
+    display: none;
+  }
+}
+
+.turn-posture-badge,
+.pipeline-posture-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.55);
+  color: #cbd5e1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+
+.turn-posture-badge.is-ask,
+.pipeline-posture-badge.is-ask {
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.turn-posture-badge.is-plan,
+.pipeline-posture-badge.is-plan {
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.45);
+}
+
+.turn-posture-badge.is-debug,
+.pipeline-posture-badge.is-debug {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.posture-gate-card {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(120, 53, 15, 0.22);
+  color: #fde68a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.posture-gate-card.is-ask {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(12, 74, 110, 0.28);
+  color: #bae6fd;
+}
+
+.posture-gate-card-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.turn-posture-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #7dd3fc;
+}
+
+/* dry-run 弱强调卡（A3） */
+.hitl-dry-run-card {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.hitl-dry-run-card .hitl-dry-run-badge {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+
+/* 对话：隐藏编排诊断 */
+.spring-root.cursor-workbench.cosmic-theme:not(.mode-professional) .conv-route-plan-block,
+.spring-root.cursor-workbench.cosmic-theme:not(.mode-professional) .conv-route-plan-lint,
+.spring-root.cursor-workbench.cosmic-theme:not(.mode-professional) .process-orchestration-block {
+  display: none !important;
+}
+
+/* 计划卡底色由 manager-hitl-panels.css SSOT；专业态仅增量 */
+
+.spring-root.cursor-workbench.cosmic-theme.mode-professional .conv-plan-preview.is-professional-plan .conv-plan-preview-actions {
+  border-top-color: rgba(56, 189, 248, 0.22);
+}
+
+.spring-root.cursor-workbench.cosmic-theme.mode-professional .conv-route-plan-block {
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+.spring-root.cursor-workbench.cosmic-theme.mode-professional .process-orchestration-block {
+  border-left: 3px solid rgba(56, 189, 248, 0.5);
+  padding-left: 12px;
+}
+
+.spring-root.cursor-workbench.cosmic-theme.mode-professional .process-orch-title::before {
+  content: '编排诊断 · ';
+  color: #38bdf8;
+  font-weight: 700;
+}

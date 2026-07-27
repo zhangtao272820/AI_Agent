@@ -1,0 +1,23 @@
+id: story_jingliu_act1_glass
+label: 玻璃门内
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [jingliu]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [jl_kept_after_meeting]
+prompt_snippet: |
+  【专属故事 · 权力差的另一侧 · 第1幕 · 玻璃门内】
+  会议、lookbook、第一次被她点名留下来
+  立绘气质参考：boardroom_stand, lookbook_flip, work。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [jl_kept_after_meeting]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

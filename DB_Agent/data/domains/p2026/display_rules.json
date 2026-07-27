@@ -1,0 +1,8 @@
+{
+  "yn_column_patterns": ["is_yn", "yn_", "is_yn_"],
+  "completion_context_keywords": ["完成", "确认", "检测记录", "校准", "足底", "压力", "重心", "康乐"],
+  "sync_keywords": ["同步"],
+  "enable_keywords": ["启用", "有效", "激活"],
+  "yes_no_comment_marker": "是否",
+  "column_suffix_completion": ["_cof", "_confirm", "_done"]
+}

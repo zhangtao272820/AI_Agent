@@ -1,0 +1,57 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false
+    jsonData:
+      tracesToMetrics:
+        datasourceUid: prometheus
+      tracesToLogs:
+        datasourceUid: loki
+        filterByTraceID: false
+        filterBySpanID: false
+        mapTagNamesEnabled: true
+        mappedTags:
+          - key: run_id
+            value: run_id
+          - key: trace_id
+            value: trace_id
+        tags: ["run_id", "trace_id"]
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - name: Trace
+          datasourceUid: tempo
+          matcherRegex: '"trace_id"\s*:\s*"([a-fA-F0-9-]+)"'
+          url: "$${__value.raw}"
+          urlDisplayLabel: "View Trace"
+        - name: TraceID
+          datasourceUid: tempo
+          matcherRegex: "trace_id[=:]\\s*([a-fA-F0-9-]+)"
+          url: "$${__value.raw}"
+          urlDisplayLabel: "View Trace"

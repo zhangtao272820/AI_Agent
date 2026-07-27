@@ -1,0 +1,32 @@
+[
+  {
+    "id": "policy_subsidy",
+    "question": "养老机构护理员补贴标准是多少？",
+    "expect_sources": ["养老机构服务规范"],
+    "tags": ["fact_lookup", "policy"]
+  },
+  {
+    "id": "compound_care",
+    "question": "压疮护理要求和口腔护理频次分别是多少？",
+    "expect_sources": ["养老机构服务规范"],
+    "tags": ["multi_part", "policy"]
+  },
+  {
+    "id": "income_txt",
+    "question": "我的月收入情况",
+    "expect_sources": ["个人月收入"],
+    "tags": ["fact_lookup", "personal"]
+  },
+  {
+    "id": "doc_list",
+    "question": "有哪些文档？",
+    "expect_intent": "document_list",
+    "tags": ["meta"]
+  },
+  {
+    "id": "quote_request",
+    "question": "请引用养老机构服务规范中关于人员配比的原文",
+    "expect_sources": ["养老机构服务规范"],
+    "tags": ["quote"]
+  }
+]

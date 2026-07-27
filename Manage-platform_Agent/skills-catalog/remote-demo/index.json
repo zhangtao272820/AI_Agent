@@ -1,0 +1,71 @@
+{
+  "apiVersion": "clawhive/registry/v1",
+  "registry_id": "remote_demo",
+  "name": "远程演示技能市场（本地 zip 包）",
+  "updated_at": "2026-06-12T00:00:00Z",
+  "skills": [
+    {
+      "skill_id": "text.word_count",
+      "name": "文本词数统计",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "starter",
+        "remote-demo"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "统计文本的词数、字符数、行数等基础指标",
+      "package_url": "skills-catalog/remote-demo/packages/text.word_count/1.0.0/package.zip",
+      "sha256": "640cb35e8fb0c55c90b322c41c5e1f901a5896c76b5b3c2f3ed5fd65344c3010",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "text.case_transform",
+      "name": "文本大小写转换",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "starter",
+        "remote-demo"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "对文本进行大小写转换",
+      "package_url": "skills-catalog/remote-demo/packages/text.case_transform/1.0.0/package.zip",
+      "sha256": "05a265a60fcaee834b8a8c183700958ebfd6eb12e7736fa581f65bb12f96bb44",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "data.pick_fields",
+      "name": "字段选取",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": [
+        "1.0.0"
+      ],
+      "tags": [
+        "starter",
+        "remote-demo"
+      ],
+      "compatible_agents": [
+        "*"
+      ],
+      "description": "从对象中按路径选取字段",
+      "package_url": "skills-catalog/remote-demo/packages/data.pick_fields/1.0.0/package.zip",
+      "sha256": "25314f029f877d6a6713c814462b24919a757946ae1e50980223016965bd5262",
+      "publisher": "platform",
+      "status": "published"
+    }
+  ]
+}

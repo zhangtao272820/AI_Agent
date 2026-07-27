@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.mp4
+*.raw.mp4
+*.pcm
+.env
+.env.local

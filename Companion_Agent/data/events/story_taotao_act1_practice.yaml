@@ -1,0 +1,23 @@
+id: story_taotao_act1_practice
+label: 练功房
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [taotao]
+  stage_min: friend
+  affinity_min: 50
+  flags_absent: [tt_practice_met]
+prompt_snippet: |
+  【专属故事 · 灯牌与素颜 · 第1幕 · 练功房】
+  社团/练习生室初遇，应援式友谊
+  立绘气质参考：vocal_booth, choreo_mark, school。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [tt_practice_met]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

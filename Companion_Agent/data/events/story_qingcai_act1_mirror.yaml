@@ -1,0 +1,23 @@
+id: story_qingcai_act1_mirror
+label: 镜前
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [qingcai]
+  stage_min: friend
+  affinity_min: 55
+  flags_absent: [qc_mirror]
+prompt_snippet: |
+  【专属故事 · 练舞室的夏 · 第1幕 · 镜前】
+  练舞室；她直球邀请你当观众
+  立绘气质参考：studio_mirror, rehearsal_sweat, school。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [qc_mirror, dance_practice_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

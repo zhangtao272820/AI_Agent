@@ -1,0 +1,28 @@
+# Optional Dex IdP for LAN OIDC smoke (compose profile: oidc)
+issuer: http://127.0.0.1:5556/dex
+
+storage:
+  type: memory
+
+web:
+  http: 0.0.0.0:5556
+
+telemetry:
+  http: 0.0.0.0:5558
+
+staticClients:
+  - id: clawhive
+    redirectURIs:
+      - http://127.0.0.1:18000/api/auth/oidc/callback
+      - http://localhost:18000/api/auth/oidc/callback
+    name: ClawHive
+    secret: clawhive-oidc-secret
+
+enablePasswordDB: true
+
+staticPasswords:
+  - email: "admin@example.com"
+    # bcrypt hash of "password"
+    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    username: "admin"
+    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"

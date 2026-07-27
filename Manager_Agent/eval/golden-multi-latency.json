@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "description": "P0 编排提速回归：步数上限、并行取数、墙钟上限（CI 可放宽 maxDurationMs）",
+  "prerequisites": {
+    "env": [
+      "MANAGER_PIPELINE_AUTO_CLEAN=0",
+      "MANAGER_PIPELINE_AUTO_CODE=0",
+      "MANAGER_EXECUTION_MODE_OVERRIDE=parallel",
+      "MANAGER_CRAWLER_SERP_ONLY=1",
+      "MANAGER_DATA_FANIN_MIN_PARALLEL=2",
+      "MANAGER_WEB_SEARCH=1",
+      "TAVILY_API_KEY=<或 SERPER_API_KEY>"
+    ],
+    "services": ["manager_agent", "db_agent", "extractor_agent"]
+  },
+  "cases": [
+    {
+      "id": "p0-db-ref-report",
+      "category": "P0 查人+参考范围+报告",
+      "user": "查库林婉清足底压力数据，联网查同龄参考范围，写对比报告",
+      "expect": {
+        "maxPlanSteps": 3,
+        "planAgentsNotIncludes": ["clean", "code"],
+        "phases": ["multi"],
+        "thinkingContains": ["dataFanIn并行", "parallel"],
+        "crawler": { "serpOnlyOrParallel": true },
+        "maxDurationMs": 120000
+      }
+    },
+    {
+      "id": "p0-db-only",
+      "category": "P0 纯查库",
+      "user": "查询数据库中林婉清最近一条足底压力记录",
+      "expect": {
+        "planAgentsIncludes": ["db"],
+        "planAgentsNotIncludes": ["clean", "code", "crawler"],
+        "maxPlanSteps": 2,
+        "maxDurationMs": 60000
+      }
+    },
+    {
+      "id": "p0-web-policy",
+      "category": "P0 纯联网政策",
+      "user": "联网查一下2024年养老政策要点摘要",
+      "expect": {
+        "phases": ["web_search"],
+        "planAgentsNotIncludes": ["clean", "code"],
+        "thinkingNotContains": ["全量浏览器"],
+        "maxDurationMs": 90000
+      }
+    },
+    {
+      "id": "p0-code-when-needed",
+      "category": "P0 负例：需计算才出 code",
+      "user": "查库销售数据并计算同比环比，生成柱状图",
+      "expect": {
+        "planAgentsIncludes": ["db", "code", "visualize"],
+        "maxDurationMs": 120000
+      }
+    }
+  ]
+}

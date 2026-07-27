@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "description": "GUI vs crawler 路由 golden 用例（Lobster 接入）",
+  "cases": [
+    {
+      "id": "gui_interactive_runoob",
+      "query": "打开 https://www.runoob.com/ ，点击第一个教程链接并提取标题",
+      "expectIntent": "gui",
+      "expectAllowedIncludes": ["gui"],
+      "expectAllowedExcludes": []
+    },
+    {
+      "id": "crawler_list_extract",
+      "query": "抓取 https://www.gov.cn/ 首页资讯列表标题和链接",
+      "expectIntent": "crawler",
+      "expectAllowedIncludes": ["crawler"],
+      "expectAllowedExcludes": ["gui"]
+    },
+    {
+      "id": "web_search_realtime_only",
+      "query": "今天美元兑人民币汇率是多少",
+      "expectIntent": "multi",
+      "expectAllowedIncludes": ["crawler"],
+      "expectNeedsWebSearch": true,
+      "expectAllowedExcludes": ["gui"]
+    },
+    {
+      "id": "gui_baidu_search_extract",
+      "query": "打开百度搜索「Python 教程」，提取第一条结果",
+      "expectIntent": "gui",
+      "expectAllowedIncludes": ["gui"],
+      "expectAllowedExcludes": ["crawler"]
+    },
+    {
+      "id": "gui_login_form",
+      "query": "登录后台管理系统并填写用户名密码后截图",
+      "expectIntent": "gui",
+      "expectAllowedIncludes": ["gui"],
+      "expectAllowedExcludes": ["crawler"]
+    }
+  ]
+}

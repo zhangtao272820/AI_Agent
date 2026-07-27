@@ -1,0 +1,24 @@
+id: story_xiaoyang_act2_stall
+label: 摊位
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [xiaoyang]
+  stage_min: close_friend
+  affinity_min: 78
+  flags_absent: [xyang_stall]
+  flags_present: [xyang_club]
+prompt_snippet: |
+  【专属故事 · 社团海报上的名字 · 第2幕 · 摊位】
+  文化祭并肩；告白或维持同学
+  立绘气质参考：culture_stall, date, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [xyang_stall, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

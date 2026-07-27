@@ -1,0 +1,684 @@
+/* ═══════════════════════════════════════════════════════════════
+   聊天主轨 · 单列对齐 SSOT
+   计划预览 / 对话 / 输入框 共用同一宽度与左右边界
+   ═══════════════════════════════════════════════════════════════ */
+
+.spring-root.cursor-workbench.cosmic-theme {
+  --chat-rail-pad-x: 20px;
+  --chat-rail-gap: 10px;
+  --chat-rail-max: min(
+    820px,
+    calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 2 * var(--chat-rail-pad-x, 20px) - 8px)
+  );
+  --chat-col-width: var(--chat-rail-max);
+}
+
+.spring-root.cursor-workbench.cosmic-theme.mode-professional {
+  --chat-rail-max: min(
+    880px,
+    calc(100vw - var(--mgr-sidebar-w, 260px) - var(--mgr-tools-w, 300px) - 2 * var(--chat-rail-pad-x, 20px) - 8px)
+  );
+}
+
+/* 中间列：居中承载主轨，空白区域可接收滚轮并转发至对话区 */
+.spring-root.cursor-workbench .spring-chat-column.cursor-chat-main {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.spring-root.cursor-workbench .spring-main.cursor-main-split {
+  position: relative;
+  min-height: 0;
+}
+
+/* 主轨容器：所有 UI 块共享边界 */
+.spring-root.cursor-workbench .chat-rail-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--chat-rail-gap);
+  width: 100%;
+  max-width: var(--chat-rail-max);
+  min-width: 0;
+  flex: 1 1 0%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 8px var(--chat-rail-pad-x) 12px;
+  box-sizing: border-box;
+}
+
+/* 主轨内所有块：100% 宽，禁止各自 margin 偏移 */
+.spring-root.cursor-workbench .chat-rail-stack > .conv-plan-preview,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-plan-todo,
+.spring-root.cursor-workbench .chat-rail-stack > .conv-plan-panel,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-examples,
+.spring-root.cursor-workbench .chat-rail-stack > .cosmic-chat-stage,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.spring-root.cursor-workbench .chat-rail-stack > .conv-plan-preview,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-plan-todo,
+.spring-root.cursor-workbench .chat-rail-stack > .conv-plan-panel,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-examples,
+.spring-root.cursor-workbench .chat-rail-stack > .spring-input {
+  flex-shrink: 0;
+}
+
+/* 计划确认卡：固定占位，内容区内部滚动，避免步骤列表被压扁 */
+.spring-root.cursor-workbench .chat-rail-stack > .conv-plan-preview {
+  flex-shrink: 0 !important;
+  min-height: 0 !important;
+  max-height: min(58vh, 520px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative;
+  z-index: 20;
+  isolation: isolate;
+}
+
+/* 计划确认期间：压缩对话区最小高度，避免 flex 溢出后对话层盖住操作按钮 */
+.spring-root.cursor-workbench .chat-rail-stack.has-plan-preview {
+  overflow: hidden;
+}
+
+.spring-root.cursor-workbench .chat-rail-stack.has-plan-preview > .conv-plan-preview {
+  max-height: min(46vh, 460px) !important;
+}
+
+.spring-root.cursor-workbench .chat-rail-stack.has-plan-preview > .cosmic-chat-stage {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  z-index: 1;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-head,
+.spring-root.cursor-workbench .conv-plan-preview-actions {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-actions {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.96));
+  pointer-events: auto;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-actions .spring-btn {
+  position: relative;
+  z-index: 1;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.spring-root.cursor-workbench .chat-rail-stack > .cosmic-chat-stage {
+  flex: 1 1 0% !important;
+  min-height: min(220px, 32vh) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative;
+  z-index: 1;
+}
+
+.spring-root.cursor-workbench .chat-rail-stack > .spring-input {
+  position: relative;
+  z-index: 25;
+  flex-shrink: 0 !important;
+  margin-top: auto !important;
+}
+
+/* 滚动区：不再单独居中，填满主轨 */
+.spring-root.cursor-workbench .spring-log.chat-scroll,
+.spring-root.cursor-workbench .spring-log.cosmic-panel,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel {
+  flex: 1 1 0% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: stretch !important;
+  padding: 4px 0 12px !important;
+  margin: 0 !important;
+}
+
+.spring-root.cursor-workbench .chat-thread,
+.spring-root.cursor-workbench .chat-thread.chat-messenger {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.spring-root.cursor-workbench .spring-turn {
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+.spring-root.cursor-workbench .spring-turn > .chat-user-row,
+.spring-root.cursor-workbench .spring-turn > .chat-agent-row,
+.spring-root.cursor-workbench .spring-turn > .chat-agent-stack,
+.spring-root.cursor-workbench .spring-turn > .turn-agent-pipeline,
+.spring-root.cursor-workbench .spring-turn > .cursor-thought-panel,
+.spring-root.cursor-workbench .spring-turn > .reply-panel,
+.spring-root.cursor-workbench .spring-turn > .conv-streaming-reply {
+  width: 100% !important;
+  max-width: 100% !important;
+  align-self: stretch !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* 计划确认卡 */
+.spring-root.cursor-workbench .conv-plan-preview,
+.spring-root.cursor-workbench .cursor-plan-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-list {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: none;
+  margin-bottom: 0;
+  overflow: visible;
+  overscroll-behavior: auto;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-list::-webkit-scrollbar-track {
+  background: rgba(8, 12, 32, 0.42);
+  border-radius: 999px;
+  margin: 4px 0;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.55), rgba(56, 189, 248, 0.45));
+  border-radius: 999px;
+  border: 1px solid rgba(8, 12, 32, 0.35);
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(129, 140, 248, 0.7), rgba(56, 189, 248, 0.6));
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-item {
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-check {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-agent {
+  white-space: nowrap;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-query {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-query-edit,
+.spring-root.cursor-workbench .conv-plan-preview-constraints-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.45);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 8px 10px;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-query-edit:disabled,
+.spring-root.cursor-workbench .conv-plan-preview-constraints-input:disabled {
+  opacity: 0.55;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-constraints {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-constraints-label,
+.spring-root.cursor-workbench .conv-plan-preview-optional {
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-optional {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+/* Plan Mode / Run Todo 视觉 SSOT → manager-hitl-panels.css；此处仅布局网格 */
+.spring-root.cursor-workbench .plan-mode-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spring-root.cursor-workbench .plan-step-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.22);
+  border: 1px solid rgba(165, 180, 252, 0.25);
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-item {
+  grid-template-columns: 22px auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 10px !important;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-item.is-disabled {
+  opacity: 0.45;
+}
+
+.spring-root.cursor-workbench .run-todo-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.spring-root.cursor-workbench .run-todo-progress-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+  max-width: 220px;
+}
+
+.spring-root.cursor-workbench .run-todo-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  transition: width 0.35s ease;
+}
+
+.spring-root.cursor-workbench .run-todo-index {
+  width: 18px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo,
+.spring-root.cursor-workbench .cursor-plan-rail {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.spring-root.cursor-workbench .spring-examples.cosmic-examples-strip {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* 回复 / 任务面板 / 思考过程：同宽 */
+.spring-root.cursor-workbench .reply-panel .reply-panel-inner,
+.spring-root.cursor-workbench .reply-panel .reply-panel-inner.cosmic-bubble-reply,
+.spring-root.cursor-workbench.cosmic-theme .chat-thread .reply-panel .reply-panel-inner.cosmic-bubble-reply {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.spring-root.cursor-workbench .turn-agent-pipeline,
+.spring-root.cursor-workbench .turn-agent-pipeline-inner {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel.process-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 4px 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-text {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ═══ 滚动条 SSOT · 单层滚动 + 嵌套条错开 ═══ */
+.spring-root.cursor-workbench {
+  --mgr-scroll-size: 5px;
+  --mgr-scroll-size-nested: 4px;
+  --mgr-scroll-track: rgba(8, 12, 32, 0.42);
+  --mgr-scroll-thumb: rgba(99, 102, 241, 0.52);
+  --mgr-scroll-thumb-hover: rgba(129, 140, 248, 0.72);
+  --mgr-scroll-inset: 12px;
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll,
+.spring-root.cursor-workbench .spring-log.cosmic-panel,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mgr-scroll-thumb) var(--mgr-scroll-track);
+  scrollbar-gutter: stable;
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll::-webkit-scrollbar,
+.spring-root.cursor-workbench .spring-log.cosmic-panel::-webkit-scrollbar,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel::-webkit-scrollbar {
+  width: var(--mgr-scroll-size);
+  height: var(--mgr-scroll-size);
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll::-webkit-scrollbar-track,
+.spring-root.cursor-workbench .spring-log.cosmic-panel::-webkit-scrollbar-track,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel::-webkit-scrollbar-track {
+  background: var(--mgr-scroll-track);
+  border-radius: 999px;
+  margin: 3px 0;
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll::-webkit-scrollbar-thumb,
+.spring-root.cursor-workbench .spring-log.cosmic-panel::-webkit-scrollbar-thumb,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.58), rgba(56, 189, 248, 0.42));
+  border-radius: 999px;
+  border: 1px solid rgba(8, 12, 32, 0.45);
+}
+
+.spring-root.cursor-workbench .spring-log.chat-scroll::-webkit-scrollbar-thumb:hover,
+.spring-root.cursor-workbench .spring-log.cosmic-panel::-webkit-scrollbar-thumb:hover,
+.spring-root.cursor-workbench .spring-log.cosmic-hud-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--mgr-scroll-thumb-hover), rgba(56, 189, 248, 0.58));
+}
+
+/* 思考面板：仅 body 滚动；timeline 不滚动；内条左缩进 */
+.spring-root.cursor-workbench .cursor-thought-panel .process-timeline,
+.spring-root.cursor-workbench .cursor-thought-panel .process-timeline-patches {
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll {
+  max-height: min(36vh, 420px) !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  box-sizing: border-box !important;
+  width: calc(100% - var(--mgr-scroll-inset)) !important;
+  margin-right: var(--mgr-scroll-inset) !important;
+  padding-right: 8px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.55) var(--mgr-scroll-track);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar {
+  width: var(--mgr-scroll-size-nested);
+  height: var(--mgr-scroll-size-nested);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-track,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-track {
+  background: var(--mgr-scroll-track);
+  border-radius: 999px;
+  margin: 3px 0;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-thumb,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.58), rgba(99, 102, 241, 0.45));
+  border-radius: 999px;
+  border: 1px solid rgba(8, 12, 32, 0.4);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-body::-webkit-scrollbar-thumb:hover,
+.spring-root.cursor-workbench .cursor-thought-panel .process-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(125, 211, 252, 0.72), rgba(129, 140, 248, 0.62));
+}
+
+/* 执行计划轨道 */
+.spring-root.cursor-workbench .spring-plan-todo-list {
+  max-height: min(30vh, 260px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  box-sizing: border-box !important;
+  width: calc(100% - var(--mgr-scroll-inset)) !important;
+  margin-right: var(--mgr-scroll-inset) !important;
+  padding-right: 8px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.55) var(--mgr-scroll-track);
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-list::-webkit-scrollbar {
+  width: var(--mgr-scroll-size-nested);
+  height: var(--mgr-scroll-size-nested);
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-list::-webkit-scrollbar-track {
+  background: var(--mgr-scroll-track);
+  border-radius: 999px;
+  margin: 3px 0;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.58), rgba(99, 102, 241, 0.45));
+  border-radius: 999px;
+  border: 1px solid rgba(8, 12, 32, 0.4);
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(125, 211, 252, 0.72), rgba(129, 140, 248, 0.62));
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-item {
+  /* index · check · agent · optional · query · status */
+  grid-template-columns: 18px 20px minmax(64px, auto) auto minmax(0, 1fr) auto !important;
+  align-items: start !important;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-agent {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spring-root.cursor-workbench .spring-plan-todo-query {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 计划确认卡内容区 */
+.spring-root.cursor-workbench .conv-plan-preview-body {
+  width: calc(100% - var(--mgr-scroll-inset)) !important;
+  margin-right: var(--mgr-scroll-inset) !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.55) var(--mgr-scroll-track);
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-body::-webkit-scrollbar {
+  width: var(--mgr-scroll-size-nested);
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-body::-webkit-scrollbar-track {
+  background: var(--mgr-scroll-track);
+  border-radius: 999px;
+  margin: 3px 0;
+}
+
+.spring-root.cursor-workbench .conv-plan-preview-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.58), rgba(99, 102, 241, 0.45));
+  border-radius: 999px;
+  border: 1px solid rgba(8, 12, 32, 0.4);
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step {
+  display: grid !important;
+  grid-template-columns: 14px 1fr !important;
+  gap: 0 10px !important;
+  align-items: start !important;
+  padding: 8px 0 10px 0 !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-marker {
+  margin-left: 0 !important;
+  padding-top: 5px !important;
+  grid-column: 1;
+  justify-self: center;
+  width: auto !important;
+  flex: none !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-body {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 5px 8px !important;
+  row-gap: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-kind {
+  order: 1;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-from {
+  order: 2;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-meta .meta-time {
+  order: 3;
+  margin-left: auto !important;
+  flex: 0 0 auto;
+  font-size: 11px !important;
+  color: var(--chat-text-muted, #94a3b8) !important;
+  opacity: 0.88;
+  white-space: nowrap;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-phase {
+  order: 4;
+  flex: 1 1 100%;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(167, 139, 250, 0.9);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.spring-root.cursor-workbench .cursor-thought-panel .process-step-text {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* 思考时间线排版 */
+.spring-root.cursor-workbench .cursor-thought-panel .process-timeline {
+  border-left: 2px solid rgba(100, 116, 139, 0.18) !important;
+  margin-left: 0 !important;
+  padding-left: 14px !important;
+  padding-right: 2px !important;
+}
+
+/* 输入框 */
+.spring-root.cursor-workbench .spring-input.cosmic-input-dock,
+.spring-root.cursor-workbench .spring-input.cosmic-comms-console {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+/* 空状态 / 系统信号 */
+.spring-root.cursor-workbench .cosmic-chat-empty,
+.spring-root.cursor-workbench .spring-thoughts.spring-thoughts-system {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 取消旧版偏移 margin */
+.spring-root .wb-professional-column .conv-plan-panel,
+.spring-root .wb-professional-column .conv-plan-preview,
+.spring-root .wb-chat-column .cosmic-examples-strip,
+.spring-root .wb-professional-column .cosmic-examples-strip {
+  margin: 0 !important;
+}
+
+@media (max-width: 960px) {
+  .spring-root.cursor-workbench.cosmic-theme {
+    --chat-rail-pad-x: 12px;
+    --chat-rail-max: calc(100vw - var(--mgr-sidebar-w, 0px) - var(--mgr-tools-w, 0px) - 2 * var(--chat-rail-pad-x) - 4px);
+  }
+
+  .spring-root.cursor-workbench .chat-rail-stack {
+    padding: 6px var(--chat-rail-pad-x) 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  .spring-root.cursor-workbench.cosmic-theme {
+    --chat-rail-pad-x: 10px;
+    --chat-rail-max: 100%;
+  }
+}

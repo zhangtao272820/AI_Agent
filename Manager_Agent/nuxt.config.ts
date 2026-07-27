@@ -1,0 +1,72 @@
+import { fileURLToPath } from 'node:url'
+import { isManagerWsAuthRequired } from './server/utils/platform/managerEnvModes'
+
+function agentSharedDir() {
+  return fileURLToPath(new URL('./agent-repo-shared', import.meta.url))
+}
+
+export default defineNuxtConfig({
+  alias: {
+    '#agent-shared': agentSharedDir()
+  },
+  // 组件按文件名注册（ManagerWorkbenchHeader），避免 workbench/ 前缀导致模板标签无法解析、高度塌缩为 0
+  components: [{ path: '~/components', pathPrefix: false }],
+  css: [
+    '~/assets/css/cosmic-chat-layout.css',
+    '~/assets/css/claude-chat-theme.css',
+    '~/assets/css/manager-fullscreen-layout.css',
+    '~/assets/css/amap-reply-cards.css',
+    '~/assets/css/manager-cursor-chat.css',
+    '~/assets/css/workbench-modes.css',
+    '~/assets/css/workbench-visual-enhance.css',
+    '~/assets/css/manager-chat-rail.css',
+    '~/assets/css/manager-index-scoped.css',
+    '~/assets/css/manager-index-cosmic.css',
+    /* HITL SSOT 最后加载，避免 scoped/cosmic 盖掉计划卡与风险模态 */
+    '~/assets/css/manager-hitl-panels.css',
+  ],
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
+  nitro: {
+    alias: {
+      '#agent-shared': agentSharedDir()
+    },
+    experimental: {
+      websocket: true
+    },
+    // 媒体文件统一走 server/routes/api/{files,video}/[...path].get.ts（读取 MUSIC/VIDEO_AGENT_HTTP_URL），
+    // 勿在此配置 devProxy/routeRules，否则与 Nitro 路由冲突导致 /api/files 404。
+  },
+  runtimeConfig: {
+    openaiApiKey: process.env.OPENAI_API_KEY,
+    openaiBaseUrl: process.env.OPENAI_BASE_URL ?? 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    openaiModel: process.env.OPENAI_MODEL ?? 'qwen3.5-flash',
+    langsmithTracing: process.env.LANGSMITH_TRACING ?? 'false',
+    langsmithProject: process.env.LANGSMITH_PROJECT ?? 'manager-agent-prod',
+    public: {
+      managerWsToken:
+        process.env.NUXT_PUBLIC_MANAGER_WS_TOKEN ||
+        (isManagerWsAuthRequired(process.env)
+          ? String(process.env.MANAGER_WS_TOKEN || process.env.CLAWHIVE_INTERNAL_TOKEN || '').trim()
+          : '')
+    },
+    agents: {
+      dbAgentWsUrl: process.env.DB_AGENT_WS_URL ?? 'ws://localhost:13101/api/chat.ws',
+      dbAgentHttpUrl: process.env.DB_AGENT_HTTP_URL ?? 'http://localhost:13101',
+      ragAgentHttpUrl: process.env.RAG_AGENT_HTTP_URL ?? 'http://localhost:13102',
+      codeAgentWsUrl: process.env.CODE_AGENT_WS_URL ?? 'ws://localhost:13103/_ws',
+      crawlerAgentWsUrl: process.env.CRAWLER_AGENT_WS_URL ?? 'ws://localhost:13104/_ws',
+      lobsterAgentWsUrl: process.env.LOBSTER_AGENT_WS_URL ?? 'ws://localhost:13108/_ws',
+      aiAdminAgentWsUrl: process.env.AI_ADMIN_AGENT_WS_URL ?? 'ws://localhost:13105/api/chat/ws',
+      multimodalAgentHttpUrl: process.env.MULTIMODAL_AGENT_HTTP_URL ?? 'http://localhost:13107',
+      musicAgentHttpUrl: process.env.MUSIC_AGENT_HTTP_URL ?? 'http://127.0.0.1:13110',
+      videoAgentHttpUrl: process.env.VIDEO_AGENT_HTTP_URL ?? 'http://127.0.0.1:13111',
+      musicAgentWsUrl: process.env.MUSIC_AGENT_WS_URL ?? 'ws://localhost:13110/ws',
+      videoAgentWsUrl: process.env.VIDEO_AGENT_WS_URL ?? 'ws://localhost:13111/ws/video',
+      timeoutMs: (() => {
+        const v = Number(process.env.AGENT_TIMEOUT_MS ?? 60000)
+        return Number.isFinite(v) && v > 0 ? Math.floor(v) : 60000
+      })()
+    }
+  }
+})

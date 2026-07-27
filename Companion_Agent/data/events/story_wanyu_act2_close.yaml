@@ -1,0 +1,24 @@
+id: story_wanyu_act2_close
+label: 打烊仪式
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [wanyu]
+  stage_min: close_friend
+  affinity_min: 62
+  flags_absent: [wy_closing_shared]
+  flags_present: [wy_regular_seat]
+prompt_snippet: |
+  【专属故事 · 关店之后的温度 · 第2幕 · 打烊仪式】
+  closing_wipe；你们擦同一张桌子
+  立绘气质参考：closing_wipe, tray_service, break_outside。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [wy_closing_shared]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

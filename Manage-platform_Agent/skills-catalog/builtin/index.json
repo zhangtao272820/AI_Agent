@@ -1,0 +1,112 @@
+{
+  "apiVersion": "clawhive/registry/v1",
+  "registry_id": "builtin",
+  "name": "ClawHive 内置技能市场",
+  "updated_at": "2026-06-12T00:00:00Z",
+  "skills": [
+    {
+      "skill_id": "text.word_count",
+      "name": "文本词数统计",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["text", "utility"],
+      "compatible_agents": ["*"],
+      "description": "统计文本的词数、字符数、行数等基础指标",
+      "workspace_path": "Manage-platform_Agent/skills-starter/text.word_count",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "text.case_transform",
+      "name": "文本大小写转换",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["text", "utility"],
+      "compatible_agents": ["*"],
+      "description": "对文本进行大小写转换",
+      "workspace_path": "Manage-platform_Agent/skills-starter/text.case_transform",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "data.pick_fields",
+      "name": "字段选取",
+      "kind": "executable",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["data", "utility"],
+      "compatible_agents": ["*"],
+      "description": "从对象中按路径选取字段",
+      "workspace_path": "Manage-platform_Agent/skills-starter/data.pick_fields",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "failure_recovery",
+      "name": "总管失败修复 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["manager", "fix", "p0"],
+      "compatible_agents": ["Manager_Agent"],
+      "description": "按 FailureAttribution.category 给出修复建议清单",
+      "workspace_path": "Manager_Agent/skills/failure_recovery",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "query_plan",
+      "name": "DB 查询计划 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["db", "plan", "p0"],
+      "compatible_agents": ["DB_Agent"],
+      "description": "将用户问句拆解为结构化查询计划 JSON",
+      "workspace_path": "DB_Agent/skills/query_plan",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "sql_generation",
+      "name": "DB SQL 生成 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["db", "sql", "p0"],
+      "compatible_agents": ["DB_Agent"],
+      "description": "SQL 生成、修复与预检规范",
+      "workspace_path": "DB_Agent/skills/sql_generation",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "table_judge",
+      "name": "DB 主表判定 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["db", "schema", "p1"],
+      "compatible_agents": ["DB_Agent"],
+      "description": "主表 vs 附属表 Judge 闸门原则",
+      "workspace_path": "DB_Agent/skills/table_judge",
+      "publisher": "platform",
+      "status": "published"
+    },
+    {
+      "skill_id": "route_policy",
+      "name": "DB 路由策略 Playbook",
+      "kind": "playbook",
+      "latest": "1.0.0",
+      "versions": ["1.0.0"],
+      "tags": ["db", "route", "p1"],
+      "compatible_agents": ["DB_Agent"],
+      "description": "Schema-First 路径与 L 级路由映射",
+      "workspace_path": "DB_Agent/skills/route_policy",
+      "publisher": "platform",
+      "status": "published"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Manager-only local mirror lives under Manager_Agent/; DB 本地直接用 ../shared
+agent-repo-shared/
+
+# TypeScript incremental build
+*.tsbuildinfo
+
+# Crawler checkpoints (Extractor)
+checkpoint_*.json

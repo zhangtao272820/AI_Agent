@@ -1,0 +1,12 @@
+apiVersion: v2
+name: clawhive
+description: ClawHive Agent control plane — standard chain + HPA / LiteLLM / Langfuse (P2b)
+type: application
+version: 0.3.0
+appVersion: "0.1.0"
+keywords:
+  - clawhive
+  - agents
+  - control-plane
+maintainers:
+  - name: ClawHive

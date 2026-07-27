@@ -1,0 +1,24 @@
+id: story_xiaoyou_act2_deadline
+label: 通宵与交稿
+priority: 6
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [xiaoyou]
+  stage_min: close_friend
+  affinity_min: 62
+  flags_absent: [xy_deadline_shared]
+  flags_present: [xy_atelier_invited]
+prompt_snippet: |
+  【专属故事 · 画框里的邻人 · 第2幕 · 通宵与交稿】
+  deadline_lamp 夜灯；你选陪她熬还是劝她睡
+  立绘气质参考：deadline_lamp, coffee_mug, window_rain。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [xy_deadline_shared]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

@@ -1,0 +1,35 @@
+{
+  "description": "P0 scoped query golden — rag/db/admin 子句隔离",
+  "cases": [
+    {
+      "id": "combo_rag_db_admin_real",
+      "user": "知识库查失能老人护理员配比，数据库查张三血压血糖，对比分析并出图。并创建明天10点项目周会",
+      "taskClauses": [
+        { "id": "c1", "text": "查失能老人护理员配比标准", "agents": ["rag"] },
+        { "id": "c2", "text": "查张三血压血糖记录", "agents": ["db"] },
+        { "id": "c3", "text": "创建明天10点项目周会", "agents": ["admin"] }
+      ],
+      "expectScoped": {
+        "rag": { "includes": ["护理员", "配比"], "excludes": ["张三", "血压", "周会"] },
+        "db": { "includes": ["张三", "血压"], "excludes": ["护理员", "周会"] },
+        "admin": { "includes": ["周会", "10"], "excludes": ["补贴", "张三", "血压"] }
+      }
+    },
+    {
+      "id": "combo_rag_db_weather_report",
+      "user": "知识库查失能老人补贴和高龄津贴标准，数据库查河西区70-79岁老人性别分布，写一份对比报告。并查一下天津明天的天气怎么样",
+      "taskClauses": [
+        { "id": "c1", "text": "知识库查失能老人补贴和高龄津贴标准", "agents": ["rag"] },
+        { "id": "c2", "text": "数据库查河西区70-79岁老人性别分布", "agents": ["db"] },
+        { "id": "c3", "text": "查一下天津明天的天气怎么样", "agents": ["admin"] },
+        { "id": "c4", "text": "写一份对比报告", "agents": ["report"] }
+      ],
+      "expectScoped": {
+        "rag": { "includes": ["补贴", "津贴"], "excludes": ["性别分布", "天气"] },
+        "db": { "includes": ["河西", "性别"], "excludes": ["补贴", "天气"] },
+        "admin": { "includes": ["天津", "天气"], "excludes": ["补贴", "性别分布", "报告"] }
+      },
+      "expectNoCrawler": true
+    }
+  ]
+}

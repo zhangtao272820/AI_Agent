@@ -1,0 +1,31 @@
+{
+  "name": "lobster-gui",
+  "version": "1.0.0",
+  "description": "Lobster GUI Agent — OpenClaw 类浏览器/桌面执行 + MCP export",
+  "owner": "lobster_agent",
+  "stage": "agent",
+  "mcp_tools": [
+    "run_browser_task",
+    "run_desktop_task",
+    "run_android_task",
+    "browser_snapshot",
+    "import_session",
+    "resolve_run_confirm",
+    "health"
+  ],
+  "skills": [
+    "gui_standalone",
+    "browser-automation",
+    "desktop-automation",
+    "android-automation",
+    "workflow-macros"
+  ],
+  "env": {
+    "LOBSTER_MCP_EXPORT": "1",
+    "LOBSTER_TASK_UNDERSTAND": "1",
+    "LOBSTER_BROWSER_PROFILE": "managed",
+    "LOBSTER_DESKTOP_MCP_ENABLED": "0",
+    "LOBSTER_ANDROID_MCP_ENABLED": "0",
+    "LOBSTER_MCP_USE_LOCAL_HEADED": "0"
+  }
+}

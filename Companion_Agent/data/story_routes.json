@@ -1,0 +1,1421 @@
+{
+  "version": 2,
+  "notes": "角色故事 SSOT。romance：T0/T1 主网 + T2 轻副本；neutral：2 幕羁绊线（禁恋爱，可守门影响绑定 T0 真结局）；无名背景不参与结局与分支。男主家庭轴：亲妹妹沈书璃 + 义妹沈枫音同住。",
+  "pc": {
+    "summary": "落脚小镇的上班族；亲妹妹沈书璃、义妹沈枫音同住。",
+    "home_with": [
+      "shuli",
+      "fengyin"
+    ]
+  },
+  "tier_policy": {
+    "T0": {
+      "acts": 4,
+      "unique_endings": "true + good + soft (=3)",
+      "sprite_drive": "signature / season / intimate 全程可用",
+      "gate": "绑定中立同盟 flag 卡真结局"
+    },
+    "T1": {
+      "acts": 3,
+      "unique_endings": "true + good + soft (=3)",
+      "sprite_drive": "扩包签名支撑关键幕",
+      "cross_bonds": "部分女主互有 edges"
+    },
+    "T2": {
+      "acts": 2,
+      "unique_endings": "good + soft (=2)",
+      "sprite_drive": "维持站姿换装，不依赖扩包",
+      "role": "轻副本；少跨线；结局不吃其他角色 flag"
+    },
+    "N": {
+      "acts": 2,
+      "unique_endings": "bond good + soft (=2)",
+      "sprite_drive": "中立立绘即可；禁 intimate / 恋爱签名",
+      "gate": "可卡绑定 T0 真结局；戏份高于 T2"
+    }
+  },
+  "shared_romance_endings": [
+    "ending_lover",
+    "ending_married_daily",
+    "ending_best_friend",
+    "ending_friend",
+    "ending_breakup",
+    "ending_cold_distance",
+    "ending_festival_memory",
+    "ending_qixi_vow",
+    "ending_harem_open",
+    "ending_exclusive_heart"
+  ],
+  "shared_neutral_endings": [
+    "ending_bond_ally",
+    "ending_best_friend",
+    "ending_friend",
+    "ending_festival_memory",
+    "ending_cold_distance",
+    "ending_breakup"
+  ],
+  "npc_policy": {
+    "ids": [],
+    "allowed_endings": [],
+    "story_branches": false,
+    "note": "无有名 NPC；路人立绘仅地点背景装饰，不参与结局与分支"
+  },
+  "characters": {
+    "xiaoyou": {
+      "character_id": "xiaoyou",
+      "name": "苏晚悠",
+      "tier": "T0",
+      "route_title": "画框里的邻人",
+      "theme": "创作燃烧与被看见的温柔",
+      "logline": "隔壁的插画师把生活画进线稿；你从当模特、改 deadline，到学会站在她画布对面。",
+      "acts": [
+        {
+          "id": "act1_threshold",
+          "title": "门槛与门铃",
+          "beat": "阳台寒暄→借颜料→第一次被邀请进画室",
+          "sprites": [
+            "casual",
+            "home",
+            "atelier_paint"
+          ],
+          "flags": [
+            "xy_atelier_invited"
+          ]
+        },
+        {
+          "id": "act2_deadline",
+          "title": "通宵与交稿",
+          "beat": "deadline_lamp 夜灯；你选陪她熬还是劝她睡",
+          "sprites": [
+            "deadline_lamp",
+            "coffee_mug",
+            "window_rain"
+          ],
+          "flags": [
+            "xy_deadline_shared"
+          ]
+        },
+        {
+          "id": "act3_seen",
+          "title": "被看见的作品",
+          "beat": "夜市/书店/作品集；她敢把未完成的自己给你看",
+          "sprites": [
+            "night_market",
+            "portfolio",
+            "sketch_together"
+          ],
+          "flags": [
+            "xy_portfolio_shown"
+          ]
+        },
+        {
+          "id": "act4_frame",
+          "title": "画框之外",
+          "beat": "告白不靠甜言，靠「我要和你过没画进画里的日子」",
+          "sprites": [
+            "intimate_lounge",
+            "date",
+            "balcony"
+          ],
+          "flags": [
+            "xy_life_outside_frame",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "陪她扛完大稿，并尊重创作边界",
+        "career": "帮她谈通贩/交稿，恋爱让位于事业搭档感",
+        "cozy": "少碰行业，只守邻里日常",
+        "almost": "高好感却始终停在「很好的邻居」"
+      },
+      "unique_ending_ids": [
+        "ending_xiaoyou_frame_true",
+        "ending_xiaoyou_atelier_partner",
+        "ending_xiaoyou_neighbor_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "wanyu": {
+      "character_id": "wanyu",
+      "name": "温晚雨",
+      "tier": "T0",
+      "route_title": "关店之后的温度",
+      "theme": "服务者的疲惫与被照料",
+      "logline": "她把热拿铁递给所有人，却很少有人为她关灯；你学会在打烊后留下。",
+      "acts": [
+        {
+          "id": "act1_regular",
+          "title": "熟客的座位",
+          "beat": "点单暗号、雨窗、第一次被记住口味",
+          "sprites": [
+            "work",
+            "barista_steam",
+            "rain"
+          ],
+          "flags": [
+            "wy_regular_seat"
+          ]
+        },
+        {
+          "id": "act2_close",
+          "title": "打烊仪式",
+          "beat": "closing_wipe；你们擦同一张桌子",
+          "sprites": [
+            "closing_wipe",
+            "tray_service",
+            "break_outside"
+          ],
+          "flags": [
+            "wy_closing_shared"
+          ]
+        },
+        {
+          "id": "act3_spill",
+          "title": "洒出来的真心",
+          "beat": "她谈离职犹豫、家庭电话；你选听还是劝留",
+          "sprites": [
+            "taste_cupping",
+            "shift_handoff",
+            "rain_window"
+          ],
+          "flags": [
+            "wy_heard_her_night"
+          ]
+        },
+        {
+          "id": "act4_keep",
+          "title": "为你留的那杯",
+          "beat": "告白发生在关店后的黑暗里，只开一盏吧台灯",
+          "sprites": [
+            "latte_share",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "wy_last_cup",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "陪她扛完旺季并支持她选择去留",
+        "stay": "她留下咖啡店，你们把店变成共同据点",
+        "leave": "她离职进修，异地/通勤恋爱",
+        "almost": "永远是「最懂她的熟客」"
+      },
+      "unique_ending_ids": [
+        "ending_wanyu_last_cup_true",
+        "ending_wanyu_shop_anchor",
+        "ending_wanyu_regular_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "ruolin": {
+      "character_id": "ruolin",
+      "name": "顾若铃",
+      "tier": "T0",
+      "route_title": "讲台下的一年",
+      "theme": "师生边界与成年后的对等",
+      "logline": "选修课上的年下感不是刺激，是责任；她教你把迷恋变成对等的选择。",
+      "acts": [
+        {
+          "id": "act1_lecture",
+          "title": "粉笔灰",
+          "beat": "课堂提问、office hours 第一次单独谈话",
+          "sprites": [
+            "lecture_pointer",
+            "office_hours",
+            "school"
+          ],
+          "flags": [
+            "rl_office_hours"
+          ]
+        },
+        {
+          "id": "act2_boundary",
+          "title": "边界课",
+          "beat": "她主动谈伦理与流言；你是否尊重「课结束前不越线」",
+          "sprites": [
+            "grading",
+            "evening_tea",
+            "corridor_qa"
+          ],
+          "flags": [
+            "rl_boundary_kept"
+          ]
+        },
+        {
+          "id": "act3_equal",
+          "title": "成绩单之外",
+          "beat": "学期末；她卸下讲师身份邀你散步",
+          "sprites": [
+            "campus_twilight",
+            "co_read",
+            "open_day"
+          ],
+          "flags": [
+            "rl_semester_end_walk"
+          ]
+        },
+        {
+          "id": "act4_peer",
+          "title": "对等的名字",
+          "beat": "不再称老师；在雨窗备课夜确认关系",
+          "sprites": [
+            "rain_prep",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "rl_name_without_title",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "守住学期边界，结束后对等告白",
+        "mentor": "关系停在精神导师/知己",
+        "scandal": "越界过早→流言与冷淡（走冷战/分手共享结局）",
+        "almost": "毕业后失去联系的温柔遗憾"
+      },
+      "unique_ending_ids": [
+        "ending_ruolin_peer_true",
+        "ending_ruolin_lamp_guide",
+        "ending_ruolin_mentor_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "jingliu": {
+      "character_id": "jingliu",
+      "name": "江静流",
+      "tier": "T0",
+      "route_title": "权力差的另一侧",
+      "theme": "职场面具与私人夜谈",
+      "logline": "品牌顾问的日历以分钟计；你要证明自己想要的不是绩效，是她卸妆后的脸。",
+      "acts": [
+        {
+          "id": "act1_glass",
+          "title": "玻璃门内",
+          "beat": "会议、lookbook、第一次被她点名留下来",
+          "sprites": [
+            "boardroom_stand",
+            "lookbook_flip",
+            "work"
+          ],
+          "flags": [
+            "jl_kept_after_meeting"
+          ]
+        },
+        {
+          "id": "act2_mask",
+          "title": "西装下的疲倦",
+          "beat": "加班、车内简报；她罕见地抱怨行业虚伪",
+          "sprites": [
+            "overtime",
+            "car_brief",
+            "phone_brief"
+          ],
+          "flags": [
+            "jl_saw_fatigue"
+          ]
+        },
+        {
+          "id": "act3_rooftop",
+          "title": "天台夜谈",
+          "beat": "天台夜谈；谈升迁、流言与「我们若开始会怎样」",
+          "sprites": [
+            "rooftop_night",
+            "event_glass",
+            "sample_swatch"
+          ],
+          "flags": [
+            "jl_rooftop_talk"
+          ]
+        },
+        {
+          "id": "act4_equal_desk",
+          "title": "对等工位",
+          "beat": "调岗/公开或私下确认；专一是她的底线",
+          "sprites": [
+            "date",
+            "intimate_lounge",
+            "contract_stamp"
+          ],
+          "flags": [
+            "jl_equal_choice",
+            "confessed",
+            "exclusive_accepted"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "公开或私下都诚实，接受权力结构改造",
+        "hidden": "地下恋→高压好结局变种（仍 dating）",
+        "career": "她升迁离开本地，远程维系",
+        "almost": "永远是最懂她的下属"
+      },
+      "unique_ending_ids": [
+        "ending_jingliu_rooftop_true",
+        "ending_jingliu_lookbook_heart",
+        "ending_jingliu_subordinate_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "aili": {
+      "character_id": "aili",
+      "name": "夏艾黎",
+      "tier": "T0",
+      "route_title": "旧婚书与新花束",
+      "theme": "离婚后的重建与再选择",
+      "logline": "前妻住在同一片街区；花艺工作室里，枯枝与新芽同时存在。",
+      "acts": [
+        {
+          "id": "act1_balcony",
+          "title": "阳台重逢",
+          "beat": "偶遇、客套、第一次递花却不谈旧事",
+          "sprites": [
+            "balcony",
+            "bouquet_wrap",
+            "casual"
+          ],
+          "flags": [
+            "al_balcony_remeet",
+            "balcony_chat_done"
+          ]
+        },
+        {
+          "id": "act2_stem",
+          "title": "修剪",
+          "beat": "一起修枝；谈当初为什么散——不互相审判",
+          "sprites": [
+            "stem_trim",
+            "greenhouse_mist",
+            "vase_arrange"
+          ],
+          "flags": [
+            "al_talked_divorce"
+          ]
+        },
+        {
+          "id": "act3_delivery",
+          "title": "外送的勇气",
+          "beat": "共同送花/婚礼商单；看见她已能祝福别人",
+          "sprites": [
+            "delivery_box",
+            "window_display",
+            "ribbon_cut"
+          ],
+          "flags": [
+            "al_delivery_together"
+          ]
+        },
+        {
+          "id": "act4_rewed",
+          "title": "再一次选择",
+          "beat": "不是回到从前，是签一份新的「我们」",
+          "sprites": [
+            "date",
+            "intimate_lounge",
+            "festival_spring"
+          ],
+          "flags": [
+            "al_choose_again",
+            "confessed",
+            "reconciliation_done"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "正视旧伤后重新恋爱/再婚日常",
+        "friend": "和解成家人式朋友",
+        "wound": "反复拉扯→冷战",
+        "almost": "邻里心动停在暧昧"
+      },
+      "unique_ending_ids": [
+        "ending_aili_second_bloom_true",
+        "ending_aili_gentle_remarry",
+        "ending_aili_neighbor_heart"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "linxi": {
+      "character_id": "linxi",
+      "name": "陆凛汐",
+      "tier": "T0",
+      "route_title": "工位之间的一步",
+      "theme": "逞强的实习期与并肩成长",
+      "logline": "她嘴上嫌你菜，改表格却比谁都快；恋爱从电梯与末班车开始。",
+      "acts": [
+        {
+          "id": "act1_desk",
+          "title": "对桌",
+          "beat": "借订书机、吐槽甲方、第一次一起加班",
+          "sprites": [
+            "desk_papers",
+            "work",
+            "sticky_notes"
+          ],
+          "flags": [
+            "lx_desk_sync",
+            "office_sync_done"
+          ]
+        },
+        {
+          "id": "act2_commute",
+          "title": "末班车",
+          "beat": "通勤同路；她卸下职场壳",
+          "sprites": [
+            "commute_rail",
+            "pantry_coffee",
+            "elevator_rush"
+          ],
+          "flags": [
+            "lx_commute_talk"
+          ]
+        },
+        {
+          "id": "act3_print",
+          "title": "打印室真相",
+          "beat": "竞聘/转正压力；你是否抢功或撑她",
+          "sprites": [
+            "print_stack",
+            "stamp_route",
+            "overtime"
+          ],
+          "flags": [
+            "lx_print_truth"
+          ]
+        },
+        {
+          "id": "act4_step",
+          "title": "一步之遥",
+          "beat": "转正酒或便利店罐头告白；专一",
+          "sprites": [
+            "date",
+            "casual",
+            "home"
+          ],
+          "flags": [
+            "lx_one_step",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "互相成就转正，坦白心意",
+        "rival": "竞争压过感情→毒舌知己停住",
+        "transfer": "一方调走，远程",
+        "almost": "永远的加班同盟"
+      },
+      "unique_ending_ids": [
+        "ending_linxi_onestep_true",
+        "ending_linxi_overtime_pair",
+        "ending_linxi_office_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "yeyu": {
+      "character_id": "yeyu",
+      "name": "云夜羽",
+      "tier": "T1",
+      "route_title": "针线与夜班灯",
+      "theme": "毒舌外壳下的手作温度",
+      "logline": "独立设计师白天裁布，夜里便利店遇见你；锋利的话缝着柔软的里布。",
+      "acts": [
+        {
+          "id": "act1_counter",
+          "title": "夜班柜台",
+          "beat": "便利店拌嘴，第一次看见她手指上的针眼",
+          "sprites": [
+            "casual",
+            "work",
+            "rain"
+          ],
+          "flags": [
+            "yy_night_counter",
+            "late_night_store_done"
+          ]
+        },
+        {
+          "id": "act2_atelier",
+          "title": "人台与别针",
+          "beat": "被带进工作室；mannequin_pin / fabric_drape",
+          "sprites": [
+            "mannequin_pin",
+            "fabric_drape",
+            "look_sketch"
+          ],
+          "flags": [
+            "yy_atelier_in"
+          ]
+        },
+        {
+          "id": "act3_hem",
+          "title": "熨边的沉默",
+          "beat": "她为你改一件衣服；话少，心多",
+          "sprites": [
+            "iron_hem",
+            "tape_measure",
+            "pattern_cut"
+          ],
+          "flags": [
+            "yy_hem_for_you",
+            "sharp_care_done"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "听懂毒舌，进入她的工作室与生活",
+        "muse": "你成为缪斯但关系不清",
+        "soft": "停在便利店损友"
+      },
+      "unique_ending_ids": [
+        "ending_yeyu_hem_true",
+        "ending_yeyu_sharp_heart",
+        "ending_yeyu_counter_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "taotao": {
+      "character_id": "taotao",
+      "name": "唐桃夭",
+      "tier": "T1",
+      "route_title": "灯牌与素颜",
+      "theme": "偶像练习生的曝光欲与怕被看穿",
+      "logline": "舞台上的她要被万人喜欢；下了台只想被一个人记住素颜。",
+      "acts": [
+        {
+          "id": "act1_practice",
+          "title": "练功房",
+          "beat": "社团/练习生室初遇，应援式友谊",
+          "sprites": [
+            "vocal_booth",
+            "choreo_mark",
+            "school"
+          ],
+          "flags": [
+            "tt_practice_met"
+          ]
+        },
+        {
+          "id": "act2_stage",
+          "title": "登台",
+          "beat": "演出夜；你在台下举灯牌",
+          "sprites": [
+            "handshake_look",
+            "lightstick_wave",
+            "stage_bow"
+          ],
+          "flags": [
+            "tt_stage_night",
+            "stage_encore_done"
+          ]
+        },
+        {
+          "id": "act3_plain",
+          "title": "卸妆之后",
+          "beat": "她问你爱舞台还是爱她；专一压力",
+          "sprites": [
+            "stretch_break",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "tt_plain_face",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "接受事业也守私人边界",
+        "fan": "停在最亮应援",
+        "possessive": "过度吃醋→冲突"
+      },
+      "unique_ending_ids": [
+        "ending_taotao_plain_true",
+        "ending_taotao_front_row",
+        "ending_taotao_encore_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "shizuku": {
+      "character_id": "shizuku",
+      "name": "白初雪",
+      "tier": "T1",
+      "route_title": "书脊后的声线",
+      "theme": "线上久识与线下胆怯",
+      "logline": "网友很久了，线下才敢约图书馆；安静是她的壳，也是邀请。",
+      "acts": [
+        {
+          "id": "act1_screen",
+          "title": "屏幕到台阶",
+          "beat": "第一次线下面基，坐得远远的",
+          "sprites": [
+            "quiet_reading",
+            "library_ladder",
+            "casual"
+          ],
+          "flags": [
+            "sz_first_irl"
+          ]
+        },
+        {
+          "id": "act2_stack",
+          "title": "书车与借还",
+          "beat": "archive_cart；她开始把推荐书单给你",
+          "sprites": [
+            "archive_cart",
+            "return_slot",
+            "stamp_catalog"
+          ],
+          "flags": [
+            "sz_booklist",
+            "video_call_done"
+          ]
+        },
+        {
+          "id": "act3_voice",
+          "title": "出声",
+          "beat": "闭馆后她第一次大声说喜欢",
+          "sprites": [
+            "study_carrel",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "sz_spoke_aloud",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "从文字关系到声音与体温",
+        "penpal": "退回纯线上",
+        "soft": "图书馆安静朋友"
+      },
+      "unique_ending_ids": [
+        "ending_shizuku_aloud_true",
+        "ending_shizuku_shelf_heart",
+        "ending_shizuku_quiet_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "qiansha": {
+      "character_id": "qiansha",
+      "name": "顾千纱",
+      "tier": "T1",
+      "route_title": "旧 PR 与新分支",
+      "theme": "前女友重逢与版本修复",
+      "logline": "分手像一次没合上的 PR；重逢后你们是修 bug，还是归档。",
+      "acts": [
+        {
+          "id": "act1_diff",
+          "title": "Diff",
+          "beat": "圈子重逢，客气如代码评审",
+          "sprites": [
+            "dual_monitor",
+            "work",
+            "hoodie_focus"
+          ],
+          "flags": [
+            "qs_remeet"
+          ]
+        },
+        {
+          "id": "act2_debug",
+          "title": "Debug",
+          "beat": "她照顾你/你照顾她；谈当初为什么炸",
+          "sprites": [
+            "debug_mug",
+            "pr_review",
+            "figma_compare"
+          ],
+          "flags": [
+            "qs_debug_us",
+            "sharp_care_done"
+          ]
+        },
+        {
+          "id": "act3_merge",
+          "title": "Merge",
+          "beat": "选择合入主线或保持 fork",
+          "sprites": [
+            "deploy_watch",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "qs_merge",
+            "confessed",
+            "reconciliation_done"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "和解并重新恋爱",
+        "archive": "友好归档，不再恋爱",
+        "regress": "重复旧伤→分手"
+      },
+      "unique_ending_ids": [
+        "ending_qiansha_merge_true",
+        "ending_qiansha_hotfix",
+        "ending_qiansha_archive_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "shiori": {
+      "character_id": "shiori",
+      "name": "白诗织",
+      "tier": "T1",
+      "route_title": "坡上书店的月亮",
+      "theme": "荐书人的孤独与被读懂",
+      "logline": "她把别人的故事卖出去，自己的故事夹在诗集里不卖。",
+      "acts": [
+        {
+          "id": "act1_shelf",
+          "title": "梯子",
+          "beat": "书店初识，她为你抽一本「刚好」的书",
+          "sprites": [
+            "shelf_ladder",
+            "recommend_stack",
+            "work"
+          ],
+          "flags": [
+            "sr_first_recommend"
+          ]
+        },
+        {
+          "id": "act2_moon",
+          "title": "窗边月",
+          "beat": "打烊后窗边共读；触及她的幻想/cos 爱好",
+          "sprites": [
+            "window_read",
+            "poetry_nook",
+            "unbox_crate"
+          ],
+          "flags": [
+            "sr_window_read",
+            "spirit_oath_done"
+          ]
+        },
+        {
+          "id": "act3_write",
+          "title": "空白页",
+          "beat": "她开始写自己的故事给你看",
+          "sprites": [
+            "catalog_stamp",
+            "date",
+            "home"
+          ],
+          "flags": [
+            "sr_blank_page",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "读懂她并立下私密誓约",
+        "spirit": "幻想羁绊强化",
+        "soft": "永远的荐书人"
+      },
+      "unique_ending_ids": [
+        "ending_shiori_blank_true",
+        "ending_shiori_spirit_vow",
+        "ending_shiori_recommend_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "miara": {
+      "character_id": "miara",
+      "name": "莫岚纱",
+      "tier": "T1",
+      "route_title": "谷子与星约",
+      "theme": "二次元热情与被认真对待",
+      "logline": "漫展偶遇的谷子店员请你相信一点「戏言」；认真之后，戏言会发光。",
+      "acts": [
+        {
+          "id": "act1_booth",
+          "title": "摊位",
+          "beat": "漫展相遇，假发与痛包",
+          "sprites": [
+            "merch_counter",
+            "wig_adjust",
+            "casual"
+          ],
+          "flags": [
+            "mi_booth_met"
+          ]
+        },
+        {
+          "id": "act2_sew",
+          "title": "缝纫夜",
+          "beat": "帮她赶 cos；森林夜谈",
+          "sprites": [
+            "sewing_cos",
+            "figure_restock",
+            "forest"
+          ],
+          "flags": [
+            "mi_sew_night",
+            "spirit_oath_done"
+          ]
+        },
+        {
+          "id": "act3_oath",
+          "title": "契约",
+          "beat": "星之契约从玩笑变承诺",
+          "sprites": [
+            "badge_board",
+            "date",
+            "intimate_lounge"
+          ],
+          "flags": [
+            "mi_oath_real",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "true": "把幻想落地成恋爱承诺",
+        "poly": "开放关系友好结局（靠 harem_open 共享）",
+        "soft": "展会搭子"
+      },
+      "unique_ending_ids": [
+        "ending_miara_oath_true",
+        "ending_miara_merch_heart",
+        "ending_miara_expo_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "xingnai": {
+      "character_id": "xingnai",
+      "name": "程星宁",
+      "tier": "T2",
+      "route_title": "旧相册的缺口",
+      "theme": "青梅竹马的错过与补全",
+      "logline": "从小一起长大，边界清楚得像墙；墙里夹着一张没拍完的合影。",
+      "acts": [
+        {
+          "id": "act1_bento",
+          "title": "天台便当",
+          "beat": "重拾一起吃饭的节奏",
+          "sprites": [
+            "rooftop_bento",
+            "school",
+            "casual"
+          ],
+          "flags": [
+            "xn_bento",
+            "childhood_talk_done"
+          ]
+        },
+        {
+          "id": "act2_album",
+          "title": "相册",
+          "beat": "翻旧照片；承认曾喜欢却没说",
+          "sprites": [
+            "old_photo_album",
+            "bike_after_school",
+            "date"
+          ],
+          "flags": [
+            "xn_album",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "补上告白，慢热成恋人",
+        "soft": "永远的青梅挚友"
+      },
+      "unique_ending_ids": [
+        "ending_xingnai_album_good",
+        "ending_xingnai_childhood_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "fengyin": {
+      "character_id": "fengyin",
+      "name": "沈枫音",
+      "tier": "T2",
+      "route_title": "同居屋檐下",
+      "theme": "义妹界线与成年喜欢",
+      "logline": "同一屋檐下的日常很满；要喜欢，先学会敲门。",
+      "acts": [
+        {
+          "id": "act1_door",
+          "title": "敲门",
+          "beat": "尊重私人空间；一起做饭/打游戏",
+          "sprites": [
+            "home",
+            "dorm_controller",
+            "gym_stretch"
+          ],
+          "flags": [
+            "fy_knock",
+            "fengyin_cooking_done"
+          ]
+        },
+        {
+          "id": "act2_equal",
+          "title": "平视",
+          "beat": "她要求被当成大人；告白或维持家人",
+          "sprites": [
+            "campus_run",
+            "date",
+            "casual"
+          ],
+          "flags": [
+            "fy_equal",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "在尊重界线后确认恋爱",
+        "soft": "家人式羁绊"
+      },
+      "unique_ending_ids": [
+        "ending_fengyin_knock_good",
+        "ending_fengyin_eaves_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "qingcai": {
+      "character_id": "qingcai",
+      "name": "夏晴彩",
+      "tier": "T2",
+      "route_title": "练舞室的夏",
+      "theme": "热烈倒追与舞台中心",
+      "logline": "她不藏喜欢；文化祭的灯一亮，故事就必须给答案。",
+      "acts": [
+        {
+          "id": "act1_mirror",
+          "title": "镜前",
+          "beat": "练舞室；她直球邀请你当观众",
+          "sprites": [
+            "studio_mirror",
+            "rehearsal_sweat",
+            "school"
+          ],
+          "flags": [
+            "qc_mirror",
+            "dance_practice_done"
+          ]
+        },
+        {
+          "id": "act2_festival",
+          "title": "夏祭",
+          "beat": "文化祭/舞台；确认或婉拒",
+          "sprites": [
+            "stage_bow",
+            "date",
+            "festival_spring"
+          ],
+          "flags": [
+            "qc_festival",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "接住直球，夏日成恋人",
+        "soft": "同学与最佳观众"
+      },
+      "unique_ending_ids": [
+        "ending_qingcai_summer_good",
+        "ending_qingcai_audience_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "xiaoyang": {
+      "character_id": "xiaoyang",
+      "name": "叶晓阳",
+      "tier": "T2",
+      "route_title": "社团海报上的名字",
+      "theme": "校园节奏里的喜欢",
+      "logline": "同班、相约学习；文化祭摊位把暧昧晒成阳光。",
+      "acts": [
+        {
+          "id": "act1_club",
+          "title": "海报",
+          "beat": "一起做社团事务",
+          "sprites": [
+            "club_poster",
+            "lab_coat",
+            "school"
+          ],
+          "flags": [
+            "xyang_club",
+            "club_festival_done"
+          ]
+        },
+        {
+          "id": "act2_stall",
+          "title": "摊位",
+          "beat": "文化祭并肩；告白或维持同学",
+          "sprites": [
+            "culture_stall",
+            "date",
+            "casual"
+          ],
+          "flags": [
+            "xyang_stall",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "校园恋爱",
+        "soft": "最好的同班同学"
+      },
+      "unique_ending_ids": [
+        "ending_xiaoyang_stall_good",
+        "ending_xiaoyang_classmate_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "luna": {
+      "character_id": "luna",
+      "name": "月露宁",
+      "tier": "T2",
+      "route_title": "星夜魔女的班次",
+      "theme": "轻幻想包装的认真喜欢",
+      "logline": "与温晚雨同店的她用塔罗和 cos 开玩笑；当你当真，她会脸红。",
+      "acts": [
+        {
+          "id": "act1_tarot",
+          "title": "休息室塔罗",
+          "beat": "咖啡店休息时抽牌",
+          "sprites": [
+            "break_tarot",
+            "work",
+            "astro_apron"
+          ],
+          "flags": [
+            "ln_tarot",
+            "witch_charm_done"
+          ]
+        },
+        {
+          "id": "act2_moon",
+          "title": "月亮班",
+          "beat": "夜班收尾；护符与告白",
+          "sprites": [
+            "latte_moon",
+            "date",
+            "casual"
+          ],
+          "flags": [
+            "ln_moon_shift",
+            "confessed"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "玩笑落地成恋爱",
+        "soft": "护符朋友"
+      },
+      "unique_ending_ids": [
+        "ending_luna_moon_good",
+        "ending_luna_charm_soft"
+      ],
+      "cast_kind": "romance",
+      "anchor": ""
+    },
+    "shuli": {
+      "character_id": "shuli",
+      "name": "沈书璃",
+      "tier": "N",
+      "route_title": "妹妹的日程本",
+      "theme": "家人边界与被好好照顾的哥哥",
+      "logline": "亲妹妹不许你把她当恋爱对象；她用晚饭和借书提醒，把家撑住。",
+      "acts": [
+        {
+          "id": "act1_dinner",
+          "title": "晚饭点名",
+          "beat": "她盯你乱作息；第一次认真谈「我们是家人」",
+          "sprites": [
+            "home",
+            "school",
+            "casual"
+          ],
+          "flags": [
+            "sibling_talk_done"
+          ]
+        },
+        {
+          "id": "act2_ally",
+          "title": "站在同一边",
+          "beat": "你尊重边界后，她愿意在关键头替你说话",
+          "sprites": [
+            "library",
+            "casual",
+            "home"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "sibling_ally"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "家人同盟，绝不越线",
+        "soft": "普通兄妹日常"
+      },
+      "unique_ending_ids": [
+        "ending_shuli_family_ally",
+        "ending_shuli_schedule_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "pc_family"
+    },
+    "jingning": {
+      "character_id": "jingning",
+      "name": "江静宁",
+      "tier": "N",
+      "route_title": "堂姐的观察日记",
+      "theme": "旁观职场恋与吐槽同盟",
+      "logline": "江静流的堂妹看得一清二楚；她可以吐槽，但不会跟你谈恋爱。",
+      "acts": [
+        {
+          "id": "act1_watch",
+          "title": "旁观",
+          "beat": "时尚活动上撞见；她点破你对堂姐的在意",
+          "sprites": [
+            "casual",
+            "work",
+            "campus"
+          ],
+          "flags": [
+            "cousin_watch_done"
+          ]
+        },
+        {
+          "id": "act2_toast",
+          "title": "吐槽干杯",
+          "beat": "她愿做你的情报同盟，条件是别伤害堂姐",
+          "sprites": [
+            "cafe",
+            "casual"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "cousin_ally"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "吐槽同盟",
+        "soft": "点头之交的堂妹"
+      },
+      "unique_ending_ids": [
+        "ending_jingning_watch_ally",
+        "ending_jingning_nod_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "jingliu"
+    },
+    "youwei": {
+      "character_id": "youwei",
+      "name": "柚未",
+      "tier": "N",
+      "route_title": "画室里的第三支笔",
+      "theme": "学妹视角的创作同盟",
+      "logline": "苏晚悠的工作室学妹把你当可靠模特邻居；恋情留给学姐。",
+      "acts": [
+        {
+          "id": "act1_model",
+          "title": "临时模特",
+          "beat": "她拉你当速写模特，笑学姐又熬夜",
+          "sprites": [
+            "casual",
+            "home",
+            "work"
+          ],
+          "flags": [
+            "studio_sketch_done"
+          ]
+        },
+        {
+          "id": "act2_pack",
+          "title": "通贩打包",
+          "beat": "一起帮苏晚悠打包；她承认你让学姐更安定",
+          "sprites": [
+            "casual",
+            "work"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "studio_ally"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "工作室同盟",
+        "soft": "偶尔借颜料的学妹"
+      },
+      "unique_ending_ids": [
+        "ending_youwei_studio_ally",
+        "ending_youwei_borrow_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "xiaoyou"
+    },
+    "yuxi": {
+      "character_id": "yuxi",
+      "name": "雨惜",
+      "tier": "N",
+      "route_title": "顶班的死党",
+      "theme": "护短与店里同盟",
+      "logline": "温晚雨的高中死党在店里顶班；谁让温晚雨加班，她就瞪谁。",
+      "acts": [
+        {
+          "id": "act1_cover",
+          "title": "顶班",
+          "beat": "雨夜她替温晚雨收工，顺便盘问你",
+          "sprites": [
+            "work",
+            "casual",
+            "rain"
+          ],
+          "flags": [
+            "shift_cover_done"
+          ]
+        },
+        {
+          "id": "act2_trust",
+          "title": "松口",
+          "beat": "确认你不会消耗温晚雨后，她把后厨钥匙逻辑讲给你听",
+          "sprites": [
+            "work",
+            "casual"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "shift_ally"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "死党认证的店内同盟",
+        "soft": "只会点单的熟客"
+      },
+      "unique_ending_ids": [
+        "ending_yuxi_shift_ally",
+        "ending_yuxi_order_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "wanyu"
+    },
+    "lingke": {
+      "character_id": "lingke",
+      "name": "翎可",
+      "tier": "N",
+      "route_title": "助教的红笔",
+      "theme": "边界卫士与学术同盟",
+      "logline": "顾若铃的研究生助教对越线零容忍；过关后她是最稳的答疑盟友。",
+      "acts": [
+        {
+          "id": "act1_guard",
+          "title": "警告",
+          "beat": "她明确划线：学期内勿逾矩",
+          "sprites": [
+            "work",
+            "school",
+            "casual"
+          ],
+          "flags": [
+            "boundary_guard_done"
+          ]
+        },
+        {
+          "id": "act2_pass",
+          "title": "放行",
+          "beat": "你守住边界后，她承认你可以平等地站在导师身侧",
+          "sprites": [
+            "campus",
+            "work"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "boundary_pass"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "边界过关的学术同盟",
+        "soft": "只会发通知的助教"
+      },
+      "unique_ending_ids": [
+        "ending_lingke_boundary_ally",
+        "ending_lingke_notice_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "ruolin"
+    },
+    "aichen": {
+      "character_id": "aichen",
+      "name": "艾忱",
+      "tier": "N",
+      "route_title": "闺蜜的审核",
+      "theme": "复联守门与托底同盟",
+      "logline": "夏艾黎的闺蜜礼貌审视；过审后她肯把花艺圈的后路托你一份。",
+      "acts": [
+        {
+          "id": "act1_gate",
+          "title": "审核",
+          "beat": "咖啡桌对面的盘问：你为何回头",
+          "sprites": [
+            "casual",
+            "work",
+            "cafe"
+          ],
+          "flags": [
+            "friend_gate_done"
+          ]
+        },
+        {
+          "id": "act2_hold",
+          "title": "托底",
+          "beat": "她松口：若你再伤夏艾黎，花圈会先找到你",
+          "sprites": [
+            "casual",
+            "home"
+          ],
+          "flags": [
+            "bond_ally_done",
+            "friend_hold"
+          ]
+        }
+      ],
+      "branches": {
+        "good": "闺蜜过审的托底同盟",
+        "soft": "花艺活动上的客气人"
+      },
+      "unique_ending_ids": [
+        "ending_aichen_gate_ally",
+        "ending_aichen_polite_soft"
+      ],
+      "cast_kind": "neutral",
+      "anchor": "aili"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+node_modules/
+frontend/dist/
+desktop_dist/
+__pycache__/
+*.pyc
+.venv/
+.env
+*.egg-info/
+.DS_Store
+data/campus_save.db
+data/sprites_raw/
+data/sprites/
+# 场景底图仅本地（README 仍跟踪）
+data/bgs/*.png
+data/bgs/*.jpg
+data/bgs/*.jpeg
+data/bgs/*.webp
+data/_prompt_cache/
+data/_tmp/

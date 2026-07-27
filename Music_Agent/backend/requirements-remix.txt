@@ -1,0 +1,5 @@
+# 重演绎音频链（legacy；Docker 默认 INSTALL_REMIX_DEPS=0 不安装）
+# 恢复：docker build --build-arg INSTALL_REMIX_DEPS=1
+spleeter==2.4.2
+basic-pitch[onnx]==0.4.0
+onnxruntime>=1.16.0

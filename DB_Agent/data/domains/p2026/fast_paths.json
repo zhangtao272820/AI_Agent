@@ -1,0 +1,10 @@
+{
+  "statistics_templates": [
+    { "kind": "new_trend", "description": "老人新增/录入/注册/建档按月趋势" },
+    { "kind": "age_trend", "description": "老人年龄按月趋势（含平均年龄）" },
+    { "kind": "gender_distribution", "description": "性别分布/占比" },
+    { "kind": "age_distribution", "description": "年龄分段分布" },
+    { "kind": "crowd_distribution", "description": "人群分类分布" },
+    { "kind": "region_distribution", "description": "地区/省市分布" }
+  ]
+}

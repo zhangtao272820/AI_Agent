@@ -1,0 +1,24 @@
+id: story_shiori_act3_write
+label: 空白页
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shiori]
+  stage_min: crush
+  affinity_min: 82
+  flags_absent: [sr_blank_page]
+  flags_present: [sr_window_read]
+prompt_snippet: |
+  【专属故事 · 坡上书店的月亮 · 第3幕 · 空白页】
+  她开始写自己的故事给你看
+  立绘气质参考：catalog_stamp, date, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sr_blank_page, confessed]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

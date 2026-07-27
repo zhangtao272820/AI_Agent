@@ -1,0 +1,45 @@
+{
+  "description": "Phase III 上下文澄清 golden（turnKind / clarifyKind / 窄历史）",
+  "cases": [
+    {
+      "id": "I1_output_followup",
+      "turnKind": "output_followup",
+      "clarifyKind": "output_disambiguation",
+      "user": "请问知识库中相关服务比对，同上面是环境指标还是指标汇总对比",
+      "expectCap": ["rag"],
+      "expectNeedsClarify": false,
+      "expectNarrowHistory": true
+    },
+    {
+      "id": "I2_slot_replan",
+      "turnKind": "slot_answer",
+      "clarifyKind": "none",
+      "user": "河西区 70 到 79 岁",
+      "priorUser": "查老人",
+      "expectCap": ["db"],
+      "expectNeedsClarify": false
+    },
+    {
+      "id": "I3_new_task_db",
+      "turnKind": "new_task",
+      "clarifyKind": "none",
+      "user": "查河西区 70-79 岁老人性别分布",
+      "expectCap": ["db"],
+      "expectNeedsClarify": false
+    },
+    {
+      "id": "I4_continuation",
+      "turnKind": "continuation",
+      "clarifyKind": "none",
+      "user": "继续",
+      "expectInheritDataPlane": true
+    },
+    {
+      "id": "F1_slot_clarify",
+      "turnKind": "new_task",
+      "clarifyKind": "slot",
+      "user": "查老人",
+      "expectNeedsClarify": true
+    }
+  ]
+}

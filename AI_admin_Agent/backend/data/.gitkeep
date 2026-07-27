@@ -1,0 +1,2 @@
+# Admin 持久化数据（SQLite agent_data.db、用户偏好、进化补丁等）
+# Docker 映射：backend/data → /app/data

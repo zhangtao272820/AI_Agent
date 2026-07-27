@@ -1,0 +1,14 @@
+# Docker build context（Manage-platform_Agent/nuxt-agent 从仓库根构建）
+**/.git
+**/.data
+**/.output
+**/.nuxt
+**/node_modules
+**/dist
+**/.cursor
+**/terminals
+**/*.md
+!Manage-platform_Agent/docker/**
+# 本地 junction/软链：勿覆盖镜像内 COPY shared 得到的目录
+Extractor_Agent/agent-repo-shared
+Manager_Agent/agent-repo-shared

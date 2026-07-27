@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["mode", "transformed"],
+  "properties": {
+    "mode": { "type": "string", "enum": ["upper", "lower", "title"] },
+    "transformed": { "type": "string" }
+  },
+  "additionalProperties": false
+}

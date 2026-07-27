@@ -1,0 +1,24 @@
+id: story_qiansha_act3_merge
+label: Merge
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [qiansha]
+  stage_min: crush
+  affinity_min: 82
+  flags_absent: [qs_merge]
+  flags_present: [qs_debug_us]
+prompt_snippet: |
+  【专属故事 · 旧 PR 与新分支 · 第3幕 · Merge】
+  选择合入主线或保持 fork
+  立绘气质参考：deploy_watch, date, home。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [qs_merge, confessed, reconciliation_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

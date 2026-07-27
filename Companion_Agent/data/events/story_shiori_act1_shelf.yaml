@@ -1,0 +1,23 @@
+id: story_shiori_act1_shelf
+label: 梯子
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shiori]
+  stage_min: friend
+  affinity_min: 50
+  flags_absent: [sr_first_recommend]
+prompt_snippet: |
+  【专属故事 · 坡上书店的月亮 · 第1幕 · 梯子】
+  书店初识，她为你抽一本「刚好」的书
+  立绘气质参考：shelf_ladder, recommend_stack, work。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sr_first_recommend]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

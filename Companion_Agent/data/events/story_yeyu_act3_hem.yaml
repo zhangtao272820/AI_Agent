@@ -1,0 +1,24 @@
+id: story_yeyu_act3_hem
+label: 熨边的沉默
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [yeyu]
+  stage_min: crush
+  affinity_min: 82
+  flags_absent: [yy_hem_for_you]
+  flags_present: [yy_atelier_in]
+prompt_snippet: |
+  【专属故事 · 针线与夜班灯 · 第3幕 · 熨边的沉默】
+  她为你改一件衣服；话少，心多
+  立绘气质参考：iron_hem, tape_measure, pattern_cut。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [yy_hem_for_you, sharp_care_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

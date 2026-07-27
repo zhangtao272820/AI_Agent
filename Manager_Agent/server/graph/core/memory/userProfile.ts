@@ -1,0 +1,205 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { sanitizeUserId } from '../task/userIdentity'
+
+export type UserProfile = {
+  sessionId: string
+  userId?: string
+  updatedAt: string
+  lastIntent?: string
+  lastPath?: string[]
+  lastScenarioKey?: string
+  runCount: number
+  successCount: number
+  intentCounts: Record<string, number>
+  /** 近期成功任务摘要（供路由/planner 偏好参考） */
+  recentSuccessSummaries: string[]
+  prefersRag?: boolean
+  prefersDb?: boolean
+}
+
+const PROFILE_FILE = 'manager-user-profiles.json'
+
+function summarize(text: string, max = 100) {
+  return String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max)
+}
+
+function sessionKey(sessionId: string) {
+  return `session:${String(sessionId || '').trim()}`
+}
+
+function userKey(userId: string) {
+  return `user:${sanitizeUserId(userId)}`
+}
+
+async function readProfiles(policyDir: string): Promise<Record<string, UserProfile>> {
+  try {
+    const raw = await fs.readFile(path.join(policyDir, PROFILE_FILE), 'utf8')
+    const o = JSON.parse(raw)
+    return o && typeof o === 'object' ? (o as Record<string, UserProfile>) : {}
+  } catch {
+    return {}
+  }
+}
+
+async function writeProfiles(policyDir: string, data: Record<string, UserProfile>) {
+  await fs.mkdir(policyDir, { recursive: true }).catch(() => undefined)
+  await fs.writeFile(path.join(policyDir, PROFILE_FILE), JSON.stringify(data, null, 2), 'utf8')
+}
+
+function mergeProfiles(session: UserProfile | null, user: UserProfile | null): UserProfile | null {
+  if (!session && !user) return null
+  if (!user) return session
+  if (!session) return user
+  const intentCounts = { ...user.intentCounts }
+  for (const [k, v] of Object.entries(session.intentCounts || {})) {
+    intentCounts[k] = (intentCounts[k] || 0) + v
+  }
+  const summaries = [
+    ...new Set([...(user.recentSuccessSummaries || []), ...(session.recentSuccessSummaries || [])])
+  ].slice(-5)
+  return {
+    sessionId: session.sessionId,
+    userId: user.userId || session.userId,
+    updatedAt: session.updatedAt > user.updatedAt ? session.updatedAt : user.updatedAt,
+    lastIntent: session.lastIntent || user.lastIntent,
+    lastPath: session.lastPath?.length ? session.lastPath : user.lastPath,
+    lastScenarioKey: session.lastScenarioKey || user.lastScenarioKey,
+    runCount: (user.runCount || 0) + (session.runCount || 0),
+    successCount: (user.successCount || 0) + (session.successCount || 0),
+    intentCounts,
+    recentSuccessSummaries: summaries,
+    prefersRag: session.prefersRag || user.prefersRag,
+    prefersDb: session.prefersDb || user.prefersDb
+  }
+}
+
+function applyRunToProfile(
+  prev: UserProfile | undefined,
+  sid: string,
+  uid: string | undefined,
+  run: {
+    user: string
+    intent?: string
+    path?: string[]
+    scenarioKey?: string
+    successScore?: number
+    probeRagHits?: number
+    probeDbMatched?: boolean
+  }
+): UserProfile {
+  const score = typeof run.successScore === 'number' ? run.successScore : 0.5
+  const intent = String(run.intent || '').trim() || 'unknown'
+  const intentCounts = { ...(prev?.intentCounts || {}) }
+  intentCounts[intent] = (intentCounts[intent] || 0) + 1
+
+  const profile: UserProfile = {
+    sessionId: sid,
+    userId: uid || prev?.userId,
+    updatedAt: new Date().toISOString(),
+    lastIntent: intent,
+    lastPath: Array.isArray(run.path) ? run.path : prev?.lastPath,
+    lastScenarioKey: run.scenarioKey || prev?.lastScenarioKey,
+    runCount: (prev?.runCount || 0) + 1,
+    successCount: (prev?.successCount || 0) + (score >= 0.75 ? 1 : 0),
+    intentCounts,
+    recentSuccessSummaries: [...(prev?.recentSuccessSummaries || [])],
+    prefersRag: Boolean(run.probeRagHits && run.probeRagHits > 0) || prev?.prefersRag,
+    prefersDb: Boolean(run.probeDbMatched) || prev?.prefersDb
+  }
+
+  if (score >= 0.75) {
+    const line = summarize(run.user, 100)
+    if (line) {
+      profile.recentSuccessSummaries = [...profile.recentSuccessSummaries.filter((x) => x !== line), line].slice(-5)
+    }
+  }
+  return profile
+}
+
+export async function loadUserProfile(
+  policyDir: string,
+  sessionId: string,
+  userId?: string
+): Promise<UserProfile | null> {
+  const sid = String(sessionId || '').trim()
+  if (!sid && !userId) return null
+  const all = await readProfiles(policyDir)
+  const legacy = sid ? all[sid] : undefined
+  const session = sid ? all[sessionKey(sid)] || legacy : undefined
+  const uid = sanitizeUserId(userId || '')
+  const user = uid ? all[userKey(uid)] : undefined
+  return mergeProfiles(session || null, user || null)
+}
+
+export async function updateUserProfileFromRun(
+  policyDir: string,
+  sessionId: string,
+  run: {
+    user: string
+    intent?: string
+    path?: string[]
+    scenarioKey?: string
+    successScore?: number
+    probeRagHits?: number
+    probeDbMatched?: boolean
+    userId?: string
+  }
+) {
+  const sid = String(sessionId || '').trim()
+  if (!sid) return
+  const uid = sanitizeUserId(run.userId || '')
+  const all = await readProfiles(policyDir)
+
+  const sk = sessionKey(sid)
+  all[sk] = applyRunToProfile(all[sk] || (all[sid] ? { ...all[sid], sessionId: sid } : undefined), sid, uid || undefined, run)
+  if (all[sid] && sid !== sk) delete all[sid]
+
+  if (uid) {
+    const uk = userKey(uid)
+    all[uk] = applyRunToProfile(all[uk], sid, uid, run)
+  }
+
+  await writeProfiles(policyDir, all)
+}
+
+export function formatUserProfileBlock(profile: UserProfile | null, scope?: 'session' | 'user' | 'merged'): string {
+  if (!profile || profile.runCount < 1) return ''
+  const topIntents = Object.entries(profile.intentCounts || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([k, v]) => `${k}×${v}`)
+    .join('，')
+  const scopeLabel =
+    scope === 'user' ? '跨会话用户画像' : scope === 'session' ? '本会话用户画像' : '用户画像（会话+跨会话合并）'
+  const lines = [
+    `### ${scopeLabel}（结构化记忆，供路由/planner 参考）`,
+    profile.userId ? `- 用户 ID：${profile.userId}` : '',
+    `- 累计对话 ${profile.runCount} 次，成功 ${profile.successCount} 次`,
+    topIntents ? `- 常用意图：${topIntents}` : '',
+    profile.lastIntent ? `- 最近一次意图：${profile.lastIntent}` : '',
+    profile.lastPath?.length ? `- 最近一次路径：${profile.lastPath.join('→')}` : '',
+    profile.prefersRag ? '- 历史倾向：知识库/RAG' : '',
+    profile.prefersDb ? '- 历史倾向：数据库/结构化查询' : ''
+  ]
+  if (profile.recentSuccessSummaries.length) {
+    lines.push('- 近期成功任务摘要：')
+    for (const s of profile.recentSuccessSummaries.slice(-3)) {
+      lines.push(`  - ${s}`)
+    }
+  }
+  return lines.filter(Boolean).join('\n')
+}
+
+export async function buildUserProfileRecall(
+  policyDir: string,
+  sessionId: string,
+  userId?: string
+): Promise<{ text: string; profile: UserProfile | null }> {
+  const profile = await loadUserProfile(policyDir, sessionId, userId)
+  const text = formatUserProfileBlock(profile, userId ? 'merged' : 'session')
+  return { text, profile }
+}

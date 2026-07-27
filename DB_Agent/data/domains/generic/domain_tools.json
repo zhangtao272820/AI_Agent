@@ -1,0 +1,8 @@
+{
+  "tables": {},
+  "health_link_columns": [
+    "person_id",
+    "user_id",
+    "entity_id"
+  ]
+}

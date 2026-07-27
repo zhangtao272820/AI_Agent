@@ -1,0 +1,40 @@
+name: Manager Agent E2E Nightly
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: Manager_Agent
+
+jobs:
+  e2e-golden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci || npm install
+      - name: Structural batch A smoke
+        run: npm run smoke:batch-a
+      - name: E2E golden paths (skip if agents offline)
+        env:
+          E2E_SKIP_IF_NO_AGENTS: '1'
+          MANAGER_WS_URL: ${{ vars.MANAGER_WS_URL || 'ws://127.0.0.1:13106/api/manager-ws' }}
+          RAG_AGENT_HTTP_URL: ${{ vars.RAG_AGENT_HTTP_URL || 'http://127.0.0.1:13102' }}
+          DB_AGENT_HTTP_URL: ${{ vars.DB_AGENT_HTTP_URL || 'http://127.0.0.1:13101' }}
+        run: npm run e2e:golden
+
+  ci-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Full structural CI gate
+        run: npm run ci:gate

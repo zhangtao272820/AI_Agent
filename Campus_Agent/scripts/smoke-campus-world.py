@@ -1,0 +1,287 @@
+#!/usr/bin/env python3
+"""Smoke: world systems — seating, scores, weather, mock, weekend, save."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "backend"))
+
+
+def main() -> int:
+    from app import campus_engine
+    from app.campus_store import store
+    from app import seating as seating_mod
+
+    hub = campus_engine.create_new(name="测试生", grade_tier="mid", mbti="INFP")
+    assert hub["student_count"] == 35
+    assert hub["calendar"]["period_id"] == "morning_study"
+    assert hub["calendar"]["weather_id"]
+    assert hub["pc_scores"]["total"] > 0
+
+    save = store.require_active()
+    assert len(save.seating) == 35
+    rel = seating_mod.relation_between(save.seating, "pc", save.seating[1]["student_id"])
+    assert rel in {"deskmate", "aisle", "front_back", "diagonal", "note", "none"}
+
+    # advance through a class period somehow
+    while store.require_active().period_id != "class_am":
+        campus_engine.advance_period()
+    before = store.require_active().scores["pc"]["math"]
+    campus_engine.advance_period()  # leave class_am → applies gain on advance from class
+    # gain applied when leaving class_am
+    # Actually gain is applied at start of advance when CURRENT period is class
+    # So when we were on class_am and advanced, math should rise
+    after = store.require_active().scores["pc"]["math"]
+    assert after > before, (before, after)
+
+    # study on free period
+    while store.require_active().period_id != "evening_study":
+        campus_engine.advance_period()
+        if store.require_active().day_index > 2:
+            break
+    if store.require_active().period_id == "evening_study":
+        campus_engine.travel("library")
+        eng_before = store.require_active().scores["pc"]["english"]
+        campus_engine.study(subject_id="english")
+        assert store.require_active().scores["pc"]["english"] > eng_before
+
+    mock = campus_engine.run_mock_exam()
+    assert mock["last_mock"]["pc_rank"] is not None
+    assert len(store.require_active().seating) == 35
+
+    board = campus_engine.board_public()
+    assert len(board["students"]) == 35
+    assert "event_reactions" in (board.get("today") or {})
+
+    # M10 mind tick: without API key still advances; with mock Aux applies minds
+    from app.llm_chat import NpcMindItem, NpcMindsResult
+    from app import npc_minds
+    from unittest.mock import patch
+
+    save = store.require_active()
+    candidates = npc_minds.sample_mind_candidates(save, limit=3)
+    assert 1 <= len(candidates) <= 5
+    mock_minds = NpcMindsResult(
+        minds=[
+            NpcMindItem(
+                student_id=candidates[0]["id"],
+                mood="shy",
+                thought="想问问他模考怎么样",
+                intent_type="greet",
+                blurb=f"{candidates[0].get('name')}想找你说两句。",
+                approach_pc=True,
+                affinity_delta=0.5,
+                event_take="这天气……有点烦。" if save.active_event else None,
+            )
+        ]
+    )
+    with patch("app.npc_minds.run_npc_minds", return_value=mock_minds), patch(
+        "app.npc_minds.llm_api_key", return_value="test-key"
+    ):
+        meta = npc_minds.run_mind_tick(save)
+    assert meta["used_llm"] is True
+    assert candidates[0]["id"] in save.npc_minds
+    assert save.npc_minds[candidates[0]["id"]]["mood"] == "shy"
+    assert any(i.get("from_id") == candidates[0]["id"] for i in save.pending_intents)
+
+    hub2 = campus_engine.advance_period()
+    assert "period_summary" in hub2
+    assert "pending_intents" in hub2
+    assert "event_reactions" in hub2
+
+    # push to weekend
+    save = store.require_active()
+    target_day = save.day_index
+    while store.require_active().day_kind != "weekend":
+        campus_engine.advance_period()
+        if store.require_active().day_index > target_day + 10:
+            raise AssertionError("weekend_not_reached")
+    campus_engine.weekend_roam()
+    assert store.require_active().locations_now
+
+    # manual save + reload preserves npc_minds
+    meta = store.persist(store.require_active(), kind="manual", slot=1, title="smoke")
+    sid = meta["save_id"]
+    store.clear()
+    loaded = store.load_save(sid)
+    assert loaded.protagonist["name"] == "测试生"
+    assert isinstance(getattr(loaded, "npc_minds", None), dict)
+
+    # M12–M14: talk dual-layer + interact verbs + club
+    from app import catalog
+    from app import relationship as rel_mod
+
+    hub_m = campus_engine.create_new(name="互动生", grade_tier="mid", mbti="ENFP")
+    campus_engine.travel("classroom")
+    present = [p for p in campus_engine.hub_public(store.require_active())["present"] if not p.get("is_pc")]
+    assert present, "need classmates present"
+    tid = present[0]["id"]
+    prep = campus_engine.prepare_talk(tid)
+    assert prep.get("sprite") is not None
+    assert prep.get("q_sprite") is not None
+    assert prep["q_sprite"].get("kind") == "q" or prep["q_sprite"].get("path")
+
+    chat = campus_engine.chat_turn(target_id=tid, text="早啊，今天天气不错。", verb="greet")
+    assert chat.get("line")
+    assert "q_sprite" in chat and "sprite" in chat
+
+    # study_together on free period (already morning_study)
+    save = store.require_active()
+    save.chat_actions_left = 3
+    before_aff = float((rel_mod.find_edge(save.edges, "pc", tid) or {}).get("affinity") or 0)
+
+    study_res = campus_engine.interact(target_id=tid, verb="study_together")
+    assert study_res.get("verb") == "study_together"
+    assert study_res.get("action_blurb")
+    assert "q_sprite" in study_res
+    after_edge = rel_mod.find_edge(store.require_active().edges, "pc", tid)
+    assert after_edge and float(after_edge.get("affinity") or 0) >= before_aff
+
+    # invite requires acquaintance+
+    edge = rel_mod.find_edge(store.require_active().edges, "pc", tid)
+    assert edge
+    edge["affinity"] = 20
+    edge["stage"] = "acquaintance"
+    store.require_active().chat_actions_left = 2
+    inv = campus_engine.interact(target_id=tid, verb="invite")
+    assert inv.get("verb") == "invite"
+    assert tid in store.require_active().invite_stick
+
+    # club activity on a free period
+    while True:
+        save = store.require_active()
+        pmeta = catalog.period_by_id(save.period_id, save.day_kind) or {}
+        if pmeta.get("kind") in {"free", "free_day"}:
+            break
+        campus_engine.advance_period()
+        if store.require_active().day_index > save.day_index + 3:
+            break
+    campus_engine.travel("club_room")
+    pmeta = catalog.period_by_id(store.require_active().period_id, store.require_active().day_kind) or {}
+    if pmeta.get("kind") in {"free", "free_day"}:
+        club = campus_engine.club_activity()
+        assert club.get("club_action_used") is True or club.get("last_action", {}).get("type") == "club"
+        assert "period_summary" in club
+        try:
+            campus_engine.club_activity()
+            raise AssertionError("club should be once per period")
+        except ValueError as e:
+            assert "club_already_used" in str(e)
+
+    # M15 spot action (playground) — may need free/meal period
+    while True:
+        save = store.require_active()
+        pmeta = catalog.period_by_id(save.period_id, save.day_kind) or {}
+        if pmeta.get("kind") in {"free", "free_day", "meal"}:
+            break
+        campus_engine.advance_period()
+        if store.require_active().day_index > save.day_index + 2:
+            break
+    campus_engine.travel("playground")
+    store.require_active().spot_action_used = False
+    pmeta = catalog.period_by_id(store.require_active().period_id, store.require_active().day_kind) or {}
+    if pmeta.get("kind") in {"free", "free_day", "meal"}:
+        spot = campus_engine.spot_activity(action_id="exercise")
+        assert spot.get("spot_action_used") is True or spot.get("last_action", {}).get("type") == "spot"
+        assert "period_summary" in spot
+        try:
+            campus_engine.spot_activity()
+            raise AssertionError("spot should be once per period")
+        except ValueError as e:
+            assert "spot_already_used" in str(e)
+
+    # coach is frontend-only (localStorage); save fields must still round-trip
+    meta2 = store.persist(store.require_active(), kind="manual", slot=2, title="interact-smoke")
+    store.clear()
+    loaded2 = store.load_save(meta2["save_id"])
+    assert hasattr(loaded2, "invite_stick")
+    assert hasattr(loaded2, "club_action_used")
+    assert hasattr(loaded2, "spot_action_used")
+
+    # M18: ask_out accepted → date talk prep (force accept path)
+    from unittest.mock import patch
+
+    hub_d = campus_engine.create_new(name="约会生", grade_tier="mid", mbti="ENFP")
+    while store.require_active().day_kind != "weekend":
+        campus_engine.advance_period()
+        if store.require_active().day_index > 14:
+            break
+    assert store.require_active().day_kind == "weekend"
+    campus_engine.travel("playground")
+    present_d = [p for p in campus_engine.hub_public(store.require_active())["present"] if not p.get("is_pc")]
+    assert present_d
+    tid_d = present_d[0]["id"]
+    edge_d = rel_mod.ensure_edge(
+        store.require_active().edges,
+        "pc",
+        tid_d,
+        gender_a="male",
+        gender_b=str(next(s for s in store.require_active().students if s["id"] == tid_d)["gender"]),
+    )
+    edge_d["affinity"] = 80
+    edge_d["stage"] = "close"
+    store.require_active().locations_now[tid_d] = "playground"
+    with patch("app.campus_engine.llm_api_key", return_value=None), patch(
+        "app.npc_intent.evaluate_date_response", return_value=True
+    ):
+        date_res = campus_engine.ask_out(target_id=tid_d, location_id="playground")
+    assert date_res["accepted"] is True
+    assert date_res.get("talk")
+    assert date_res["talk"].get("scene") == "date"
+    assert date_res["talk"].get("opening_line")
+    assert store.require_active().active_date
+    prep_d = campus_engine.prepare_talk(tid_d)
+    assert prep_d.get("scene") == "date"
+    stroll = campus_engine.interact(target_id=tid_d, verb="date_stroll")
+    assert stroll.get("line")
+    assert "q_sprite" in stroll
+
+    # M11: q_sprite on public + D-0 ending when day 100 ends
+    from app import sprites as sprites_mod
+
+    q = sprites_mod.resolve_q_sprite("f01")
+    assert q.get("kind") == "q"
+    assert "path" in q
+
+    hub_q = campus_engine.create_new(name="终章生", grade_tier="mid", mbti="INTJ")
+    present_npc = next(s for s in hub_q["present"] if not s.get("is_pc"))
+    assert present_npc.get("q_sprite") is not None
+    sample = next(p for loc in hub_q["locations"] for p in (loc.get("present_preview") or []) if not p.get("is_pc"))
+    assert "q_sprite" in sample
+
+    save = store.require_active()
+    save.day_index = 100
+    save.weekday = campus_engine._weekday_from_day(100)
+    save.day_kind = campus_engine._day_kind(save.weekday)
+
+    periods = catalog.period_ids(save.day_kind)
+    save.period_id = periods[-1]
+    save.ended = False
+    save.ending = None
+    end_hub = campus_engine.advance_period()
+    assert end_hub.get("ended") is True
+    assert end_hub.get("ending")
+    assert end_hub["ending"]["kind"] == "gaokao"
+    assert end_hub["ending"]["pc_rank"] >= 1
+    # second advance stays ended
+    again = campus_engine.advance_period()
+    assert again.get("ended") is True
+
+    print("OK world smoke")
+    print(" weather:", hub["calendar"]["weather_id"])
+    print(" pc_rank:", mock["last_mock"]["pc_rank"])
+    print(" weekend day:", loaded.day_index, loaded.day_kind)
+    print(" minds:", len(loaded.npc_minds))
+    print(" ending:", end_hub["ending"]["tone"], "rank", end_hub["ending"]["pc_rank"])
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except Exception as e:
+        print("FAIL:", e, file=sys.stderr)
+        raise SystemExit(1)

@@ -1,0 +1,25 @@
+{
+  "description": "Admin 子任务 paraphrase golden — 天气/路线/邮件换说法",
+  "cases": [
+    {
+      "id": "weather_city_a",
+      "user": "查一下天津今天天气怎么样",
+      "expectAdminScope": { "includes": ["天津", "天气"], "intent": "weather" }
+    },
+    {
+      "id": "weather_city_b",
+      "user": "天津气温如何",
+      "expectAdminScope": { "includes": ["天津"], "intent": "weather" }
+    },
+    {
+      "id": "route_transit",
+      "user": "坐地铁从天津西站到天津站大概多久",
+      "expectAdminScope": { "includes": ["天津西站", "天津站"], "intent": "route" }
+    },
+    {
+      "id": "email_list",
+      "user": "帮我看看最近未读邮件",
+      "expectAdminScope": { "includes": ["邮件"], "intent": "email" }
+    }
+  ]
+}

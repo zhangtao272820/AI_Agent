@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# ClawHive 客户服务器一键部署（Linux）
+# 用法：
+#   cd /path/to/agent/Manage-platform_Agent
+#   bash scripts/install-linux.sh                 # 标准版（含监控）
+#   bash scripts/install-linux.sh --extended      # + 媒体 / Lobster
+#   bash scripts/install-linux.sh --no-monitor    # 弱机跳过 Prom/Grafana/AM/Tempo/Loki
+#   bash scripts/install-linux.sh --offline       # 从 offline/images.tar 加载
+#   bash scripts/install-linux.sh --no-build
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+COMPOSE_FILE="$ROOT/docker-compose.agents-lan.yml"
+ENV_FILE="$ROOT/.env.agents-lan"
+EXAMPLE="$ROOT/.env.agents-lan.example"
+OFFLINE_DIR="$ROOT/offline"
+EXTENDED=0
+NO_BUILD=0
+NO_MONITOR=0
+OFFLINE=0
+HEALTH_TIMEOUT_SEC=180
+
+for arg in "$@"; do
+  case "$arg" in
+    --extended) EXTENDED=1 ;;
+    --no-build) NO_BUILD=1 ;;
+    --no-monitor) NO_MONITOR=1 ;;
+    --offline) OFFLINE=1; NO_BUILD=1 ;;
+    -h|--help)
+      echo "用法: bash scripts/install-linux.sh [--extended] [--no-build] [--no-monitor] [--offline]"
+      exit 0
+      ;;
+    *) echo "未知参数: $arg"; exit 1 ;;
+  esac
+done
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "错误: 未找到 docker，请先安装 Docker Engine + Compose 插件"
+  exit 1
+fi
+
+if ! docker compose version >/dev/null 2>&1; then
+  echo "错误: 需要 docker compose v2（docker compose version）"
+  exit 1
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  if [[ ! -f "$EXAMPLE" ]]; then
+    echo "错误: 缺少 $EXAMPLE"
+    exit 1
+  fi
+  cp "$EXAMPLE" "$ENV_FILE"
+  echo "已创建 $ENV_FILE，请编辑必填项后重新运行本脚本"
+  echo "  必填: LAN_HOST, CLAWHIVE_INTERNAL_TOKEN, OPENAI_API_KEY, CLAWHIVE_ADMIN_PASSWORD"
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$ENV_FILE" 2>/dev/null || true
+
+missing=()
+[[ -z "${LAN_HOST:-}" || "$LAN_HOST" == *"请"* ]] && missing+=("LAN_HOST")
+[[ -z "${CLAWHIVE_INTERNAL_TOKEN:-}" || "$CLAWHIVE_INTERNAL_TOKEN" == *"请"* ]] && missing+=("CLAWHIVE_INTERNAL_TOKEN")
+[[ -z "${OPENAI_API_KEY:-}${QWEN_API_KEY:-}${DASHSCOPE_API_KEY:-}" ]] && missing+=("OPENAI_API_KEY 或 QWEN_API_KEY")
+if ((${#missing[@]})); then
+  echo "错误: .env.agents-lan 尚未配置: ${missing[*]}"
+  exit 1
+fi
+
+# 同步 internal token 到 Manager（若存在 .env）
+MANAGER_ENV="$ROOT/../Manager_Agent/.env"
+if [[ -f "$MANAGER_ENV" ]]; then
+  if grep -q '^CLAWHIVE_INTERNAL_TOKEN=' "$MANAGER_ENV"; then
+    sed -i.bak "s|^CLAWHIVE_INTERNAL_TOKEN=.*|CLAWHIVE_INTERNAL_TOKEN=${CLAWHIVE_INTERNAL_TOKEN}|" "$MANAGER_ENV"
+  else
+    echo "CLAWHIVE_INTERNAL_TOKEN=${CLAWHIVE_INTERNAL_TOKEN}" >> "$MANAGER_ENV"
+  fi
+  if ! grep -q '^CLAWHIVE_BACKEND_URL=' "$MANAGER_ENV"; then
+    echo "CLAWHIVE_BACKEND_URL=http://${LAN_HOST}:${CLAWHIVE_BACKEND_PORT:-18000}" >> "$MANAGER_ENV"
+  fi
+fi
+
+# 可选：写入镜像 tag（未设置则保持 prod）
+if [[ -z "${CLAWHIVE_IMAGE_TAG:-}" ]]; then
+  if command -v git >/dev/null 2>&1 && git -C "$ROOT/.." rev-parse --short HEAD >/dev/null 2>&1; then
+    SHA="$(git -C "$ROOT/.." rev-parse --short HEAD)"
+    TAG="0.1.0-${SHA}"
+  else
+    TAG="prod"
+  fi
+  if grep -q '^CLAWHIVE_IMAGE_TAG=' "$ENV_FILE"; then
+    sed -i.bak "s|^CLAWHIVE_IMAGE_TAG=.*|CLAWHIVE_IMAGE_TAG=${TAG}|" "$ENV_FILE"
+  else
+    echo "CLAWHIVE_IMAGE_TAG=${TAG}" >> "$ENV_FILE"
+  fi
+  export CLAWHIVE_IMAGE_TAG="$TAG"
+  echo "CLAWHIVE_IMAGE_TAG=${CLAWHIVE_IMAGE_TAG}"
+fi
+
+if (( OFFLINE )); then
+  echo "离线模式: 校验并加载 ${OFFLINE_DIR}"
+  if [[ ! -f "$OFFLINE_DIR/SHA256SUMS" || ! -f "$OFFLINE_DIR/images.tar" ]]; then
+    echo "错误: 需要 ${OFFLINE_DIR}/images.tar 与 SHA256SUMS"
+    exit 1
+  fi
+  (
+    cd "$OFFLINE_DIR"
+    sha256sum -c SHA256SUMS
+  )
+  docker load -i "$OFFLINE_DIR/images.tar"
+fi
+
+PROFILE_ARGS=()
+if (( EXTENDED )); then
+  PROFILE_ARGS=(--profile extended)
+  echo "部署模式: 完整版（extended）"
+else
+  echo "部署模式: 标准版（平台 + Manager 协作链 + 监控）"
+fi
+if (( NO_MONITOR )); then
+  echo "监控: 跳过（--no-monitor）"
+fi
+
+UP_ARGS=(up -d "${PROFILE_ARGS[@]}")
+if (( NO_BUILD )); then
+  :
+else
+  UP_ARGS+=(--build)
+fi
+
+echo "启动 ClawHive 集群..."
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "${UP_ARGS[@]}"
+
+if (( NO_MONITOR )); then
+  docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" stop prometheus grafana alertmanager tempo loki promtail || true
+fi
+
+wait_health() {
+  local base="http://127.0.0.1:${CLAWHIVE_BACKEND_PORT:-18000}"
+  local deadline=$((SECONDS + HEALTH_TIMEOUT_SEC))
+  echo "健康门禁: 轮询 ${base}/health/ready （最多 ${HEALTH_TIMEOUT_SEC}s）"
+  while (( SECONDS < deadline )); do
+    if curl -fsS "${base}/health/ready" >/dev/null 2>&1; then
+      echo "健康门禁通过: /health/ready"
+      return 0
+    fi
+    sleep 5
+  done
+  echo "错误: 健康门禁超时（${HEALTH_TIMEOUT_SEC}s）"
+  return 1
+}
+
+if ! wait_health; then
+  exit 1
+fi
+
+echo ""
+echo "========== 部署完成 =========="
+echo "管理平台:  http://${LAN_HOST}:${CLAWHIVE_FRONTEND_PORT:-18073}  （admin / 见 .env.agents-lan）"
+echo "Manager UI: http://${LAN_HOST}:${MANAGER_PORT:-13106}"
+echo "后端健康:  http://${LAN_HOST}:${CLAWHIVE_BACKEND_PORT:-18000}/health"
+if (( ! NO_MONITOR )); then
+  echo "Grafana:    http://${LAN_HOST}:${CLAWHIVE_GRAFANA_PORT:-13000}"
+  echo "Prometheus: http://${LAN_HOST}:${CLAWHIVE_PROMETHEUS_PORT:-19090}"
+  echo "Alertmanager: http://${LAN_HOST}:${CLAWHIVE_ALERTMANAGER_PORT:-19093}"
+  echo "Tempo:      http://${LAN_HOST}:${CLAWHIVE_TEMPO_PORT:-3200}"
+  echo "Loki:       http://${LAN_HOST}:${CLAWHIVE_LOKI_PORT:-3100}"
+fi
+echo ""
+echo "日常运维: 登录控制台 → Agent 管控 / Agent 配置 → 总览"
+echo "备份: bash scripts/backup-postgres.sh"
+echo "恢复: bash scripts/restore-postgres.sh backups/<file>.sql.gz --yes"
+echo "回滚: bash scripts/rollback-agents.sh <旧CLAWHIVE_IMAGE_TAG>"
+if (( ! EXTENDED )); then
+  echo "如需媒体/Lobster: bash scripts/install-linux.sh --extended --no-build"
+fi

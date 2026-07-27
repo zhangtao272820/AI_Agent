@@ -1,0 +1,23 @@
+id: story_shizuku_act1_screen
+label: 屏幕到台阶
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shizuku]
+  stage_min: friend
+  affinity_min: 50
+  flags_absent: [sz_first_irl]
+prompt_snippet: |
+  【专属故事 · 书脊后的声线 · 第1幕 · 屏幕到台阶】
+  第一次线下面基，坐得远远的
+  立绘气质参考：quiet_reading, library_ladder, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sz_first_irl]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

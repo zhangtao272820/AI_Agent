@@ -1,0 +1,23 @@
+id: story_shuli_act1_dinner
+label: 晚饭点名
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [shuli]
+  stage_min: friend
+  affinity_min: 52
+  flags_absent: [sibling_talk_done]
+prompt_snippet: |
+  【专属故事 · 妹妹的日程本 · 第1幕 · 晚饭点名】
+  她盯你乱作息；第一次认真谈「我们是家人」
+  立绘气质参考：home, school, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [sibling_talk_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

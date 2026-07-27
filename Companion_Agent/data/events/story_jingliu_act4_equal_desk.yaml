@@ -1,0 +1,24 @@
+id: story_jingliu_act4_equal_desk
+label: 对等工位
+priority: 8
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [jingliu]
+  stage_min: dating
+  affinity_min: 85
+  flags_absent: [jl_equal_choice]
+  flags_present: [jl_rooftop_talk]
+prompt_snippet: |
+  【专属故事 · 权力差的另一侧 · 第4幕 · 对等工位】
+  调岗/公开或私下确认；专一是她的底线
+  立绘气质参考：date, intimate_lounge, contract_stamp。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [jl_equal_choice, confessed, exclusive_accepted]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

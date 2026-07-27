@@ -1,0 +1,24 @@
+id: story_jingliu_act3_rooftop
+label: 天台夜谈
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [jingliu]
+  stage_min: crush
+  affinity_min: 75
+  flags_absent: [jl_rooftop_talk]
+  flags_present: [jl_saw_fatigue]
+prompt_snippet: |
+  【专属故事 · 权力差的另一侧 · 第3幕 · 天台夜谈】
+  天台夜谈；谈升迁、流言与「我们若开始会怎样」
+  立绘气质参考：rooftop_night, event_glass, sample_swatch。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [jl_rooftop_talk]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

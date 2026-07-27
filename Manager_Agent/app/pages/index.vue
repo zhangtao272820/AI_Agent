@@ -1,0 +1,144 @@
+<template>
+  <div class="spring-root cosmic-theme cursor-workbench" :class="{ 'cosmic-agent-thinking': agentCosmicActive, 'mode-professional': workbenchMode === 'professional', 'thought-view-user': thoughtViewMode === 'user', 'thought-view-developer': thoughtViewMode === 'developer', 'posture-debug': collaborationPosture === 'debug', 'posture-ask': collaborationPosture === 'ask', 'posture-plan': collaborationPosture === 'plan' }">
+    <ClientOnly>
+    <CosmicGalaxyLane side="full" class="spring-bg-unified" :agent-thinking="agentCosmicActive" aria-hidden="true" />
+    </ClientOnly>
+    <div class="spring-container cosmic-command-deck">
+      <div class="cosmic-hud-readout" aria-hidden="true">
+        <span class="cosmic-hud-tag">STELLAR CMD</span>
+        <span class="cosmic-hud-tag">{{ connected ? 'LINK · OK' : 'LINK · OFF' }}</span>
+      </div>
+      <ManagerWorkbenchHeader
+        :connected="connected"
+        :current-run-id="currentRunId"
+        :live-phase-text="livePhaseText"
+        :route-cap-live="routeCapLive"
+        :plan-steps-todo="planStepsTodo"
+        :plan-steps-done-count="planStepsDoneCount"
+        :current-phase="currentPhase"
+        :collab-status-items="collabStatusItems"
+        :step-progress-line="stepProgressLine"
+        :active-trace-id="activeTraceId"
+        :workbench-mode="workbenchMode"
+        :thought-view-mode="thoughtViewMode"
+        :history-panel-open="historyPanelOpen"
+        :sidebar-open="sidebarOpen"
+        :tools-badge-count="toolsBadgeCount"
+        :plan-agent-label="planAgentLabel"
+        :collab-status-short="collabStatusShort"
+        @set-workbench-mode="setWorkbenchMode"
+        @set-thought-view-mode="setThoughtViewMode"
+        @toggle-history="historyPanelOpen = !historyPanelOpen"
+        @new-session="newSession"
+        @toggle-sidebar="sidebarOpen = !sidebarOpen"
+      />
+
+      <ManagerHumanConfirmBar
+        v-if="pendingHumanConfirm"
+        :title="pendingHumanConfirm.title"
+        :message="pendingHumanConfirm.message"
+        :agent="pendingHumanConfirm.agent"
+        :screenshot="pendingHumanConfirm.screenshotDataUrl || latestGuiScreenshot"
+        :page-url="pendingHumanConfirm.pageUrl"
+        :failure-type="pendingHumanConfirm.failureType"
+        :lobster-run-id="pendingHumanConfirm.lobsterRunId"
+        :sending="humanConfirmSending"
+        @confirm="respondHumanConfirm('confirm')"
+        @cancel="respondHumanConfirm('cancel')"
+      />
+
+      <div class="spring-body-row" ref="chatScrollHostEl">
+        <ManagerSessionHistoryPanel
+          :open="historyPanelOpen"
+          :backdrop-visible="historyBackdropVisible"
+          :session-id="sessionId"
+          :items="sessionHistoryItems"
+          :format-history-time="formatHistoryTime"
+          @close-backdrop="closeHistoryPanel"
+          @new-session="newSession"
+          @select="switchSession"
+          @rename="renameSessionHistory"
+          @delete="deleteSessionHistory"
+        />
+
+      <div class="spring-main cursor-main-split" ref="chatMainEl">
+          <ManagerWorkbenchSidebar />
+
+        <div class="spring-chat-column cursor-chat-main" ref="chatColumnEl" :class="workbenchMode === 'professional' ? 'wb-professional-column' : 'wb-chat-column'">
+            <ManagerChatRail :turns="visibleTurnGroups" />
+            </div>
+              </div>
+      </div>
+    </div>
+    <AppModal
+      v-model="modalOpen"
+      :mode="modalMode"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText"
+      :input-value="modalInputValue"
+      :input-placeholder="modalInputPlaceholder"
+      :input-max-length="80"
+      @confirm="onModalConfirm"
+      @cancel="onModalCancel"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import AppModal from '~/components/AppModal.vue'
+
+const {
+  agentCosmicActive,
+  workbenchMode,
+  thoughtViewMode,
+  collaborationPosture,
+  connected,
+  currentRunId,
+  livePhaseText,
+  routeCapLive,
+  planStepsTodo,
+  planStepsDoneCount,
+  currentPhase,
+  collabStatusItems,
+  stepProgressLine,
+  activeTraceId,
+  historyPanelOpen,
+  sidebarOpen,
+  toolsBadgeCount,
+  planAgentLabel,
+  collabStatusShort,
+  setWorkbenchMode,
+  setThoughtViewMode,
+  setCollaborationPosture,
+  newSession,
+  pendingHumanConfirm,
+  latestGuiScreenshot,
+  humanConfirmSending,
+  respondHumanConfirm,
+  chatScrollHostEl,
+  historyBackdropVisible,
+  sessionId,
+  sessionHistoryItems,
+  formatHistoryTime,
+  closeHistoryPanel,
+  switchSession,
+  renameSessionHistory,
+  deleteSessionHistory,
+  chatMainEl,
+  visibleTurnGroups,
+  chatColumnEl,
+  modalOpen,
+  modalMode,
+  modalTitle,
+  modalMessage,
+  modalConfirmText,
+  modalCancelText,
+  modalInputValue,
+  modalInputPlaceholder,
+  onModalConfirm,
+  onModalCancel
+} = useManagerChatPage()
+</script>
+

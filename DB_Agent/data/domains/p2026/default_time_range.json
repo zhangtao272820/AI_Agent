@@ -1,0 +1,7 @@
+{
+  "最近": { "relative_days": 30, "description": "最近 30 天" },
+  "近期": { "relative_days": 30, "description": "最近 30 天" },
+  "本月": { "relative_days": 0, "description": "当前自然月（按事实表时间列）" },
+  "上周": { "relative_days": 7, "description": "最近 7 天" },
+  "今年": { "relative_days": 365, "description": "当前自然年" }
+}

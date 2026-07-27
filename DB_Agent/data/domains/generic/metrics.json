@@ -1,0 +1,24 @@
+{
+  "metrics": [
+    {
+      "id": "schema_table_count",
+      "title": "当前库表数量",
+      "description": "information_schema 统计 BASE TABLE",
+      "match_hints": ["多少张表", "表数量", "几个表", "数据库有几张表", "有多少表"],
+      "sql": "SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'"
+    },
+    {
+      "id": "schema_column_count",
+      "title": "当前库列总数",
+      "match_hints": ["多少列", "字段数量", "列总数", "多少个字段"],
+      "sql": "SELECT COUNT(*) AS count FROM information_schema.columns WHERE table_schema = DATABASE()"
+    },
+    {
+      "id": "schema_largest_tables",
+      "title": "表行数 Top10",
+      "description": "按 information_schema.tables.table_rows 估算",
+      "match_hints": ["最大的表", "哪张表数据最多", "表行数排名", "top表"],
+      "sql": "SELECT table_name AS label, table_rows AS count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE' ORDER BY table_rows DESC LIMIT 10"
+    }
+  ]
+}

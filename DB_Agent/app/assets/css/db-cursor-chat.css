@@ -1,0 +1,311 @@
+/* DB 养老信息助手 · Cursor 式历史侧栏与输入区 */
+
+.db-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.db-history-row {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(179, 199, 255, 0.12);
+  background: rgba(8, 12, 28, 0.45);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.db-history-row:hover {
+  border-color: rgba(120, 160, 255, 0.32);
+  background: rgba(20, 28, 52, 0.55);
+}
+
+.db-history-row.active {
+  border-color: rgba(120, 160, 255, 0.48);
+  background: rgba(80, 120, 200, 0.14);
+  box-shadow: inset 3px 0 0 rgba(179, 199, 255, 0.65);
+}
+
+.db-history-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.55rem 0.65rem 0.35rem;
+  cursor: pointer;
+  color: #e7eaf3;
+}
+
+.db-history-item-title {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.db-history-item-meta {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(170, 178, 213, 0.9);
+  margin-top: 0.15rem;
+}
+
+.db-history-item-actions {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 0.45rem 0.45rem;
+  min-height: 1.65rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.db-history-row:hover .db-history-item-actions,
+.db-history-row.active .db-history-item-actions,
+.db-history-row:focus-within .db-history-item-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.db-history-action-btn {
+  flex: 1;
+  font-size: 0.65rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(179, 199, 255, 0.16);
+  background: rgba(8, 12, 28, 0.45);
+  color: #aab2d5;
+  padding: 0.2rem 0.35rem;
+  cursor: pointer;
+}
+
+.db-history-action-btn:hover {
+  border-color: rgba(120, 160, 255, 0.4);
+  color: #e7eaf3;
+}
+
+.db-history-action-btn.danger:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fecaca;
+}
+
+.db-chat-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 8rem;
+  color: #aab2d5;
+  font-size: 0.85rem;
+}
+
+.db-chat-loading-dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(120, 160, 255, 0.25);
+  border-top-color: #b3c7ff;
+  border-radius: 50%;
+  animation: db-spin 0.85s linear infinite;
+}
+
+@keyframes db-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.db-send-cancel.is-cancel {
+  background: rgba(220, 100, 100, 0.88) !important;
+  border-color: rgba(255, 140, 140, 0.45) !important;
+}
+
+.db-send-cancel.is-cancel:hover:not(:disabled) {
+  background: rgba(240, 120, 120, 0.92) !important;
+}
+
+.db-feedback-ack {
+  margin: 0.35rem 0 0;
+  font-size: 0.68rem;
+  color: #a8e8c8;
+  line-height: 1.45;
+}
+
+.db-input-hint {
+  font-size: 0.65rem;
+  color: rgba(170, 178, 213, 0.75);
+  margin-bottom: 0.35rem;
+  text-align: right;
+}
+
+.db-answer-main {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.78;
+  letter-spacing: 0.02em;
+  color: #e7eaf3;
+}
+
+.db-process-panel {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(120, 160, 255, 0.18);
+  background: rgba(4, 6, 16, 0.5);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.db-process-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 11px;
+  color: rgba(201, 212, 255, 0.92);
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.db-process-toggle:hover {
+  background: rgba(120, 160, 255, 0.08);
+}
+
+.db-process-count {
+  margin-left: auto;
+  color: rgba(170, 178, 213, 0.85);
+  font-size: 10px;
+}
+
+.db-process-chevron {
+  color: rgba(170, 178, 213, 0.75);
+  font-size: 10px;
+}
+
+.db-process-steps {
+  border-top: 1px solid rgba(120, 160, 255, 0.12);
+  padding: 0.35rem 0.55rem 0.5rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.db-process-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(203, 213, 225, 0.88);
+  padding: 0.2rem 0;
+}
+
+.db-process-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+  background: rgba(120, 160, 255, 0.65);
+}
+
+.db-process-step.kind-status .db-process-text {
+  color: rgba(201, 212, 255, 0.95);
+}
+
+.db-workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 0;
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.db-history-aside {
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  border-radius: 14px 0 0 14px;
+  border: 1px solid rgba(179, 199, 255, 0.16);
+  border-right: none;
+  background: rgba(6, 8, 20, 0.82);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+}
+
+.db-history-aside.open {
+  width: 15rem;
+}
+
+.db-history-inner {
+  width: 15rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.db-chat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid rgba(179, 199, 255, 0.12);
+  background: rgba(6, 8, 20, 0.55);
+}
+
+.db-chat-toolbar-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #c9d4ff;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.db-toolbar-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(179, 199, 255, 0.2);
+  background: rgba(120, 160, 255, 0.08);
+  color: #c9d4ff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.db-toolbar-btn:hover {
+  background: rgba(120, 160, 255, 0.16);
+}
+
+.db-toolbar-btn.active {
+  border-color: rgba(120, 160, 255, 0.45);
+  background: rgba(120, 160, 255, 0.18);
+}
+
+.composer-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.composer-row .input {
+  flex: 1;
+}

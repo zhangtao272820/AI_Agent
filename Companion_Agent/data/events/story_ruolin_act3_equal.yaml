@@ -1,0 +1,24 @@
+id: story_ruolin_act3_equal
+label: 成绩单之外
+priority: 7
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [ruolin]
+  stage_min: crush
+  affinity_min: 75
+  flags_absent: [rl_semester_end_walk]
+  flags_present: [rl_boundary_kept]
+prompt_snippet: |
+  【专属故事 · 讲台下的一年 · 第3幕 · 成绩单之外】
+  学期末；她卸下讲师身份邀你散步
+  立绘气质参考：campus_twilight, co_read, open_day。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [rl_semester_end_walk]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

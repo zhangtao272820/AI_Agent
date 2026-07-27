@@ -1,0 +1,23 @@
+id: story_linxi_act1_desk
+label: 对桌
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [linxi]
+  stage_min: friend
+  affinity_min: 48
+  flags_absent: [lx_desk_sync]
+prompt_snippet: |
+  【专属故事 · 工位之间的一步 · 第1幕 · 对桌】
+  借订书机、吐槽甲方、第一次一起加班
+  立绘气质参考：desk_papers, work, sticky_notes。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [lx_desk_sync, office_sync_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

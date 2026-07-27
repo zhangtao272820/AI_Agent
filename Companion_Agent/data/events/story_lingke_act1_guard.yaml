@@ -1,0 +1,23 @@
+id: story_lingke_act1_guard
+label: 警告
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [lingke]
+  stage_min: friend
+  affinity_min: 52
+  flags_absent: [boundary_guard_done]
+prompt_snippet: |
+  【专属故事 · 助教的红笔 · 第1幕 · 警告】
+  她明确划线：学期内勿逾矩
+  立绘气质参考：work, school, casual。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [boundary_guard_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

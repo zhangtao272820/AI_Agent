@@ -1,0 +1,23 @@
+id: story_aichen_act1_gate
+label: 审核
+priority: 5
+once: true
+chance: 1.0
+scene_id: ""
+trigger:
+  character_ids: [aichen]
+  stage_min: friend
+  affinity_min: 52
+  flags_absent: [friend_gate_done]
+prompt_snippet: |
+  【专属故事 · 闺蜜的审核 · 第1幕 · 审核】
+  咖啡桌对面的盘问：你为何回头
+  立绘气质参考：casual, work, cafe。
+  用角色口吻推进这一幕的情绪与选择；可给 2～3 个短选项。
+  不要直接宣布结局名称；关系阶段由系统判定。
+rewards:
+  flags_set: [friend_gate_done]
+choice_effects:
+  - { trust_delta: 3, affinity_delta: 3 }
+  - { trust_delta: 2, affinity_delta: 2 }
+  - { trust_delta: -2, affinity_delta: -1 }

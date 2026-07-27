@@ -1,0 +1,15 @@
+apiVersion: clawhive/v1
+kind: Skill
+metadata:
+  id: text.case_transform
+  name: 文本大小写转换
+  version: 1.0.0
+  description: 将输入文本按指定模式转换为大写、小写或标题格式
+  owner: platform
+  tags: [text, transform, utility]
+spec:
+  runtime: python3.11
+  entry: entrypoint/main.py:run
+  io:
+    inputSchema: schemas/input.schema.json
+    outputSchema: schemas/output.schema.json

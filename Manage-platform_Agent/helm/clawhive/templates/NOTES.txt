@@ -1,0 +1,15 @@
+1. Create namespace (if needed):
+   kubectl create namespace {{ include "clawhive.namespace" . }}
+
+2. ClawHive console (NodePort):
+   http://<node-ip>:{{ .Values.frontend.nodePort }}
+   Backend health: http://<node-ip>:{{ .Values.backend.nodePort }}/health/ready
+
+3. Agent control mode is kubernetes (no docker.sock).
+   Console start/stop scales Deployments named like docker_service
+   (db_agent, manager_agent, ...).
+
+4. Optional: disable monitoring
+   helm upgrade {{ .Release.Name }} . --set monitoring.enabled=false
+
+5. Compose remains the default LAN path; this chart is the K8s delivery track (P2a).

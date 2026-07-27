@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "#agent-shared/*": ["./agent-repo-shared/*"]
+    }
+  },
+  "include": ["scripts/**/*.ts", "server/**/*.ts", "shared/**/*.ts", "../shared/**/*.ts"]
+}
